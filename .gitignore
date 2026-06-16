@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+venv/
+.env
+
+# Model weights (too large for git)
+backend/weights/*.pt
+backend/weights/*.onnx
+backend/weights/*.pth
+!backend/weights/.gitkeep
+
+# Outputs (generated at runtime)
+outputs/
+*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Data (large files)
+data/sample_images/*.jpg
+data/sample_images/*.png
+data/sample_videos/*.mp4
+!data/sample_images/.gitkeep
+!data/sample_videos/.gitkeep
+
+# Agents
+.agents/
