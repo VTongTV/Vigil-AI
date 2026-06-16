@@ -14,7 +14,7 @@ import numpy as np
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from sqlalchemy.orm import Session
 
-from backend.app.config import get_violation_config, settings
+from backend.app.config import get_camera_info, get_violation_config, settings
 from backend.app.core.evidence import (
     VIOLATION_INFO,
     generate_evidence_image,
@@ -159,6 +159,7 @@ async def detect_violations(
     # Build violation records for response
     now = datetime.now(timezone.utc)
     violation_records = []
+    camera_info = get_camera_info(camera_id) if camera_id else {}
 
     for i, v in enumerate(violations):
         v_type = v["type"]
@@ -199,6 +200,9 @@ async def detect_violations(
             status=ViolationStatus.PENDING,
             data_source=DataSource.LIVE,
             camera_id=camera_id,
+            junction_name=camera_info.get("junction_name"),
+            latitude=camera_info.get("latitude"),
+            longitude=camera_info.get("longitude"),
             timestamp=now,
             evidence_url=evidence_url,
             evidence_hash=evidence_hash,
@@ -267,6 +271,9 @@ def _save_violation_to_db(
             status=ViolationStatusDB.PENDING.value,
             data_source="live",
             camera_id=camera_id,
+            junction_name=record.junction_name,
+            latitude=record.latitude,
+            longitude=record.longitude,
             timestamp=record.timestamp,
             evidence_url=record.evidence_url,
             evidence_hash=record.evidence_hash,

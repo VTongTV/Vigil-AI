@@ -80,6 +80,9 @@ class ViolationRecord(BaseModel):
     status: ViolationStatus = ViolationStatus.PENDING
     data_source: DataSource = DataSource.LIVE
     camera_id: Optional[str] = None
+    junction_name: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     evidence_url: Optional[str] = None
     evidence_hash: Optional[str] = None

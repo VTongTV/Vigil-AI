@@ -41,6 +41,9 @@ export interface ViolationRecord {
   status: ViolationStatus;
   data_source: DataSource;
   camera_id: string | null;
+  junction_name: string | null;
+  latitude: number | null;
+  longitude: number | null;
   timestamp: string;
   evidence_url: string | null;
   evidence_hash: string | null;
