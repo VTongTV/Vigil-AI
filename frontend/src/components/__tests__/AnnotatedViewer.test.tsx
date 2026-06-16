@@ -83,7 +83,8 @@ beforeEach(() => {
     shadowColor: 'rgba(0, 0, 0, 0)',
     shadowOffsetX: 0,
     shadowOffsetY: 0,
-  })) as unknown as CanvasRenderingContext2D;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  })) as any;
 });
 
 describe('AnnotatedViewer', () => {

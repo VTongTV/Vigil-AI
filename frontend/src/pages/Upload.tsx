@@ -26,10 +26,15 @@ import AnnotatedViewer from "@/components/AnnotatedViewer";
 
 const DEMO_CAMERAS = [
   { id: "MGROAD-01", name: "MG Road — Trinity Circle" },
-  { id: "KORMANGALA-01", name: "Koramangala — Sony Junction" },
-  { id: "INDIRANAGAR-01", name: "Indiranagar — 100ft Road" },
-  { id: "HEBBAL-01", name: "Hebbal Flyover" },
   { id: "SILKBOARD-01", name: "Silk Board Junction" },
+  { id: "HEBBAL-01", name: "Hebbal Flyover" },
+  { id: "WHITEFIELD-01", name: "Whitefield Main Road" },
+  { id: "ELECTRONIC-01", name: "Electronic City Phase 1" },
+  { id: "MARATHAHALLI-01", name: "Marathahalli Bridge" },
+  { id: "KRPURAM-01", name: "KR Puram Railway Junction" },
+  { id: "YELAHANKA-01", name: "Yelahanka New Town" },
+  { id: "BANNERGHATTA-01", name: "Bannerghatta Road — Jayadeva" },
+  { id: "KORMANGALA-01", name: "Koramangala 100ft Road" },
 ];
 
 /** Mapping from timing_breakdown keys to display labels and CSS colors. */
