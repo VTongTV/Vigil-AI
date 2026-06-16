@@ -1,9 +1,15 @@
+/**
+ * Analytics page — violation trend charts, statistics, camera breakdown,
+ * and an ROI Calculator showing Conservative vs Aggressive projections.
+ */
+
 import { useEffect, useState } from "react";
 import {
   BarChart3,
   Camera,
   TrendingUp,
   AlertTriangle,
+  IndianRupee,
 } from "lucide-react";
 import {
   BarChart,
@@ -31,6 +37,20 @@ const PIE_COLORS = [
   "oklch(65% 0.18 320)",
   "oklch(65% 0.15 210)",
   "oklch(55% 0.22 20)",
+];
+
+/** ROI Calculator table data per plan.md Section 12. */
+const ROI_DATA = [
+  { metric: "Junctions", conservative: "500", aggressive: "500" },
+  { metric: "Violations / day", conservative: "40,000", aggressive: "80,000" },
+  {
+    metric: "Annual Recovery",
+    conservative: "₹219 Cr",
+    aggressive: "₹438 Cr",
+  },
+  { metric: "Investment", conservative: "₹2.5 Cr", aggressive: "₹2.5 Cr" },
+  { metric: "Payback", conservative: "< 1 week", aggressive: "< 1 week" },
+  { metric: "ROI", conservative: "87×", aggressive: "175×" },
 ];
 
 export default function Analytics() {
@@ -151,12 +171,13 @@ export default function Analytics() {
                   }}
                 />
                 <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                  {typeData.map((entry, i) => (
+                  {typeData.map((entry) => (
                     <Cell
                       key={entry.key}
                       fill={
-                        VIOLATION_COLORS[entry.key as keyof typeof VIOLATION_COLORS] ??
-                        PIE_COLORS[i % PIE_COLORS.length]
+                        VIOLATION_COLORS[
+                          entry.key as keyof typeof VIOLATION_COLORS
+                        ] ?? PIE_COLORS[0]
                       }
                     />
                   ))}
@@ -187,14 +208,20 @@ export default function Analytics() {
                     <Cell
                       key={i}
                       fill={
-                        ["var(--color-success)", "var(--color-warning)", "var(--color-danger)"][i] ??
-                        PIE_COLORS[i]
+                        [
+                          "var(--color-success)",
+                          "var(--color-warning)",
+                          "var(--color-danger)",
+                        ][i] ?? PIE_COLORS[i]
                       }
                     />
                   ))}
                 </Pie>
                 <Legend
-                  wrapperStyle={{ fontSize: "11px", color: "var(--color-ink-muted)" }}
+                  wrapperStyle={{
+                    fontSize: "11px",
+                    color: "var(--color-ink-muted)",
+                  }}
                 />
                 <Tooltip />
               </PieChart>
@@ -271,10 +298,58 @@ export default function Analytics() {
           </div>
         </section>
       )}
+
+      {/* ROI Calculator */}
+      <section className="mt-6 rounded-lg border border-[var(--color-paper-3)] bg-[var(--color-paper-1)] p-5">
+        <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-[var(--color-ink)]">
+          <IndianRupee className="h-4 w-4 text-[var(--color-warning)]" />
+          ROI Calculator
+        </h2>
+        <p className="mb-4 text-xs text-[var(--color-ink-muted)]">
+          Projected financial impact based on Bengaluru-wide deployment across
+          500 junctions
+        </p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-[var(--color-paper-3)]">
+                <th className="pb-2 pr-4 font-medium text-[var(--color-ink-faint)]">
+                  Metric
+                </th>
+                <th className="pb-2 px-4 font-medium text-[var(--color-accent)]">
+                  Conservative
+                </th>
+                <th className="pb-2 pl-4 font-medium text-[var(--color-success)]">
+                  Aggressive
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {ROI_DATA.map((row) => (
+                <tr
+                  key={row.metric}
+                  className="border-b border-[var(--color-paper-3)]/50 last:border-0"
+                >
+                  <td className="py-2.5 pr-4 font-medium text-[var(--color-ink)]">
+                    {row.metric}
+                  </td>
+                  <td className="py-2.5 px-4 font-mono tabular-nums text-[var(--color-ink-muted)]">
+                    {row.conservative}
+                  </td>
+                  <td className="py-2.5 pl-4 font-mono tabular-nums font-medium text-[var(--color-ink)]">
+                    {row.aggressive}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   );
 }
 
+/** Stat card used in the summary row. */
 function StatBox({
   icon: Icon,
   label,

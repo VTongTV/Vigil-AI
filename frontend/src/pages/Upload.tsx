@@ -1,3 +1,9 @@
+/**
+ * Upload page — drag-and-drop image upload for violation detection.
+ * Shows a pipeline waterfall chart for timing breakdown and the
+ * AnnotatedViewer with overlaid bounding boxes for detection results.
+ */
+
 import { useState, useRef, useCallback } from "react";
 import {
   Upload as UploadIcon,
@@ -9,9 +15,14 @@ import {
 } from "lucide-react";
 import { detectViolation } from "@/lib/api";
 import type { DetectResponse, ViolationRecord } from "@/types/violation";
-import { VIOLATION_LABELS, VIOLATION_COLORS, VIOLATION_SECTIONS } from "@/types/violation";
+import {
+  VIOLATION_LABELS,
+  VIOLATION_COLORS,
+  VIOLATION_SECTIONS,
+} from "@/types/violation";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
+import AnnotatedViewer from "@/components/AnnotatedViewer";
 
 const DEMO_CAMERAS = [
   { id: "MGROAD-01", name: "MG Road — Trinity Circle" },
@@ -19,6 +30,17 @@ const DEMO_CAMERAS = [
   { id: "INDIRANAGAR-01", name: "Indiranagar — 100ft Road" },
   { id: "HEBBAL-01", name: "Hebbal Flyover" },
   { id: "SILKBOARD-01", name: "Silk Board Junction" },
+];
+
+/** Mapping from timing_breakdown keys to display labels and CSS colors. */
+const PIPELINE_STAGES: { key: string; label: string; color: string }[] = [
+  { key: "preprocess_ms", label: "Preprocess", color: "var(--color-ink-faint)" },
+  { key: "detect_coco_ms", label: "COCO Detect", color: "var(--color-accent)" },
+  { key: "detect_helmet_ms", label: "Helmet Detect", color: "var(--color-accent-bright)" },
+  { key: "violation_logic_ms", label: "Violation Logic", color: "var(--color-warning)" },
+  { key: "detect_plate_ms", label: "Plate Detect", color: "var(--color-triple)" },
+  { key: "ocr_ms", label: "OCR", color: "var(--color-plate)" },
+  { key: "evidence_gen_ms", label: "Evidence Gen", color: "var(--color-success)" },
 ];
 
 export default function Upload() {
@@ -50,7 +72,7 @@ export default function Upload() {
       const f = e.dataTransfer.files[0];
       if (f) handleFile(f);
     },
-    [handleFile]
+    [handleFile],
   );
 
   const onSubmit = async () => {
@@ -67,6 +89,14 @@ export default function Upload() {
       setLoading(false);
     }
   };
+
+  /** Compute the max stage duration for scaling waterfall bars. */
+  const maxMs = result
+    ? Math.max(
+        ...Object.values(result.timing_breakdown).map((v) => Number(v)),
+        1,
+      )
+    : 1;
 
   return (
     <div className="p-6">
@@ -89,7 +119,8 @@ export default function Upload() {
             className={cn(
               "flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-10 transition-colors",
               "border-[var(--color-paper-3)] hover:border-[var(--color-accent-dim)] hover:bg-[var(--color-paper-1)]",
-              preview && "border-[var(--color-accent-dim)] bg-[var(--color-paper-1)]"
+              preview &&
+                "border-[var(--color-accent-dim)] bg-[var(--color-paper-1)]",
             )}
           >
             {preview ? (
@@ -144,7 +175,10 @@ export default function Upload() {
             <div className="flex items-center gap-2 rounded-md bg-[var(--color-paper-2)] px-3 py-2">
               <Camera className="h-4 w-4 text-[var(--color-ink-faint)]" />
               <span className="text-xs text-[var(--color-ink-muted)]">
-                Signal: <span className="font-medium capitalize text-[var(--color-ink)]">{signalState}</span>
+                Signal:{" "}
+                <span className="font-medium capitalize text-[var(--color-ink)]">
+                  {signalState}
+                </span>
               </span>
             </div>
 
@@ -155,7 +189,7 @@ export default function Upload() {
                 "w-full rounded-md px-4 py-2.5 text-sm font-semibold transition-colors",
                 file && !loading
                   ? "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-bright)]"
-                  : "bg-[var(--color-paper-3)] text-[var(--color-ink-faint)] cursor-not-allowed"
+                  : "bg-[var(--color-paper-3)] text-[var(--color-ink-faint)] cursor-not-allowed",
               )}
             >
               {loading ? (
@@ -189,24 +223,50 @@ export default function Upload() {
                 </span>
               </div>
 
-              {/* Timing breakdown */}
+              {/* Pipeline waterfall chart */}
               <div className="rounded-lg border border-[var(--color-paper-3)] bg-[var(--color-paper-1)] p-4">
                 <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                  Pipeline Timing
+                  Pipeline Timing — {result.processing_time_ms}ms total
                 </h3>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  {Object.entries(result.timing_breakdown).map(([key, ms]) => (
-                    <div key={key} className="flex justify-between">
-                      <span className="text-[var(--color-ink-muted)]">
-                        {key.replace(/_/g, " ")}
-                      </span>
-                      <span className="font-mono tabular-nums text-[var(--color-ink)]">
-                        {ms}ms
-                      </span>
-                    </div>
-                  ))}
+                <div className="space-y-2">
+                  {PIPELINE_STAGES.map((stage) => {
+                    const ms =
+                      (result.timing_breakdown as unknown as Record<string, number>)[
+                        stage.key
+                      ] ?? 0;
+                    const pct = Math.max((ms / maxMs) * 100, 2);
+                    return (
+                      <div key={stage.key} className="flex items-center gap-3">
+                        <span className="w-28 shrink-0 text-[10px] font-medium text-[var(--color-ink-muted)]">
+                          {stage.label}
+                        </span>
+                        <div className="flex-1 overflow-hidden rounded bg-[var(--color-paper-3)]/50">
+                          <div
+                            className="h-5 rounded transition-all duration-500"
+                            style={{
+                              width: `${pct}%`,
+                              backgroundColor: stage.color,
+                            }}
+                          />
+                        </div>
+                        <span className="w-14 shrink-0 text-right font-mono text-[10px] tabular-nums text-[var(--color-ink)]">
+                          {ms}ms
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
+
+              {/* Annotated image with bbox overlay */}
+              {preview && result.violations.length > 0 && (
+                <AnnotatedViewer
+                  imageUrl={preview}
+                  violations={result.violations}
+                  className="rounded-lg border border-[var(--color-paper-3)] bg-[var(--color-paper-1)] p-2"
+                  alt="Detected violations"
+                />
+              )}
 
               {/* Violation list */}
               <div className="space-y-2">
@@ -231,6 +291,7 @@ export default function Upload() {
   );
 }
 
+/** Compact card for a single violation row in the results list. */
 function ViolationCard({ violation }: { violation: ViolationRecord }) {
   const vColor =
     VIOLATION_COLORS[violation.violation_type] ?? "var(--color-accent)";

@@ -5,7 +5,7 @@ Tables:
     audit_log  — Audit trail for approve/reject actions on violations
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum as PyEnum
 
 from sqlalchemy import (
@@ -81,10 +81,14 @@ class ViolationRecordDB(Base):
     )
     data_source = Column(SAEnum(DataSourceDB), nullable=False, default=DataSourceDB.LIVE)
     camera_id = Column(String, nullable=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True)
+    junction_name = Column(String, nullable=True)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
     evidence_url = Column(String, nullable=True)
     evidence_hash = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     audit_logs = relationship("AuditLogDB", back_populates="violation", cascade="all, delete-orphan")
 
@@ -99,7 +103,7 @@ class AuditLogDB(Base):
     action = Column(String, nullable=False)  # "approve" | "reject" | "create"
     actor = Column(String, nullable=False, default="system")
     detail = Column(JSON, nullable=True)
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     violation = relationship("ViolationRecordDB", back_populates="audit_logs")
 

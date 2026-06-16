@@ -132,6 +132,25 @@ def get_demo_cameras() -> list[dict]:
     return demo.get("cameras", [])
 
 
+def get_camera_info(camera_id: str) -> dict:
+    """Look up camera metadata (name, lat, lng) by camera ID.
+
+    Args:
+        camera_id: Camera identifier string (e.g. 'MGROAD-01').
+
+    Returns:
+        Dict with 'name', 'lat', 'lng' keys, or empty dict if not found.
+    """
+    for cam in get_demo_cameras():
+        if cam.get("id") == camera_id:
+            return {
+                "junction_name": cam.get("name", ""),
+                "latitude": cam.get("lat"),
+                "longitude": cam.get("lng"),
+            }
+    return {}
+
+
 def get_traffic_signal_config() -> dict:
     """Get traffic signal configuration from default.yaml."""
     violations = _YAML_CONFIG.get("violations", {})

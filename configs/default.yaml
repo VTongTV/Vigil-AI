@@ -106,19 +106,39 @@ demo:
       name: "MG Road - Trinity Circle"
       lat: 12.9758
       lng: 77.6045
-    - id: "KORMANGALA-01"
-      name: "Koramangala - Sony Junction"
-      lat: 12.9352
-      lng: 77.6245
-    - id: "INDIRANAGAR-01"
-      name: "Indiranagar - 100ft Road Junction"
-      lat: 12.9784
-      lng: 77.6408
-    - id: "HEBBAL-01"
-      name: "Hebbal Flyover"
-      lat: 13.0358
-      lng: 77.5970
     - id: "SILKBOARD-01"
       name: "Silk Board Junction"
       lat: 12.9177
       lng: 77.6238
+    - id: "HEBBAL-01"
+      name: "Hebbal Flyover"
+      lat: 13.0358
+      lng: 77.5970
+    - id: "WHITEFIELD-01"
+      name: "Whitefield Main Road"
+      lat: 12.9698
+      lng: 77.7500
+    - id: "ELECTRONIC-01"
+      name: "Electronic City Phase 1"
+      lat: 12.8456
+      lng: 77.6603
+    - id: "MARATHAHALLI-01"
+      name: "Marathahalli Bridge"
+      lat: 12.9591
+      lng: 77.6974
+    - id: "KRPURAM-01"
+      name: "KR Puram Railway Junction"
+      lat: 12.9970
+      lng: 77.6844
+    - id: "YELAHANKA-01"
+      name: "Yelahanka New Town"
+      lat: 13.1007
+      lng: 77.5963
+    - id: "BANNERGHATTA-01"
+      name: "Bannerghatta Road - Jayadeva"
+      lat: 12.9135
+      lng: 77.5985
+    - id: "KORMANGALA-01"
+      name: "Koramangala 100ft Road"
+      lat: 12.9352
+      lng: 77.6245
