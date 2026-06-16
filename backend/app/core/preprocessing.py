@@ -129,20 +129,24 @@ def apply_denoise(
     return cv2.fastNlMeansDenoisingColored(
         image,
         None,
-        h=h,
-        hForColorComponents=h,
-        templateWindowSize=template_window_size,
-        searchWindowSize=search_window_size,
+        h,
+        h,
+        template_window_size,
+        search_window_size,
     )
 
 
 def apply_gamma(image: np.ndarray, gamma: float = 1.2) -> np.ndarray:
     """Apply gamma correction to adjust image brightness.
 
+    Uses the formula: output = (input/255)^(1/gamma) * 255.
+    gamma > 1.0 brightens (useful for low-light traffic cameras).
+    gamma < 1.0 darkens. gamma = 1.0 is identity.
+
     Args:
         image: BGR image (HWC, uint8).
-        gamma: Gamma value. <1.0 brightens, >1.0 darkens.
-            Typical range: 0.8 (brighten low-light) to 1.5 (darken).
+        gamma: Gamma value. >1.0 brightens, <1.0 darkens.
+            Typical range: 1.2 (brighten low-light) to 0.8 (darken).
 
     Returns:
         Gamma-corrected BGR image.
