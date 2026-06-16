@@ -258,7 +258,7 @@ def _save_violation_to_db(
             confidence_tier=record.confidence_tier.value,
             bbox=record.bbox.model_dump(),
             person_bbox=record.person_bbox.model_dump() if record.person_bbox else None,
-            metadata=raw_violation.get("metadata", {}),
+            violation_metadata=raw_violation.get("metadata", {}),
             mv_act_section=record.mv_act_section,
             fine_amount=record.fine_amount,
             license_plate_text=plate_text,

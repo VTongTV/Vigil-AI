@@ -136,7 +136,7 @@ def _db_record_to_schema(record: ViolationRecordDB) -> ViolationRecord:
         confidence_tier=record.confidence_tier.value if hasattr(record.confidence_tier, 'value') else record.confidence_tier,
         bbox=Bbox(**bbox_data) if bbox_data else Bbox(x1=0, y1=0, x2=0, y2=0),
         person_bbox=Bbox(**person_bbox_data) if person_bbox_data else None,
-        metadata=record.metadata or {},
+        metadata=record.violation_metadata or {},
         mv_act_section=record.mv_act_section,
         fine_amount=record.fine_amount,
         license_plate=plate_result,
