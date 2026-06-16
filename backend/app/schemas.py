@@ -4,7 +4,7 @@ These schemas define the API contract between backend and frontend.
 TypeScript types in frontend/src/types/ must mirror these exactly.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
@@ -80,7 +80,7 @@ class ViolationRecord(BaseModel):
     status: ViolationStatus = ViolationStatus.PENDING
     data_source: DataSource = DataSource.LIVE
     camera_id: Optional[str] = None
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     evidence_url: Optional[str] = None
     evidence_hash: Optional[str] = None
 

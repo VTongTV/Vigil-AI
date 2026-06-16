@@ -12,6 +12,7 @@ from sqlalchemy import (
     Column,
     DateTime,
     Float,
+    ForeignKey,
     Integer,
     JSON,
     String,
@@ -94,7 +95,7 @@ class AuditLogDB(Base):
     __tablename__ = "audit_log"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    violation_id = Column(String, nullable=False, index=True)
+    violation_id = Column(String, ForeignKey("violations.id"), nullable=False, index=True)
     action = Column(String, nullable=False)  # "approve" | "reject" | "create"
     actor = Column(String, nullable=False, default="system")
     detail = Column(JSON, nullable=True)

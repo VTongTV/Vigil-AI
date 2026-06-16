@@ -130,22 +130,35 @@ def apply_ocr_corrections(text: str) -> str:
     state = text[:2]  # Always 2 letters
     remainder = text[2:]
 
-    # Try to identify district (digits), series (letters), number (digits)
-    # Walk through remainder character by character
+    # Try to identify district (1-2 digits), series (1-3 letters), number (1-4 digits)
+    # Use a greedy-but-limited walk: district max 2 chars, then series, then number
     district = ""
     series = ""
     number = ""
-    phase = "district"  # district -> series -> number
+    phase = "district"
+
+    # Ambiguous characters that may be misclassified
+    digit_like_letters = {"O", "I"}  # O↔0, I↔1
+    letter_like_digits = {"0", "1"}  # 0↔O, 1↔I
 
     for ch in remainder:
         if phase == "district":
-            if ch.isdigit():
+            # District can be at most 2 characters
+            if len(district) >= 2:
+                # Must move to series
+                series += ch
+                phase = "series"
+            elif ch.isdigit() or ch in digit_like_letters:
                 district += ch
             else:
                 series += ch
                 phase = "series"
         elif phase == "series":
             if ch.isalpha():
+                series += ch
+            elif ch in letter_like_digits and len(series) < 2 and any(c.isalpha() for c in series) and not number:
+                # Ambiguous digit 0/1 in early series position
+                # Only if series has at least one real letter and room for more
                 series += ch
             else:
                 number += ch

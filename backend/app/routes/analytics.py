@@ -1,7 +1,7 @@
 """GET /api/v1/analytics — Violation statistics and trends."""
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import desc, func
@@ -26,7 +26,7 @@ async def get_analytics(
     Returns:
         Statistics by type, tier, status, daily trends, and top cameras.
     """
-    since = datetime.utcnow() - timedelta(days=days)
+    since = datetime.now(timezone.utc) - timedelta(days=days)
 
     query = db.query(ViolationRecordDB).filter(ViolationRecordDB.timestamp >= since)
     if camera_id:

@@ -5,7 +5,7 @@ pagination, and approve/reject actions.
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -143,7 +143,7 @@ def _db_record_to_schema(record: ViolationRecordDB) -> ViolationRecord:
         status=ViolationStatus(record.status.value if hasattr(record.status, 'value') else record.status),
         data_source=DataSource(record.data_source.value if hasattr(record.data_source, 'value') else record.data_source),
         camera_id=record.camera_id,
-        timestamp=record.timestamp or datetime.utcnow(),
+        timestamp=record.timestamp or datetime.now(timezone.utc),
         evidence_url=record.evidence_url,
         evidence_hash=record.evidence_hash,
     )
