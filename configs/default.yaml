@@ -1,0 +1,124 @@
+# VigilAI — Default Configuration
+# All tunable parameters live here. No magic numbers in code.
+
+models:
+  coco:
+    path: "weights/yolov8n.pt"
+    device: "cuda"
+    conf_threshold: 0.25
+    iou_threshold: 0.45
+    resident: true
+    classes: [0, 1, 2, 3, 5]  # person, bicycle, car, motorcycle, bus
+
+  helmet:
+    path: "weights/helmet.pt"
+    device: "cuda"
+    conf_threshold: 0.30
+    iou_threshold: 0.45
+    resident: true
+    classes: ["helmet", "no_helmet"]
+
+  plate:
+    path: "weights/plate.pt"
+    device: "cuda"
+    conf_threshold: 0.25
+    iou_threshold: 0.45
+    resident: false  # On-demand: load → infer → unload
+    classes: ["license_plate"]
+
+preprocessing:
+  clahe:
+    enabled: true
+    clip_limit: 2.0
+    tile_grid_size: [8, 8]
+  denoise:
+    enabled: true
+    h: 10
+    template_window_size: 7
+    search_window_size: 21
+  gamma:
+    enabled: true
+    value: 1.2
+
+violations:
+  helmet:
+    head_fraction: 0.30
+    iou_threshold: 0.3
+  triple_riding:
+    max_riders: 2
+    horizontal_center_threshold: 0.15
+    vertical_overlap_threshold: 0.30
+    person_iou_threshold: 0.15
+  wrong_side:
+    enabled: true
+    lane_polygons: []
+    direction: "left_to_right"
+  illegal_parking:
+    enabled: true
+    zone_polygons: []
+    min_confidence: 0.5
+  seatbelt:
+    enabled: true
+    windshield_crop_ratio: 0.40
+    confidence_discount: 0.70
+    min_confidence: 0.30
+    review_threshold: 0.50
+  stop_line:
+    enabled: true
+    stop_line_zones: []
+    min_confidence: 0.3
+    confidence_discount: 0.75
+  red_light:
+    enabled: true
+    # Shares stop_line_zones with stop_line violations
+    signal_state: "unknown"  # "red" | "green" | "unknown" — set by operator
+    confidence_discount: 0.80
+
+ocr:
+  engine: "rapidocr"
+  thread_count: 4
+  # Indian plate regex: KA01AB1234 or KA01AB123
+  plate_regex: "^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{3,4}$"
+  min_confidence: 0.5
+
+evidence:
+  output_dir: "outputs/evidence"
+  bbox_color: [0, 0, 255]      # Red BGR
+  text_color: [255, 255, 255]  # White BGR
+  bbox_thickness: 2
+  font_scale: 0.6
+  include_hash: true
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  max_image_size_mb: 10
+  cors_origins: ["http://localhost:5173"]
+
+database:
+  path: "outputs/vigilai.db"
+
+demo:
+  mode: false
+  # Camera locations for demo data (Bengaluru junctions)
+  cameras:
+    - id: "MGROAD-01"
+      name: "MG Road - Trinity Circle"
+      lat: 12.9758
+      lng: 77.6045
+    - id: "KORMANGALA-01"
+      name: "Koramangala - Sony Junction"
+      lat: 12.9352
+      lng: 77.6245
+    - id: "INDIRANAGAR-01"
+      name: "Indiranagar - 100ft Road Junction"
+      lat: 12.9784
+      lng: 77.6408
+    - id: "HEBBAL-01"
+      name: "Hebbal Flyover"
+      lat: 13.0358
+      lng: 77.5970
+    - id: "SILKBOARD-01"
+      name: "Silk Board Junction"
+      lat: 12.9177
+      lng: 77.6238
