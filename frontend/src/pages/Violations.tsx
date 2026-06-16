@@ -1,3 +1,8 @@
+/**
+ * Violations page — tabular list of all detected violations with filters,
+ * approve/reject actions, and a local audit trail that logs every action.
+ */
+
 import { useEffect, useState, useCallback } from "react";
 import {
   Filter,
@@ -5,6 +10,7 @@ import {
   XCircle,
   ChevronLeft,
   ChevronRight,
+  History,
 } from "lucide-react";
 import { listViolations, actionViolation } from "@/lib/api";
 import type { ViolationRecord } from "@/types/violation";
@@ -23,6 +29,14 @@ type FilterState = {
   camera_id: string;
 };
 
+/** A single entry in the local audit trail. */
+interface AuditEntry {
+  action: "approve" | "reject";
+  violationId: string;
+  timestamp: string;
+  actor: string;
+}
+
 export default function Violations() {
   const [violations, setViolations] = useState<ViolationRecord[]>([]);
   const [total, setTotal] = useState(0);
@@ -33,6 +47,7 @@ export default function Violations() {
     status: "",
     camera_id: "",
   });
+  const [auditLog, setAuditLog] = useState<AuditEntry[]>([]);
   const setSelectedViolation = useAppStore((s) => s.setSelectedViolation);
 
   const fetchViolations = useCallback(async () => {
@@ -57,9 +72,23 @@ export default function Violations() {
     fetchViolations();
   }, [fetchViolations]);
 
+  /**
+   * Approve or reject a violation and log the action to the local audit trail.
+   */
   const handleAction = async (id: string, action: "approve" | "reject") => {
     try {
       await actionViolation(id, action);
+      setAuditLog((prev) => [
+        {
+          action,
+          violationId: id,
+          timestamp: new Date().toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata",
+          }),
+          actor: "officer_001",
+        },
+        ...prev,
+      ]);
       fetchViolations();
     } catch {
       /* ignore */
@@ -129,13 +158,19 @@ export default function Violations() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-[var(--color-ink-muted)]">
+                <td
+                  colSpan={7}
+                  className="px-4 py-8 text-center text-[var(--color-ink-muted)]"
+                >
                   Loading...
                 </td>
               </tr>
             ) : violations.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-[var(--color-ink-muted)]">
+                <td
+                  colSpan={7}
+                  className="px-4 py-8 text-center text-[var(--color-ink-muted)]"
+                >
                   No violations found
                 </td>
               </tr>
@@ -177,10 +212,49 @@ export default function Violations() {
           </div>
         </div>
       )}
+
+      {/* Audit trail */}
+      {auditLog.length > 0 && (
+        <section className="mt-6 rounded-lg border border-[var(--color-paper-3)] bg-[var(--color-paper-1)] p-4">
+          <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+            <History className="h-3 w-3" />
+            Action Log
+          </h2>
+          <div className="space-y-1.5">
+            {auditLog.map((entry, i) => (
+              <div
+                key={`${entry.violationId}-${entry.timestamp}-${i}`}
+                className="flex items-center gap-3 text-xs"
+              >
+                <span
+                  className={cn(
+                    "rounded px-1.5 py-0.5 text-[10px] font-medium uppercase",
+                    entry.action === "approve"
+                      ? "bg-[var(--color-success)]/15 text-[var(--color-success)]"
+                      : "bg-[var(--color-danger)]/15 text-[var(--color-danger)]",
+                  )}
+                >
+                  {entry.action}
+                </span>
+                <span className="font-mono text-[var(--color-ink-muted)]">
+                  {entry.violationId}
+                </span>
+                <span className="text-[var(--color-ink-faint)]">
+                  by {entry.actor}
+                </span>
+                <span className="ml-auto text-[var(--color-ink-faint)]">
+                  {entry.timestamp}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
 
+/** Single row in the violations table. */
 function ViolationRow({
   violation: v,
   onAction,
@@ -219,7 +293,7 @@ function ViolationRow({
               ? "bg-[var(--color-success)]/20 text-[var(--color-success)]"
               : v.confidence_tier === "medium"
                 ? "bg-[var(--color-warning)]/20 text-[var(--color-warning)]"
-                : "bg-[var(--color-danger)]/20 text-[var(--color-danger)]"
+                : "bg-[var(--color-danger)]/20 text-[var(--color-danger)]",
           )}
         >
           {v.confidence_tier}
@@ -236,7 +310,10 @@ function ViolationRow({
       </td>
       <td className="px-4 py-3">
         <span
-          className={cn("rounded px-2 py-0.5 text-[10px] font-medium capitalize", statusBadge)}
+          className={cn(
+            "rounded px-2 py-0.5 text-[10px] font-medium capitalize",
+            statusBadge,
+          )}
         >
           {v.status}
         </span>
