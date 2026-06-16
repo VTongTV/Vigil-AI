@@ -1,13 +1,8 @@
 import { useState } from "react";
 import { FileImage, ZoomIn, Hash } from "lucide-react";
 import { useAppStore } from "@/lib/store";
-import { getEvidenceUrl } from "@/lib/api";
 import type { ViolationRecord } from "@/types/violation";
-import {
-  VIOLATION_LABELS,
-  VIOLATION_COLORS,
-  VIOLATION_SECTIONS,
-} from "@/types/violation";
+import { VIOLATION_LABELS, VIOLATION_COLORS, VIOLATION_SECTIONS } from "@/types/violation";
 import { cn } from "@/lib/utils";
 
 export default function Evidence() {

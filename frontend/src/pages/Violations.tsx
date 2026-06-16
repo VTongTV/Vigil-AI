@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
 import {
-  AlertTriangle,
   Filter,
   CheckCircle2,
   XCircle,
@@ -12,7 +11,6 @@ import type { ViolationRecord } from "@/types/violation";
 import {
   VIOLATION_LABELS,
   VIOLATION_COLORS,
-  VIOLATION_SECTIONS,
 } from "@/types/violation";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
