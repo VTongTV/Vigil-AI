@@ -1,0 +1,70 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+@theme {
+  --color-paper: oklch(15% 0.01 260);
+  --color-paper-1: oklch(18% 0.01 260);
+  --color-paper-2: oklch(22% 0.015 260);
+  --color-paper-3: oklch(28% 0.015 260);
+  --color-paper-4: oklch(34% 0.02 260);
+
+  --color-ink: oklch(92% 0.01 260);
+  --color-ink-muted: oklch(65% 0.02 260);
+  --color-ink-faint: oklch(45% 0.02 260);
+
+  --color-accent: oklch(65% 0.18 250);
+  --color-accent-dim: oklch(45% 0.12 250);
+  --color-accent-bright: oklch(75% 0.2 250);
+
+  --color-helmet: oklch(65% 0.2 25);
+  --color-triple: oklch(70% 0.18 55);
+  --color-wrong-side: oklch(65% 0.18 280);
+  --color-parking: oklch(70% 0.15 90);
+  --color-seatbelt: oklch(65% 0.18 320);
+  --color-stopline: oklch(65% 0.15 210);
+  --color-redlight: oklch(55% 0.22 20);
+  --color-plate: oklch(70% 0.15 90);
+
+  --color-success: oklch(65% 0.18 145);
+  --color-warning: oklch(75% 0.18 85);
+  --color-danger: oklch(60% 0.22 25);
+
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "Cascadia Code", monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}
+
+code, pre, .font-mono {
+  font-family: var(--font-mono);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-paper-1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-paper-4);
+  border-radius: 3px;
+}
