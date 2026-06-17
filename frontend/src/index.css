@@ -6,38 +6,43 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ── VigilAI Midnight Theme ── */
+/* ── VigilAI Interceptor Grid Theme ── */
 
 @theme {
-  /* Paper / surface (dark) */
-  --color-paper: oklch(15% 0.01 260);
-  --color-paper-1: oklch(18% 0.01 260);
-  --color-paper-2: oklch(22% 0.015 260);
-  --color-paper-3: oklch(28% 0.015 260);
-  --color-paper-4: oklch(34% 0.02 260);
+  /* Paper / surface — deep steel */
+  --color-paper: oklch(13% 0.008 255);
+  --color-paper-1: oklch(16% 0.01 255);
+  --color-paper-2: oklch(20% 0.012 255);
+  --color-paper-3: oklch(26% 0.014 255);
+  --color-paper-4: oklch(32% 0.016 255);
 
-  /* Ink / text */
-  --color-ink: oklch(92% 0.01 260);
-  --color-ink-muted: oklch(65% 0.02 260);
-  --color-ink-faint: oklch(45% 0.02 260);
+  /* Ink / text — warm neutral */
+  --color-ink: oklch(90% 0.008 75);
+  --color-ink-muted: oklch(62% 0.015 75);
+  --color-ink-faint: oklch(42% 0.015 75);
 
-  /* Accent — phosphor blue */
-  --color-accent: oklch(65% 0.18 250);
-  --color-accent-dim: oklch(45% 0.12 250);
-  --color-accent-bright: oklch(75% 0.2 250);
+  /* Primary accent — amber CRT */
+  --color-accent: oklch(75% 0.18 85);
+  --color-accent-dim: oklch(50% 0.12 85);
+  --color-accent-bright: oklch(85% 0.2 85);
+
+  /* Secondary accent — phosphor green */
+  --color-phosphor: oklch(65% 0.2 155);
+  --color-phosphor-dim: oklch(40% 0.12 155);
+  --color-phosphor-bright: oklch(78% 0.22 155);
 
   /* Semantic — violation types */
   --color-helmet: oklch(65% 0.2 25);
-  --color-triple: oklch(70% 0.18 55);
+  --color-triple: oklch(75% 0.18 85);
   --color-wrong-side: oklch(65% 0.18 280);
   --color-parking: oklch(70% 0.15 90);
   --color-seatbelt: oklch(65% 0.18 320);
   --color-stopline: oklch(65% 0.15 210);
   --color-redlight: oklch(55% 0.22 20);
-  --color-plate: oklch(70% 0.15 90);
+  --color-plate: oklch(65% 0.2 155);
 
   /* Semantic — status */
-  --color-success: oklch(65% 0.18 145);
+  --color-success: oklch(65% 0.2 155);
   --color-warning: oklch(75% 0.18 85);
   --color-danger: oklch(60% 0.22 25);
 
@@ -47,7 +52,7 @@
   --font-mono: "IBM Plex Mono", "Cascadia Code", monospace;
 }
 
-/* ── shadcn dark-mode overrides (Midnight palette) ── */
+/* ── shadcn dark-mode overrides (Interceptor Grid palette) ── */
 
 @theme inline {
   --font-heading: var(--font-sans);
@@ -92,74 +97,74 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Midnight dark theme — mapped to shadcn semantic tokens */
+/* Interceptor Grid dark theme — amber primary, phosphor green secondary */
 .dark {
-  --background: oklch(12% 0.01 260);
-  --foreground: oklch(92% 0.01 260);
-  --card: oklch(16% 0.012 260);
-  --card-foreground: oklch(92% 0.01 260);
-  --popover: oklch(16% 0.012 260);
-  --popover-foreground: oklch(92% 0.01 260);
-  --primary: oklch(65% 0.18 250);
-  --primary-foreground: oklch(98% 0.005 250);
-  --secondary: oklch(22% 0.015 260);
-  --secondary-foreground: oklch(85% 0.01 260);
-  --muted: oklch(20% 0.012 260);
-  --muted-foreground: oklch(60% 0.02 260);
-  --accent: oklch(22% 0.015 260);
-  --accent-foreground: oklch(85% 0.01 260);
+  --background: oklch(11% 0.008 255);
+  --foreground: oklch(90% 0.008 75);
+  --card: oklch(14% 0.01 255);
+  --card-foreground: oklch(90% 0.008 75);
+  --popover: oklch(14% 0.01 255);
+  --popover-foreground: oklch(90% 0.008 75);
+  --primary: oklch(75% 0.18 85);
+  --primary-foreground: oklch(11% 0.008 85);
+  --secondary: oklch(20% 0.012 255);
+  --secondary-foreground: oklch(82% 0.01 75);
+  --muted: oklch(18% 0.01 255);
+  --muted-foreground: oklch(58% 0.015 75);
+  --accent: oklch(20% 0.012 255);
+  --accent-foreground: oklch(82% 0.01 75);
   --destructive: oklch(60% 0.22 25);
-  --border: oklch(28% 0.015 260);
-  --input: oklch(28% 0.015 260);
-  --ring: oklch(65% 0.18 250);
-  --chart-1: oklch(65% 0.18 250);
-  --chart-2: oklch(65% 0.2 25);
-  --chart-3: oklch(70% 0.18 55);
-  --chart-4: oklch(65% 0.18 145);
+  --border: oklch(26% 0.014 255);
+  --input: oklch(26% 0.014 255);
+  --ring: oklch(75% 0.18 85);
+  --chart-1: oklch(75% 0.18 85);
+  --chart-2: oklch(65% 0.2 155);
+  --chart-3: oklch(65% 0.2 25);
+  --chart-4: oklch(70% 0.15 90);
   --chart-5: oklch(65% 0.18 280);
-  --sidebar: oklch(14% 0.01 260);
-  --sidebar-foreground: oklch(85% 0.01 260);
-  --sidebar-primary: oklch(65% 0.18 250);
-  --sidebar-primary-foreground: oklch(98% 0.005 250);
-  --sidebar-accent: oklch(22% 0.015 260);
-  --sidebar-accent-foreground: oklch(85% 0.01 260);
-  --sidebar-border: oklch(25% 0.015 260);
-  --sidebar-ring: oklch(65% 0.18 250);
+  --sidebar: oklch(12% 0.008 255);
+  --sidebar-foreground: oklch(82% 0.01 75);
+  --sidebar-primary: oklch(75% 0.18 85);
+  --sidebar-primary-foreground: oklch(11% 0.008 85);
+  --sidebar-accent: oklch(20% 0.012 255);
+  --sidebar-accent-foreground: oklch(82% 0.01 75);
+  --sidebar-border: oklch(24% 0.012 255);
+  --sidebar-ring: oklch(75% 0.18 85);
 }
 
 :root {
-  --background: oklch(12% 0.01 260);
-  --foreground: oklch(92% 0.01 260);
-  --card: oklch(16% 0.012 260);
-  --card-foreground: oklch(92% 0.01 260);
-  --popover: oklch(16% 0.012 260);
-  --popover-foreground: oklch(92% 0.01 260);
-  --primary: oklch(65% 0.18 250);
-  --primary-foreground: oklch(98% 0.005 250);
-  --secondary: oklch(22% 0.015 260);
-  --secondary-foreground: oklch(85% 0.01 260);
-  --muted: oklch(20% 0.012 260);
-  --muted-foreground: oklch(60% 0.02 260);
-  --accent: oklch(22% 0.015 260);
-  --accent-foreground: oklch(85% 0.01 260);
+  --background: oklch(11% 0.008 255);
+  --foreground: oklch(90% 0.008 75);
+  --card: oklch(14% 0.01 255);
+  --card-foreground: oklch(90% 0.008 75);
+  --popover: oklch(14% 0.01 255);
+  --popover-foreground: oklch(90% 0.008 75);
+  --primary: oklch(75% 0.18 85);
+  --primary-foreground: oklch(11% 0.008 85);
+  --secondary: oklch(20% 0.012 255);
+  --secondary-foreground: oklch(82% 0.01 75);
+  --muted: oklch(18% 0.01 255);
+  --muted-foreground: oklch(58% 0.015 75);
+  --accent: oklch(20% 0.012 255);
+  --accent-foreground: oklch(82% 0.01 75);
   --destructive: oklch(60% 0.22 25);
-  --border: oklch(28% 0.015 260);
-  --input: oklch(28% 0.015 260);
-  --ring: oklch(65% 0.18 250);
-  --chart-1: oklch(65% 0.18 250);
-  --chart-2: oklch(65% 0.2 25);
-  --chart-3: oklch(70% 0.18 55);
-  --chart-4: oklch(65% 0.18 145);
+  --border: oklch(26% 0.014 255);
+  --input: oklch(26% 0.014 255);
+  --ring: oklch(75% 0.18 85);
+  --chart-1: oklch(75% 0.18 85);
+  --chart-2: oklch(65% 0.2 155);
+  --chart-3: oklch(65% 0.2 25);
+  --chart-4: oklch(70% 0.15 90);
   --chart-5: oklch(65% 0.18 280);
   --radius: 0.5rem;
-  --sidebar: oklch(14% 0.01 260);
-  --sidebar-foreground: oklch(85% 0.01 260);
-  --sidebar-primary: oklch(65% 0.18 250);
-  --sidebar-primary-foreground: oklch(98% 0.005 250);
-  --sidebar-accent: oklch(22% 0.015 260);
-  --sidebar-accent-foreground: oklch(85% 0.01 260);
-  --sidebar-border: oklch(25% 0.015 260);
-  --sidebar-ring: oklch(65% 0.18 250);
+  --sidebar: oklch(12% 0.008 255);
+  --sidebar-foreground: oklch(82% 0.01 75);
+  --sidebar-primary: oklch(75% 0.18 85);
+  --sidebar-primary-foreground: oklch(11% 0.008 85);
+  --sidebar-accent: oklch(20% 0.012 255);
+  --sidebar-accent-foreground: oklch(82% 0.01 75);
+  --sidebar-border: oklch(24% 0.012 255);
+  --sidebar-ring: oklch(75% 0.18 85);
 }
 
 @layer base {
@@ -212,27 +217,27 @@ code, pre, .font-mono {
   background: var(--color-ink-faint);
 }
 
-/* ── Glass card effect ── */
+/* ── Glass card effect (amber-tinted) ── */
 
 .glass {
-  background: oklch(16% 0.012 260 / 0.6);
+  background: oklch(16% 0.012 255 / 0.6);
   backdrop-filter: blur(16px) saturate(1.2);
   -webkit-backdrop-filter: blur(16px) saturate(1.2);
-  border: 1px solid oklch(30% 0.015 260 / 0.4);
+  border: 1px solid oklch(28% 0.014 255 / 0.4);
 }
 
 .glass-subtle {
-  background: oklch(16% 0.012 260 / 0.35);
+  background: oklch(16% 0.012 255 / 0.35);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid oklch(28% 0.015 260 / 0.3);
+  border: 1px solid oklch(26% 0.014 255 / 0.3);
 }
 
-/* ── Glow effects ── */
+/* ── Glow effects (amber CRT primary) ── */
 
 .glow-accent {
-  box-shadow: 0 0 20px oklch(65% 0.18 250 / 0.15),
-              0 0 60px oklch(65% 0.18 250 / 0.05);
+  box-shadow: 0 0 20px oklch(75% 0.18 85 / 0.15),
+              0 0 60px oklch(75% 0.18 85 / 0.05);
 }
 
 .glow-danger {
@@ -241,11 +246,16 @@ code, pre, .font-mono {
 }
 
 .glow-success {
-  box-shadow: 0 0 20px oklch(65% 0.18 145 / 0.15),
-              0 0 60px oklch(65% 0.18 145 / 0.05);
+  box-shadow: 0 0 20px oklch(65% 0.2 155 / 0.15),
+              0 0 60px oklch(65% 0.2 155 / 0.05);
 }
 
-/* ── Accent line ── */
+.glow-phosphor {
+  box-shadow: 0 0 20px oklch(65% 0.2 155 / 0.2),
+              0 0 60px oklch(65% 0.2 155 / 0.08);
+}
+
+/* ── Accent line (amber) ── */
 
 .accent-line-top {
   position: relative;
@@ -260,13 +270,35 @@ code, pre, .font-mono {
   height: 2px;
   background: linear-gradient(
     90deg,
-    oklch(65% 0.18 250 / 0),
-    oklch(65% 0.18 250 / 0.8),
-    oklch(65% 0.18 250 / 0)
+    oklch(75% 0.18 85 / 0),
+    oklch(75% 0.18 85 / 0.8),
+    oklch(75% 0.18 85 / 0)
   );
 }
 
-/* ── Scan line animation (futuristic) ── */
+/* ── CRT scan-line overlay (static texture — the signature) ── */
+
+.scan-overlay {
+  position: relative;
+}
+
+.scan-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: repeating-linear-gradient(
+    0deg,
+    oklch(11% 0.008 255 / 0) 0px,
+    oklch(11% 0.008 255 / 0) 1px,
+    oklch(11% 0.008 255 / 0.03) 1px,
+    oklch(11% 0.008 255 / 0.03) 2px
+  );
+  mix-blend-mode: multiply;
+}
+
+/* ── Animated scan line (subtle sweep) ── */
 
 @keyframes scan-line {
   0% { transform: translateY(-100%); }
@@ -279,12 +311,12 @@ code, pre, .font-mono {
   inset: 0;
   background: linear-gradient(
     180deg,
-    oklch(65% 0.18 250 / 0.03) 0%,
-    oklch(65% 0.18 250 / 0.06) 50%,
-    oklch(65% 0.18 250 / 0.03) 100%
+    oklch(75% 0.18 85 / 0.02) 0%,
+    oklch(75% 0.18 85 / 0.05) 50%,
+    oklch(75% 0.18 85 / 0.02) 100%
   );
   height: 40px;
-  animation: scan-line 4s linear infinite;
+  animation: scan-line 6s linear infinite;
   pointer-events: none;
 }
 
@@ -299,12 +331,32 @@ code, pre, .font-mono {
   animation: pulse-dot 2s ease-in-out infinite;
 }
 
-/* ── Grid pattern overlay ── */
+/* ── Beacon pulse (signal state indicator) ── */
+
+@keyframes beacon-pulse {
+  0%, 100% {
+    box-shadow: 0 0 4px currentColor,
+                0 0 8px currentColor;
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 8px currentColor,
+                0 0 16px currentColor,
+                0 0 24px currentColor;
+    opacity: 0.8;
+  }
+}
+
+.beacon {
+  animation: beacon-pulse 2.5s ease-in-out infinite;
+}
+
+/* ── Grid pattern overlay (tactical graph paper) ── */
 
 .grid-pattern {
   background-image:
-    linear-gradient(oklch(30% 0.015 260 / 0.2) 1px, transparent 1px),
-    linear-gradient(90deg, oklch(30% 0.015 260 / 0.2) 1px, transparent 1px);
+    linear-gradient(oklch(28% 0.014 255 / 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(28% 0.014 255 / 0.15) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -326,11 +378,30 @@ code, pre, .font-mono {
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
+/* ── Phosphor text (CRT terminal green on monospace) ── */
+
+.text-phosphor {
+  color: oklch(65% 0.2 155);
+}
+
+/* ── Amber text (CRT amber phosphor) ── */
+
+.text-amber {
+  color: oklch(75% 0.18 85);
+}
+
+/* ── Steel divider ── */
+
+.steel-divider {
+  border-color: oklch(24% 0.012 255 / 0.6);
+}
+
 /* ── Reduced motion ── */
 
 @media (prefers-reduced-motion: reduce) {
   .scan-line::after,
   .pulse-dot,
+  .beacon,
   .shimmer {
     animation: none;
   }
@@ -345,5 +416,8 @@ code, pre, .font-mono {
   }
   .no-print {
     display: none !important;
+  }
+  .scan-overlay::before {
+    display: none;
   }
 }

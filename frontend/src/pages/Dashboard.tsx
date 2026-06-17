@@ -1,10 +1,13 @@
 /**
- * Dashboard — Command Center for VigilAI.
+ * Dashboard — Interceptor Grid Command Center.
  *
- * Design direction: "Tactical Operations Board"
- * Dense, information-first layout inspired by military C2 systems.
- * Glow-accented stat cards, violation type breakdown with mini sparklines,
- * daily trend with animated bars, and a live activity feed.
+ * Design direction: Industrial utilitarian + retro-futuristic.
+ * Dense, information-first layout inspired by military C2 systems and CRT terminals.
+ * - Amber CRT phosphor accent on stat cards
+ * - Phosphor green LIVE indicator and monospace elements
+ * - Grid pattern background hint (tactical graph paper)
+ * - Amber glow on hover states
+ * - Deep steel card backgrounds
  */
 
 import { useEffect, useState } from "react";
@@ -52,7 +55,7 @@ export default function Dashboard() {
         <div className="space-y-3 text-center">
           <div className="mx-auto h-8 w-8 rounded-full border-2 border-t-transparent border-[var(--color-accent)] animate-spin" />
           <p className="text-xs tracking-wider text-[var(--color-ink-faint)] uppercase">
-            Loading command center
+            Loading interceptor grid
           </p>
         </div>
       </div>
@@ -77,22 +80,22 @@ export default function Dashboard() {
       label: "Fines Imposed",
       value: `₹${totalFines.toLocaleString("en-IN")}`,
       icon: IndianRupee,
-      color: "var(--color-warning)",
+      color: "var(--color-accent-bright)",
       glow: "glow-accent",
     },
     {
       label: "Avg Confidence",
       value: `${avgConf.toFixed(1)}%`,
       icon: TrendingUp,
-      color: "var(--color-success)",
-      glow: "glow-success",
+      color: "var(--color-phosphor)",
+      glow: "glow-phosphor",
     },
     {
       label: "Active Cameras",
       value: cameraCount,
       icon: Camera,
-      color: "var(--color-accent-bright)",
-      glow: "glow-accent",
+      color: "var(--color-phosphor-bright)",
+      glow: "glow-phosphor",
     },
   ];
 
@@ -105,11 +108,11 @@ export default function Dashboard() {
   const recentDays = [...dailyCounts].reverse().slice(0, 21);
 
   return (
-    <div className="p-5">
-      {/* Header */}
+    <div className="p-5 grid-pattern min-h-full">
+      {/* Header — Interceptor Grid branding */}
       <header className="mb-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent)]/15">
+          <div className="relative flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent)]/12 border border-[var(--color-accent)]/20">
             <ShieldAlert className="h-4 w-4 text-[var(--color-accent)]" />
           </div>
           <div>
@@ -117,15 +120,16 @@ export default function Dashboard() {
               Command Center
             </h1>
             <p className="text-[11px] text-[var(--color-ink-faint)]">
-              Real-time traffic violation detection — Bengaluru Traffic Police
+              Real-time traffic violation interception — Bengaluru Traffic Police
             </p>
           </div>
           <div className="ml-auto flex items-center gap-2">
+            {/* Phosphor green LIVE badge — CRT terminal aesthetic */}
             <Badge
               variant="outline"
-              className="border-[var(--color-accent)]/30 bg-[var(--color-accent)]/8 text-[10px] text-[var(--color-accent)]"
+              className="border-[var(--color-phosphor)]/30 bg-[var(--color-phosphor)]/8 text-[10px] text-[var(--color-phosphor)] glow-phosphor"
             >
-              <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-[var(--color-accent)] pulse-dot" />
+              <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-[var(--color-phosphor)] pulse-dot" />
               LIVE
             </Badge>
           </div>
@@ -138,21 +142,25 @@ export default function Dashboard() {
           <Card
             key={label}
             className={cn(
-              "group relative overflow-hidden border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 transition-all duration-300 hover:border-[var(--color-paper-4)]",
+              "group relative overflow-hidden border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80 transition-all duration-300 hover:border-[var(--color-accent)]/20",
               glow,
             )}
           >
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-accent)]/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+            {/* Amber accent line on hover */}
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-accent)]/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <CardContent className="p-3.5">
               <div className="flex items-start justify-between">
                 <div
-                  className="flex h-8 w-8 items-center justify-center rounded-md"
-                  style={{ backgroundColor: `color-mix(in oklch, ${color} 15%, transparent)` }}
+                  className="flex h-8 w-8 items-center justify-center rounded-md border"
+                  style={{
+                    backgroundColor: `color-mix(in oklch, ${color} 10%, transparent)`,
+                    borderColor: `color-mix(in oklch, ${color} 20%, transparent)`,
+                  }}
                 >
                   <Icon className="h-4 w-4" style={{ color }} />
                 </div>
                 {trend && (
-                  <span className="rounded bg-[var(--color-paper-3)]/60 px-1.5 py-0.5 font-mono text-[9px] text-[var(--color-ink-faint)]">
+                  <span className="rounded bg-[var(--color-paper-3)]/50 px-1.5 py-0.5 font-mono text-[9px] text-[var(--color-ink-faint)] border border-[var(--color-paper-3)]/30">
                     {trend}
                   </span>
                 )}
@@ -171,14 +179,14 @@ export default function Dashboard() {
       {/* Main content — 2-column */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
         {/* Left: Violations by type — 3 cols */}
-        <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 lg:col-span-3">
+        <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80 lg:col-span-3">
           <CardContent className="p-4">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="flex items-center gap-2 text-xs font-semibold text-[var(--color-ink)]">
                 <Activity className="h-3.5 w-3.5 text-[var(--color-accent)]" />
                 Violations by Type
               </h2>
-              <span className="font-mono text-[10px] tabular-nums text-[var(--color-ink-faint)]">
+              <span className="font-mono text-[10px] tabular-nums text-[var(--color-phosphor)]">
                 {totalViolations} total
               </span>
             </div>
@@ -199,7 +207,7 @@ export default function Dashboard() {
                         {label}
                       </span>
                       <div className="flex-1">
-                        <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/50">
+                        <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/40">
                           <div
                             className="h-1.5 rounded-full transition-all duration-700"
                             style={{
@@ -229,18 +237,18 @@ export default function Dashboard() {
         </Card>
 
         {/* Right: Daily trend — 2 cols */}
-        <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 lg:col-span-2">
+        <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80 lg:col-span-2">
           <CardContent className="p-4">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="flex items-center gap-2 text-xs font-semibold text-[var(--color-ink)]">
                 <TrendingUp className="h-3.5 w-3.5 text-[var(--color-accent)]" />
                 Daily Trend
               </h2>
-              <span className="font-mono text-[10px] text-[var(--color-ink-faint)]">
+              <span className="font-mono text-[10px] text-[var(--color-phosphor)]">
                 21 days
               </span>
             </div>
-            {/* Mini bar chart */}
+            {/* Mini bar chart — amber bars with phosphor hover */}
             <div className="flex items-end gap-[3px]" style={{ height: 120 }}>
               {recentDays.length > 0 ? (
                 recentDays.map(({ date, count }) => {
@@ -251,8 +259,8 @@ export default function Dashboard() {
                       className="group relative flex-1 cursor-default"
                       style={{ height: `${h}%` }}
                     >
-                      <div className="absolute inset-0 rounded-sm bg-[var(--color-accent)]/50 transition-colors group-hover:bg-[var(--color-accent)]/80" />
-                      <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 rounded bg-[var(--color-paper-2)] px-1.5 py-0.5 font-mono text-[9px] tabular-nums text-[var(--color-ink)] opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+                      <div className="absolute inset-0 rounded-sm bg-[var(--color-accent)]/40 transition-colors group-hover:bg-[var(--color-accent)]/70" />
+                      <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 rounded bg-[var(--color-paper-2)] px-1.5 py-0.5 font-mono text-[9px] tabular-nums text-[var(--color-accent)] opacity-0 shadow-lg ring-1 ring-[var(--color-paper-3)]/30 transition-opacity group-hover:opacity-100">
                         {count}
                       </div>
                     </div>
@@ -284,7 +292,7 @@ export default function Dashboard() {
       {/* Bottom: Top cameras + status breakdown */}
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Top cameras */}
-        <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
+        <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
           <CardContent className="p-4">
             <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold text-[var(--color-ink)]">
               <Camera className="h-3.5 w-3.5 text-[var(--color-accent)]" />
@@ -298,13 +306,13 @@ export default function Dashboard() {
                     <span className="w-4 text-right font-mono text-[10px] tabular-nums text-[var(--color-ink-faint)]">
                       {i + 1}
                     </span>
-                    <span className="w-32 truncate text-[11px] text-[var(--color-ink-muted)]">
+                    <span className="w-32 truncate font-mono text-[11px] text-[var(--color-phosphor)]">
                       {cam.camera_id}
                     </span>
                     <div className="flex-1">
-                      <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/50">
+                      <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/40">
                         <div
-                          className="h-1.5 rounded-full bg-[var(--color-accent)]/60 transition-all duration-500"
+                          className="h-1.5 rounded-full bg-[var(--color-accent)]/50 transition-all duration-500"
                           style={{ width: `${(cam.count / topCount) * 100}%` }}
                         />
                       </div>
@@ -320,7 +328,7 @@ export default function Dashboard() {
         </Card>
 
         {/* Status breakdown */}
-        <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
+        <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
           <CardContent className="p-4">
             <h2 className="mb-3 text-xs font-semibold text-[var(--color-ink)]">
               Review Status
@@ -332,8 +340,8 @@ export default function Dashboard() {
                       const total = totalViolations || 1;
                       const pct = ((count / total) * 100).toFixed(0);
                       const colorMap: Record<string, string> = {
-                        pending: "var(--color-warning)",
-                        approved: "var(--color-success)",
+                        pending: "var(--color-accent)",
+                        approved: "var(--color-phosphor)",
                         rejected: "var(--color-danger)",
                       };
                       const color = colorMap[status] ?? "var(--color-accent)";
@@ -354,7 +362,7 @@ export default function Dashboard() {
                               </span>
                             </span>
                           </div>
-                          <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/50">
+                          <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/40">
                             <div
                               className="h-1.5 rounded-full transition-all duration-700"
                               style={{

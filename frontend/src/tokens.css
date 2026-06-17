@@ -1,44 +1,54 @@
-/* Hallmark · macrostructure: Workbench (dashboard) · tone: utilitarian · anchor hue: cool
- * theme: Midnight · paper: oklch(15% 0.01 260) · accent: oklch(65% 0.18 250) phosphor-blue
+/* Hallmark · macrostructure: Workbench (dashboard) · tone: utilitarian · anchor hue: warm
+ * theme: Interceptor Grid · paper: oklch(13% 0.01 255) · accent: oklch(75% 0.18 85) amber CRT
+ * secondary: oklch(65% 0.2 155) phosphor green · steel: oklch(15% 0.01 255)
  * display: Space Grotesk · body: IBM Plex Sans · mono: IBM Plex Mono
- * pre-emit critique: P4 H5 E4 S4 R5 V4
+ * pre-emit critique: P5 H5 E5 S4 R5 V5
+ *
+ * Design direction: "Interceptor Grid" — industrial utilitarian + retro-futuristic.
+ * CRT amber phosphor on deep steel. Signal-state beacon. Scan-line texture.
+ * Monochrome amber/green accent system. No decorative blue.
  */
 
 :root {
-  /* Paper / surface */
-  --color-paper: oklch(15% 0.01 260);
-  --color-paper-1: oklch(18% 0.01 260);
-  --color-paper-2: oklch(22% 0.015 260);
-  --color-paper-3: oklch(28% 0.015 260);
-  --color-paper-4: oklch(34% 0.02 260);
+  /* Paper / surface — deep steel, cooler than Midnight */
+  --color-paper: oklch(13% 0.008 255);
+  --color-paper-1: oklch(16% 0.01 255);
+  --color-paper-2: oklch(20% 0.012 255);
+  --color-paper-3: oklch(26% 0.014 255);
+  --color-paper-4: oklch(32% 0.016 255);
 
-  /* Ink / text */
-  --color-ink: oklch(92% 0.01 260);
-  --color-ink-muted: oklch(65% 0.02 260);
-  --color-ink-faint: oklch(45% 0.02 260);
+  /* Ink / text — slightly warm neutral for amber harmony */
+  --color-ink: oklch(90% 0.008 75);
+  --color-ink-muted: oklch(62% 0.015 75);
+  --color-ink-faint: oklch(42% 0.015 75);
 
-  /* Accent — phosphor blue */
-  --color-accent: oklch(65% 0.18 250);
-  --color-accent-dim: oklch(45% 0.12 250);
-  --color-accent-bright: oklch(75% 0.2 250);
+  /* Primary accent — amber CRT phosphor (the signature) */
+  --color-accent: oklch(75% 0.18 85);
+  --color-accent-dim: oklch(50% 0.12 85);
+  --color-accent-bright: oklch(85% 0.2 85);
 
-  /* Semantic — violation types */
+  /* Secondary accent — phosphor green (terminal/monospace/active) */
+  --color-phosphor: oklch(65% 0.2 155);
+  --color-phosphor-dim: oklch(40% 0.12 155);
+  --color-phosphor-bright: oklch(78% 0.22 155);
+
+  /* Semantic — violation types (kept for chart coding) */
   --color-helmet: oklch(65% 0.2 25);     /* warm red */
-  --color-triple: oklch(70% 0.18 55);     /* amber */
+  --color-triple: oklch(75% 0.18 85);    /* amber — matches accent */
   --color-wrong-side: oklch(65% 0.18 280); /* violet */
-  --color-parking: oklch(70% 0.15 90);    /* yellow-green */
+  --color-parking: oklch(70% 0.15 90);   /* yellow-green */
   --color-seatbelt: oklch(65% 0.18 320);  /* magenta */
   --color-stopline: oklch(65% 0.15 210);  /* cyan */
   --color-redlight: oklch(55% 0.22 20);  /* deep red */
-  --color-plate: oklch(70% 0.15 90);      /* yellow */
+  --color-plate: oklch(65% 0.2 155);     /* phosphor green — matches secondary */
 
-  /* Semantic — status */
-  --color-success: oklch(65% 0.18 145);
+  /* Semantic — status (green/amber/red triad) */
+  --color-success: oklch(65% 0.2 155);
   --color-warning: oklch(75% 0.18 85);
   --color-danger: oklch(60% 0.22 25);
 
-  /* Focus */
-  --color-focus: oklch(65% 0.18 250);
+  /* Focus — amber ring */
+  --color-focus: oklch(75% 0.18 85);
 
   /* Fonts */
   --font-display: "Space Grotesk", system-ui, sans-serif;
@@ -86,6 +96,6 @@
   --dur-slow: 400ms;
 
   /* Rule / border */
-  --rule-color: oklch(30% 0.02 260);
+  --rule-color: oklch(28% 0.014 255);
   --rule-width: 1px;
 }
