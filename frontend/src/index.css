@@ -1,44 +1,185 @@
 @import "tailwindcss";
 @import "./tokens.css";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ── VigilAI Interceptor Grid Theme ── */
 
 @theme {
-  --color-paper: oklch(15% 0.01 260);
-  --color-paper-1: oklch(18% 0.01 260);
-  --color-paper-2: oklch(22% 0.015 260);
-  --color-paper-3: oklch(28% 0.015 260);
-  --color-paper-4: oklch(34% 0.02 260);
+  /* Paper / surface — deep steel */
+  --color-paper: oklch(13% 0.008 255);
+  --color-paper-1: oklch(16% 0.01 255);
+  --color-paper-2: oklch(20% 0.012 255);
+  --color-paper-3: oklch(26% 0.014 255);
+  --color-paper-4: oklch(32% 0.016 255);
 
-  --color-ink: oklch(92% 0.01 260);
-  --color-ink-muted: oklch(65% 0.02 260);
-  --color-ink-faint: oklch(45% 0.02 260);
+  /* Ink / text — warm neutral */
+  --color-ink: oklch(90% 0.008 75);
+  --color-ink-muted: oklch(62% 0.015 75);
+  --color-ink-faint: oklch(42% 0.015 75);
 
-  --color-accent: oklch(65% 0.18 250);
-  --color-accent-dim: oklch(45% 0.12 250);
-  --color-accent-bright: oklch(75% 0.2 250);
+  /* Primary accent — amber CRT */
+  --color-accent: oklch(75% 0.18 85);
+  --color-accent-dim: oklch(50% 0.12 85);
+  --color-accent-bright: oklch(85% 0.2 85);
 
+  /* Secondary accent — phosphor green */
+  --color-phosphor: oklch(65% 0.2 155);
+  --color-phosphor-dim: oklch(40% 0.12 155);
+  --color-phosphor-bright: oklch(78% 0.22 155);
+
+  /* Semantic — violation types */
   --color-helmet: oklch(65% 0.2 25);
-  --color-triple: oklch(70% 0.18 55);
+  --color-triple: oklch(75% 0.18 85);
   --color-wrong-side: oklch(65% 0.18 280);
   --color-parking: oklch(70% 0.15 90);
   --color-seatbelt: oklch(65% 0.18 320);
   --color-stopline: oklch(65% 0.15 210);
   --color-redlight: oklch(55% 0.22 20);
-  --color-plate: oklch(70% 0.15 90);
+  --color-plate: oklch(65% 0.2 155);
 
-  --color-success: oklch(65% 0.18 145);
+  /* Semantic — status */
+  --color-success: oklch(65% 0.2 155);
   --color-warning: oklch(75% 0.18 85);
   --color-danger: oklch(60% 0.22 25);
 
+  /* Fonts */
   --font-display: "Space Grotesk", system-ui, sans-serif;
   --font-body: "IBM Plex Sans", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", "Cascadia Code", monospace;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* ── shadcn dark-mode overrides (Interceptor Grid palette) ── */
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: 'Geist Variable', sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
+
+/* Interceptor Grid dark theme — amber primary, phosphor green secondary */
+.dark {
+  --background: oklch(11% 0.008 255);
+  --foreground: oklch(90% 0.008 75);
+  --card: oklch(14% 0.01 255);
+  --card-foreground: oklch(90% 0.008 75);
+  --popover: oklch(14% 0.01 255);
+  --popover-foreground: oklch(90% 0.008 75);
+  --primary: oklch(75% 0.18 85);
+  --primary-foreground: oklch(11% 0.008 85);
+  --secondary: oklch(20% 0.012 255);
+  --secondary-foreground: oklch(82% 0.01 75);
+  --muted: oklch(18% 0.01 255);
+  --muted-foreground: oklch(58% 0.015 75);
+  --accent: oklch(20% 0.012 255);
+  --accent-foreground: oklch(82% 0.01 75);
+  --destructive: oklch(60% 0.22 25);
+  --border: oklch(26% 0.014 255);
+  --input: oklch(26% 0.014 255);
+  --ring: oklch(75% 0.18 85);
+  --chart-1: oklch(75% 0.18 85);
+  --chart-2: oklch(65% 0.2 155);
+  --chart-3: oklch(65% 0.2 25);
+  --chart-4: oklch(70% 0.15 90);
+  --chart-5: oklch(65% 0.18 280);
+  --sidebar: oklch(12% 0.008 255);
+  --sidebar-foreground: oklch(82% 0.01 75);
+  --sidebar-primary: oklch(75% 0.18 85);
+  --sidebar-primary-foreground: oklch(11% 0.008 85);
+  --sidebar-accent: oklch(20% 0.012 255);
+  --sidebar-accent-foreground: oklch(82% 0.01 75);
+  --sidebar-border: oklch(24% 0.012 255);
+  --sidebar-ring: oklch(75% 0.18 85);
+}
+
+:root {
+  --background: oklch(11% 0.008 255);
+  --foreground: oklch(90% 0.008 75);
+  --card: oklch(14% 0.01 255);
+  --card-foreground: oklch(90% 0.008 75);
+  --popover: oklch(14% 0.01 255);
+  --popover-foreground: oklch(90% 0.008 75);
+  --primary: oklch(75% 0.18 85);
+  --primary-foreground: oklch(11% 0.008 85);
+  --secondary: oklch(20% 0.012 255);
+  --secondary-foreground: oklch(82% 0.01 75);
+  --muted: oklch(18% 0.01 255);
+  --muted-foreground: oklch(58% 0.015 75);
+  --accent: oklch(20% 0.012 255);
+  --accent-foreground: oklch(82% 0.01 75);
+  --destructive: oklch(60% 0.22 25);
+  --border: oklch(26% 0.014 255);
+  --input: oklch(26% 0.014 255);
+  --ring: oklch(75% 0.18 85);
+  --chart-1: oklch(75% 0.18 85);
+  --chart-2: oklch(65% 0.2 155);
+  --chart-3: oklch(65% 0.2 25);
+  --chart-4: oklch(70% 0.15 90);
+  --chart-5: oklch(65% 0.18 280);
+  --radius: 0.5rem;
+  --sidebar: oklch(12% 0.008 255);
+  --sidebar-foreground: oklch(82% 0.01 75);
+  --sidebar-primary: oklch(75% 0.18 85);
+  --sidebar-primary-foreground: oklch(11% 0.008 85);
+  --sidebar-accent: oklch(20% 0.012 255);
+  --sidebar-accent-foreground: oklch(82% 0.01 75);
+  --sidebar-border: oklch(24% 0.012 255);
+  --sidebar-ring: oklch(75% 0.18 85);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* ── Base resets ── */
 
 body {
   font-family: var(--font-body);
@@ -56,15 +197,227 @@ code, pre, .font-mono {
   font-family: var(--font-mono);
 }
 
+/* ── Scrollbar ── */
+
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-paper-1);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--color-paper-4);
   border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-faint);
+}
+
+/* ── Glass card effect (amber-tinted) ── */
+
+.glass {
+  background: oklch(16% 0.012 255 / 0.6);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid oklch(28% 0.014 255 / 0.4);
+}
+
+.glass-subtle {
+  background: oklch(16% 0.012 255 / 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid oklch(26% 0.014 255 / 0.3);
+}
+
+/* ── Glow effects (amber CRT primary) ── */
+
+.glow-accent {
+  box-shadow: 0 0 20px oklch(75% 0.18 85 / 0.15),
+              0 0 60px oklch(75% 0.18 85 / 0.05);
+}
+
+.glow-danger {
+  box-shadow: 0 0 20px oklch(60% 0.22 25 / 0.15),
+              0 0 60px oklch(60% 0.22 25 / 0.05);
+}
+
+.glow-success {
+  box-shadow: 0 0 20px oklch(65% 0.2 155 / 0.15),
+              0 0 60px oklch(65% 0.2 155 / 0.05);
+}
+
+.glow-phosphor {
+  box-shadow: 0 0 20px oklch(65% 0.2 155 / 0.2),
+              0 0 60px oklch(65% 0.2 155 / 0.08);
+}
+
+/* ── Accent line (amber) ── */
+
+.accent-line-top {
+  position: relative;
+}
+
+.accent-line-top::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    oklch(75% 0.18 85 / 0),
+    oklch(75% 0.18 85 / 0.8),
+    oklch(75% 0.18 85 / 0)
+  );
+}
+
+/* ── CRT scan-line overlay (static texture — the signature) ── */
+
+.scan-overlay {
+  position: relative;
+}
+
+.scan-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: repeating-linear-gradient(
+    0deg,
+    oklch(11% 0.008 255 / 0) 0px,
+    oklch(11% 0.008 255 / 0) 1px,
+    oklch(11% 0.008 255 / 0.03) 1px,
+    oklch(11% 0.008 255 / 0.03) 2px
+  );
+  mix-blend-mode: multiply;
+}
+
+/* ── Animated scan line (subtle sweep) ── */
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.scan-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    oklch(75% 0.18 85 / 0.02) 0%,
+    oklch(75% 0.18 85 / 0.05) 50%,
+    oklch(75% 0.18 85 / 0.02) 100%
+  );
+  height: 40px;
+  animation: scan-line 6s linear infinite;
+  pointer-events: none;
+}
+
+/* ── Pulse dot ── */
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* ── Beacon pulse (signal state indicator) ── */
+
+@keyframes beacon-pulse {
+  0%, 100% {
+    box-shadow: 0 0 4px currentColor,
+                0 0 8px currentColor;
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 8px currentColor,
+                0 0 16px currentColor,
+                0 0 24px currentColor;
+    opacity: 0.8;
+  }
+}
+
+.beacon {
+  animation: beacon-pulse 2.5s ease-in-out infinite;
+}
+
+/* ── Grid pattern overlay (tactical graph paper) ── */
+
+.grid-pattern {
+  background-image:
+    linear-gradient(oklch(28% 0.014 255 / 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(28% 0.014 255 / 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ── Shimmer loading ── */
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-paper-2) 25%,
+    var(--color-paper-3) 50%,
+    var(--color-paper-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ── Phosphor text (CRT terminal green on monospace) ── */
+
+.text-phosphor {
+  color: oklch(65% 0.2 155);
+}
+
+/* ── Amber text (CRT amber phosphor) ── */
+
+.text-amber {
+  color: oklch(75% 0.18 85);
+}
+
+/* ── Steel divider ── */
+
+.steel-divider {
+  border-color: oklch(24% 0.012 255 / 0.6);
+}
+
+/* ── Reduced motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-line::after,
+  .pulse-dot,
+  .beacon,
+  .shimmer {
+    animation: none;
+  }
+}
+
+/* ── Print styles ── */
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .scan-overlay::before {
+    display: none;
+  }
 }

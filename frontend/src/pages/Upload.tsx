@@ -1,7 +1,11 @@
 /**
  * Upload page — drag-and-drop image upload for violation detection.
- * Shows a pipeline waterfall chart for timing breakdown and the
- * AnnotatedViewer with overlaid bounding boxes for detection results.
+ *
+ * Design: "Detection Pipeline Console"
+ * - Glass-morphic drop zone with animated border
+ * - Stepped pipeline visualization with timing stages
+ * - Rich violation result cards with shadcn components
+ * - AnnotatedViewer with bbox overlays
  */
 
 import { useState, useRef, useCallback } from "react";
@@ -12,6 +16,7 @@ import {
   CheckCircle2,
   XCircle,
   AlertTriangle,
+  Zap,
 } from "lucide-react";
 import { detectViolation } from "@/lib/api";
 import type { DetectResponse, ViolationRecord } from "@/types/violation";
@@ -23,6 +28,17 @@ import {
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
 import AnnotatedViewer from "@/components/AnnotatedViewer";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 
 const DEMO_CAMERAS = [
   { id: "MGROAD-01", name: "MG Road — Trinity Circle" },
@@ -37,15 +53,15 @@ const DEMO_CAMERAS = [
   { id: "KORMANGALA-01", name: "Koramangala 100ft Road" },
 ];
 
-/** Mapping from timing_breakdown keys to display labels and CSS colors. */
-const PIPELINE_STAGES: { key: string; label: string; color: string }[] = [
-  { key: "preprocess_ms", label: "Preprocess", color: "var(--color-ink-faint)" },
-  { key: "detect_coco_ms", label: "COCO Detect", color: "var(--color-accent)" },
-  { key: "detect_helmet_ms", label: "Helmet Detect", color: "var(--color-accent-bright)" },
-  { key: "violation_logic_ms", label: "Violation Logic", color: "var(--color-warning)" },
-  { key: "detect_plate_ms", label: "Plate Detect", color: "var(--color-triple)" },
-  { key: "ocr_ms", label: "OCR", color: "var(--color-plate)" },
-  { key: "evidence_gen_ms", label: "Evidence Gen", color: "var(--color-success)" },
+/** Pipeline stages with display metadata. */
+const PIPELINE_STAGES: { key: string; label: string; color: string; abbr: string }[] = [
+  { key: "preprocess_ms", label: "Preprocess", color: "var(--color-ink-faint)", abbr: "PRE" },
+  { key: "detect_coco_ms", label: "COCO Detect", color: "var(--color-accent)", abbr: "COCO" },
+  { key: "detect_helmet_ms", label: "Helmet Detect", color: "var(--color-accent-bright)", abbr: "HELM" },
+  { key: "violation_logic_ms", label: "Violation Logic", color: "var(--color-warning)", abbr: "VIOL" },
+  { key: "detect_plate_ms", label: "Plate Detect", color: "var(--color-triple)", abbr: "PLATE" },
+  { key: "ocr_ms", label: "OCR", color: "var(--color-plate)", abbr: "OCR" },
+  { key: "evidence_gen_ms", label: "Evidence Gen", color: "var(--color-success)", abbr: "EVID" },
 ];
 
 export default function Upload() {
@@ -55,6 +71,7 @@ export default function Upload() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<DetectResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const signalState = useAppStore((s) => s.signalState);
   const setLastDetection = useAppStore((s) => s.setLastDetection);
@@ -74,6 +91,7 @@ export default function Upload() {
   const onDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
+      setDragOver(false);
       const f = e.dataTransfer.files[0];
       if (f) handleFile(f);
     },
@@ -104,46 +122,77 @@ export default function Upload() {
     : 1;
 
   return (
-    <div className="p-6">
-      <header className="mb-6">
-        <h1 className="text-2xl font-semibold text-[var(--color-ink)]">
-          Detect Violations
-        </h1>
-        <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
-          Upload a traffic camera image to run violation detection
-        </p>
+    <div className="p-5">
+      <header className="mb-5">
+        <div className="flex items-center gap-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent)]/15">
+            <Zap className="h-4 w-4 text-[var(--color-accent)]" />
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">
+              Detect Violations
+            </h1>
+            <p className="text-[11px] text-[var(--color-ink-faint)]">
+              Upload a traffic camera image to run the violation detection pipeline
+            </p>
+          </div>
+        </div>
       </header>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Upload area */}
-        <div>
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
+        {/* Upload panel — 2 cols */}
+        <div className="space-y-4 lg:col-span-2">
+          {/* Drop zone */}
           <div
-            onDragOver={(e) => e.preventDefault()}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOver(true);
+            }}
+            onDragLeave={() => setDragOver(false)}
             onDrop={onDrop}
             onClick={() => fileRef.current?.click()}
             className={cn(
-              "flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-10 transition-colors",
-              "border-[var(--color-paper-3)] hover:border-[var(--color-accent-dim)] hover:bg-[var(--color-paper-1)]",
-              preview &&
-                "border-[var(--color-accent-dim)] bg-[var(--color-paper-1)]",
+              "group relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-all duration-300",
+              dragOver
+                ? "border-[var(--color-accent)] bg-[var(--color-accent)]/5"
+                : preview
+                  ? "border-[var(--color-accent)]/40 bg-[var(--color-paper-1)]/50"
+                  : "border-[var(--color-paper-3)] bg-[var(--color-paper-1)]/30 hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-paper-1)]/50",
             )}
           >
+            {/* Animated border glow on drag */}
+            {dragOver && (
+              <div className="absolute inset-0 rounded-lg glow-accent pointer-events-none" />
+            )}
+
             {preview ? (
-              <img
-                src={preview}
-                alt="Preview"
-                className="max-h-64 rounded object-contain"
-              />
+              <div className="relative w-full">
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="max-h-56 mx-auto rounded object-contain"
+                />
+                <div className="absolute right-1 top-1">
+                  <Badge
+                    variant="outline"
+                    className="border-[var(--color-success)]/30 bg-[var(--color-success)]/10 text-[9px] text-[var(--color-success)]"
+                  >
+                    Ready
+                  </Badge>
+                </div>
+              </div>
             ) : (
-              <>
-                <UploadIcon className="mb-3 h-10 w-10 text-[var(--color-ink-faint)]" />
+              <div className="text-center">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-paper-3)]/40">
+                  <UploadIcon className="h-5 w-5 text-[var(--color-ink-faint)]" />
+                </div>
                 <p className="text-sm text-[var(--color-ink-muted)]">
                   Drop image or click to browse
                 </p>
-                <p className="mt-1 text-xs text-[var(--color-ink-faint)]">
+                <p className="mt-1 text-[10px] text-[var(--color-ink-faint)]">
                   JPEG / PNG, max 10MB
                 </p>
-              </>
+              </div>
             )}
             <input
               ref={fileRef}
@@ -158,137 +207,175 @@ export default function Upload() {
           </div>
 
           {/* Controls */}
-          <div className="mt-4 space-y-3">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-[var(--color-ink-muted)]">
-                Camera ID
-              </label>
-              <select
-                value={cameraId}
-                onChange={(e) => setCameraId(e.target.value)}
-                className="w-full rounded-md border border-[var(--color-paper-3)] bg-[var(--color-paper-2)] px-3 py-2 text-sm text-[var(--color-ink)]"
+          <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
+            <CardContent className="space-y-3 p-3.5">
+              {/* Camera select */}
+              <div>
+                <label className="mb-1.5 block text-[10px] font-medium tracking-wider text-[var(--color-ink-faint)] uppercase">
+                  Camera ID
+                </label>
+                <Select value={cameraId} onValueChange={(val) => { if (val !== null) setCameraId(val); }}>
+                  <SelectTrigger className="h-8 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50 text-xs">
+                    <SelectValue placeholder="Select camera (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DEMO_CAMERAS.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        <span className="text-xs">{c.name}</span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Signal state */}
+              <div className="flex items-center gap-2 rounded-md bg-[var(--color-paper-2)]/50 px-3 py-1.5">
+                <Camera className="h-3.5 w-3.5 text-[var(--color-ink-faint)]" />
+                <span className="text-[10px] text-[var(--color-ink-faint)] uppercase tracking-wider">
+                  Signal:
+                </span>
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-[9px] font-mono",
+                    signalState === "red"
+                      ? "border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 text-[var(--color-danger)]"
+                      : signalState === "green"
+                        ? "border-[var(--color-success)]/30 bg-[var(--color-success)]/10 text-[var(--color-success)]"
+                        : "border-[var(--color-paper-4)] bg-[var(--color-paper-3)]/30 text-[var(--color-ink-faint)]",
+                  )}
+                >
+                  {signalState.toUpperCase()}
+                </Badge>
+              </div>
+
+              {/* Submit button */}
+              <Button
+                onClick={onSubmit}
+                disabled={!file || loading}
+                className={cn(
+                  "w-full text-xs font-semibold",
+                  file && !loading
+                    ? "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-bright)]"
+                    : "bg-[var(--color-paper-3)] text-[var(--color-ink-faint)]",
+                )}
               >
-                <option value="">Select camera (optional)</option>
-                {DEMO_CAMERAS.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    Processing pipeline...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <Zap className="h-3.5 w-3.5" />
+                    Run Detection
+                  </span>
+                )}
+              </Button>
 
-            <div className="flex items-center gap-2 rounded-md bg-[var(--color-paper-2)] px-3 py-2">
-              <Camera className="h-4 w-4 text-[var(--color-ink-faint)]" />
-              <span className="text-xs text-[var(--color-ink-muted)]">
-                Signal:{" "}
-                <span className="font-medium capitalize text-[var(--color-ink)]">
-                  {signalState}
-                </span>
-              </span>
-            </div>
-
-            <button
-              onClick={onSubmit}
-              disabled={!file || loading}
-              className={cn(
-                "w-full rounded-md px-4 py-2.5 text-sm font-semibold transition-colors",
-                file && !loading
-                  ? "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-bright)]"
-                  : "bg-[var(--color-paper-3)] text-[var(--color-ink-faint)] cursor-not-allowed",
+              {error && (
+                <div className="flex items-center gap-2 rounded-md bg-[var(--color-danger)]/10 px-3 py-2">
+                  <XCircle className="h-3.5 w-3.5 shrink-0 text-[var(--color-danger)]" />
+                  <span className="text-[11px] text-[var(--color-danger)]">{error}</span>
+                </div>
               )}
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Processing...
-                </span>
-              ) : (
-                "Run Detection"
-              )}
-            </button>
-          </div>
-
-          {error && (
-            <div className="mt-3 flex items-center gap-2 rounded-md bg-[var(--color-danger)]/10 px-3 py-2">
-              <XCircle className="h-4 w-4 text-[var(--color-danger)]" />
-              <span className="text-xs text-[var(--color-danger)]">{error}</span>
-            </div>
-          )}
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Results */}
-        <div>
+        {/* Results panel — 3 cols */}
+        <div className="lg:col-span-3">
           {result ? (
             <div className="space-y-4">
-              <div className="flex items-center gap-2 rounded-md bg-[var(--color-success)]/10 px-3 py-2">
+              {/* Result summary */}
+              <div className="flex items-center gap-3 rounded-lg bg-[var(--color-success)]/8 px-4 py-2.5 ring-1 ring-[var(--color-success)]/20">
                 <CheckCircle2 className="h-4 w-4 text-[var(--color-success)]" />
                 <span className="text-sm font-medium text-[var(--color-success)]">
-                  {result.violations.length} violation(s) detected in{" "}
+                  {result.violations.length} violation(s) detected
+                </span>
+                <Separator orientation="vertical" className="h-4 bg-[var(--color-success)]/20" />
+                <span className="font-mono text-xs tabular-nums text-[var(--color-success)]/80">
                   {result.processing_time_ms}ms
                 </span>
               </div>
 
               {/* Pipeline waterfall chart */}
-              <div className="rounded-lg border border-[var(--color-paper-3)] bg-[var(--color-paper-1)] p-4">
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                  Pipeline Timing — {result.processing_time_ms}ms total
-                </h3>
-                <div className="space-y-2">
-                  {PIPELINE_STAGES.map((stage) => {
-                    const ms =
-                      (result.timing_breakdown as unknown as Record<string, number>)[
-                        stage.key
-                      ] ?? 0;
-                    const pct = Math.max((ms / maxMs) * 100, 2);
-                    return (
-                      <div key={stage.key} className="flex items-center gap-3">
-                        <span className="w-28 shrink-0 text-[10px] font-medium text-[var(--color-ink-muted)]">
-                          {stage.label}
-                        </span>
-                        <div className="flex-1 overflow-hidden rounded bg-[var(--color-paper-3)]/50">
-                          <div
-                            className="h-5 rounded transition-all duration-500"
-                            style={{
-                              width: `${pct}%`,
-                              backgroundColor: stage.color,
-                            }}
-                          />
+              <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
+                <CardContent className="p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                      Pipeline Timing
+                    </h3>
+                    <span className="font-mono text-[10px] tabular-nums text-[var(--color-accent)]">
+                      {result.processing_time_ms}ms total
+                    </span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {PIPELINE_STAGES.map((stage) => {
+                      const ms =
+                        (result.timing_breakdown as unknown as Record<string, number>)[
+                          stage.key
+                        ] ?? 0;
+                      const pct = Math.max((ms / maxMs) * 100, 3);
+                      return (
+                        <div key={stage.key} className="flex items-center gap-2">
+                          <span className="w-12 shrink-0 text-right font-mono text-[9px] font-medium text-[var(--color-ink-faint)]">
+                            {stage.abbr}
+                          </span>
+                          <div className="flex-1 overflow-hidden rounded-sm bg-[var(--color-paper-3)]/30">
+                            <div
+                              className="h-4 rounded-sm transition-all duration-700"
+                              style={{
+                                width: `${pct}%`,
+                                backgroundColor: stage.color,
+                                opacity: 0.7,
+                              }}
+                            />
+                          </div>
+                          <span className="w-14 shrink-0 text-right font-mono text-[10px] tabular-nums text-[var(--color-ink-muted)]">
+                            {ms}ms
+                          </span>
                         </div>
-                        <span className="w-14 shrink-0 text-right font-mono text-[10px] tabular-nums text-[var(--color-ink)]">
-                          {ms}ms
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
 
-              {/* Annotated image with bbox overlay */}
+              {/* Annotated image */}
               {preview && result.violations.length > 0 && (
-                <AnnotatedViewer
-                  imageUrl={preview}
-                  violations={result.violations}
-                  className="rounded-lg border border-[var(--color-paper-3)] bg-[var(--color-paper-1)] p-2"
-                  alt="Detected violations"
-                />
+                <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 overflow-hidden">
+                  <CardContent className="p-2">
+                    <AnnotatedViewer
+                      imageUrl={preview}
+                      violations={result.violations}
+                      alt="Detected violations"
+                    />
+                  </CardContent>
+                </Card>
               )}
 
-              {/* Violation list */}
+              {/* Violation result cards */}
               <div className="space-y-2">
                 {result.violations.map((v: ViolationRecord) => (
-                  <ViolationCard key={v.id} violation={v} />
+                  <ViolationResultCard key={v.id} violation={v} />
                 ))}
               </div>
             </div>
           ) : (
-            <div className="flex h-full items-center justify-center rounded-lg border border-[var(--color-paper-3)] bg-[var(--color-paper-1)] p-10">
+            <Card className="flex h-80 items-center justify-center border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/30">
               <div className="text-center">
-                <AlertTriangle className="mx-auto mb-3 h-8 w-8 text-[var(--color-ink-faint)]" />
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-paper-3)]/30">
+                  <AlertTriangle className="h-5 w-5 text-[var(--color-ink-faint)]" />
+                </div>
                 <p className="text-sm text-[var(--color-ink-muted)]">
                   Upload an image to see detection results
                 </p>
+                <p className="mt-1 text-[10px] text-[var(--color-ink-faint)]">
+                  The pipeline will process and return violations in real-time
+                </p>
               </div>
-            </div>
+            </Card>
           )}
         </div>
       </div>
@@ -296,48 +383,58 @@ export default function Upload() {
   );
 }
 
-/** Compact card for a single violation row in the results list. */
-function ViolationCard({ violation }: { violation: ViolationRecord }) {
+/** Compact result card for a single detected violation. */
+function ViolationResultCard({ violation: v }: { violation: ViolationRecord }) {
   const vColor =
-    VIOLATION_COLORS[violation.violation_type] ?? "var(--color-accent)";
+    VIOLATION_COLORS[v.violation_type] ?? "var(--color-accent)";
   const vLabel =
-    VIOLATION_LABELS[violation.violation_type] ?? violation.violation_type;
+    VIOLATION_LABELS[v.violation_type] ?? v.violation_type;
   const vSection =
-    VIOLATION_SECTIONS[violation.violation_type] ?? "S.177";
+    VIOLATION_SECTIONS[v.violation_type] ?? "S.177";
+
+  const tierColor = {
+    high: "border-[var(--color-success)]/30 bg-[var(--color-success)]/10 text-[var(--color-success)]",
+    medium: "border-[var(--color-warning)]/30 bg-[var(--color-warning)]/10 text-[var(--color-warning)]",
+    low: "border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 text-[var(--color-danger)]",
+  }[v.confidence_tier] ?? "";
 
   return (
-    <div className="flex items-start gap-3 rounded-md border border-[var(--color-paper-3)] bg-[var(--color-paper-1)] p-3">
-      <div
-        className="mt-0.5 h-2.5 w-2.5 rounded-full"
-        style={{ backgroundColor: vColor }}
-      />
-      <div className="flex-1">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-[var(--color-ink)]">
-            {vLabel}
-          </span>
-          <span className="font-mono text-xs text-[var(--color-ink-muted)]">
-            {vSection}
-          </span>
-        </div>
-        <div className="mt-1 flex items-center gap-3 text-xs text-[var(--color-ink-muted)]">
-          <span>
-            Confidence:{" "}
-            <span className="font-medium text-[var(--color-ink)]">
-              {(violation.confidence * 100).toFixed(0)}%
+    <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 overflow-hidden">
+      <div className="flex">
+        {/* Left color accent strip */}
+        <div className="w-1 shrink-0" style={{ backgroundColor: vColor }} />
+        <CardContent className="flex-1 p-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-[var(--color-ink)]">
+                {vLabel}
+              </span>
+              <Badge variant="outline" className={cn("text-[9px]", tierColor)}>
+                {v.confidence_tier}
+              </Badge>
+            </div>
+            <div className="flex items-center gap-3">
+              {v.license_plate && (
+                <span className="rounded bg-[var(--color-accent)]/10 px-2 py-0.5 font-mono text-[11px] font-semibold text-[var(--color-accent)]">
+                  {v.license_plate.text}
+                </span>
+              )}
+              <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-muted)]">
+                {(v.confidence * 100).toFixed(0)}%
+              </span>
+              <span className="font-mono text-[10px] text-[var(--color-ink-faint)]">
+                {vSection}
+              </span>
+            </div>
+          </div>
+          <div className="mt-1 flex items-center gap-4 text-[10px] text-[var(--color-ink-faint)]">
+            <span>
+              Fine: <span className="font-medium text-[var(--color-warning)]">₹{v.fine_amount.toLocaleString("en-IN")}</span>
             </span>
-          </span>
-          <span className="capitalize">{violation.confidence_tier}</span>
-          {violation.license_plate && (
-            <span className="font-mono font-medium text-[var(--color-accent)]">
-              {violation.license_plate.text}
-            </span>
-          )}
-        </div>
-        <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
-          Fine: ₹{violation.fine_amount.toLocaleString("en-IN")}
-        </p>
+            {v.camera_id && <span>Camera: {v.camera_id}</span>}
+          </div>
+        </CardContent>
       </div>
-    </div>
+    </Card>
   );
 }

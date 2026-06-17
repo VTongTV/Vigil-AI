@@ -1,15 +1,20 @@
 /**
  * Map page — full-page Leaflet map centered on Bengaluru with violation
- * markers fetched from the API. Each marker is colour-coded by violation
- * type and shows a popup with details on click.
+ * markers fetched from the API. Colour-coded by violation type with
+ * popups showing details on click.
+ *
+ * Design: "Tactical Map Overlay"
+ * - Dark CartoDB tiles with violation markers
+ * - Floating filter/count panel in the corner
+ * - Legend overlay
  */
 
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import { listViolations } from "@/lib/api";
-import type { ViolationRecord } from "@/types/violation";
+import type { ViolationRecord, ViolationType } from "@/types/violation";
 import { VIOLATION_LABELS, VIOLATION_COLORS } from "@/types/violation";
-
+import { Card, CardContent } from "@/components/ui/card";
 /** Bengaluru city-centre coordinates. */
 const BENGALURU_CENTER: [number, number] = [12.9716, 77.5946];
 
@@ -58,13 +63,25 @@ export default function Map() {
       !Number.isNaN(v.longitude),
   );
 
+  /** Compute type counts for the legend. */
+  const typeCounts: Partial<Record<ViolationType, number>> = {};
+  for (const v of mapped) {
+    typeCounts[v.violation_type] = (typeCounts[v.violation_type] ?? 0) + 1;
+  }
+  const legendEntries = Object.entries(typeCounts)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 6);
+
   return (
     <div className="relative h-full w-full">
       {loading && (
-        <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-[var(--color-paper)]/80">
-          <p className="text-sm text-[var(--color-ink-muted)]">
-            Loading violations...
-          </p>
+        <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-[var(--color-paper)]/80 backdrop-blur-sm">
+          <div className="space-y-3 text-center">
+            <div className="mx-auto h-8 w-8 rounded-full border-2 border-t-transparent border-[var(--color-accent)] animate-spin" />
+            <p className="text-xs tracking-wider text-[var(--color-ink-faint)] uppercase">
+              Loading violations...
+            </p>
+          </div>
         </div>
       )}
 
@@ -86,45 +103,48 @@ export default function Map() {
             <CircleMarker
               key={v.id}
               center={[v.latitude!, v.longitude!]}
-              radius={7}
+              radius={6}
               pathOptions={{
                 color: color,
                 fillColor: color,
-                fillOpacity: 0.7,
-                weight: 2,
+                fillOpacity: 0.65,
+                weight: 1.5,
               }}
             >
               <Popup>
                 <div
-                  className="space-y-1 text-xs"
+                  className="min-w-40 space-y-1 text-[11px]"
                   style={{ fontFamily: "var(--font-body)" }}
                 >
                   <p className="font-semibold text-[var(--color-ink)]">
                     {VIOLATION_LABELS[v.violation_type] ?? v.violation_type}
                   </p>
-                  <p className="text-[var(--color-ink-muted)]">
-                    ID:{" "}
-                    <span className="font-mono text-[var(--color-ink)]">
-                      {v.id}
-                    </span>
-                  </p>
-                  <p className="text-[var(--color-ink-muted)]">
-                    Confidence:{" "}
-                    <span className="font-medium text-[var(--color-ink)]">
-                      {(v.confidence * 100).toFixed(0)}%
-                    </span>
-                  </p>
-                  <p className="text-[var(--color-ink-muted)]">
-                    Fine:{" "}
-                    <span className="font-medium text-[var(--color-warning)]">
-                      ₹{v.fine_amount.toLocaleString("en-IN")}
-                    </span>
-                  </p>
-                  {v.junction_name && (
-                    <p className="text-[var(--color-ink-muted)]">
-                      Junction: {v.junction_name}
+                  <div className="space-y-0.5 text-[var(--color-ink-muted)]">
+                    <p>
+                      ID:{" "}
+                      <span className="font-mono text-[var(--color-ink)]">
+                        {v.id.slice(0, 8)}…
+                      </span>
                     </p>
-                  )}
+                    <p>
+                      Confidence:{" "}
+                      <span className="font-medium text-[var(--color-ink)]">
+                        {(v.confidence * 100).toFixed(0)}%
+                      </span>
+                    </p>
+                    <p>
+                      Fine:{" "}
+                      <span className="font-medium text-[var(--color-warning)]">
+                        ₹{v.fine_amount.toLocaleString("en-IN")}
+                      </span>
+                    </p>
+                    {v.junction_name && <p>Junction: {v.junction_name}</p>}
+                    {v.license_plate && (
+                      <p className="font-mono text-[var(--color-accent)]">
+                        {v.license_plate.text}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </Popup>
             </CircleMarker>
@@ -132,9 +152,50 @@ export default function Map() {
         })}
       </MapContainer>
 
-      {/* Marker count overlay */}
-      <div className="absolute bottom-4 left-4 z-[1000] rounded-md bg-[var(--color-paper-1)]/90 px-3 py-1.5 text-xs font-medium text-[var(--color-ink-muted)] backdrop-blur-sm">
-        {mapped.length} violation{mapped.length !== 1 ? "s" : ""} mapped
+      {/* Bottom-left: marker count */}
+      <div className="absolute bottom-4 left-4 z-[1000]">
+        <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/85 backdrop-blur-md">
+          <CardContent className="px-3 py-1.5">
+            <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-muted)]">
+              {mapped.length}
+            </span>
+            <span className="ml-1 text-[10px] text-[var(--color-ink-faint)]">
+              violation{mapped.length !== 1 ? "s" : ""} mapped
+            </span>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Top-right: legend */}
+      <div className="absolute right-4 top-4 z-[1000]">
+        <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/85 backdrop-blur-md">
+          <CardContent className="p-3">
+            <p className="mb-2 text-[9px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+              Legend
+            </p>
+            <div className="space-y-1.5">
+              {legendEntries.map(([type, count]) => {
+                const vType = type as ViolationType;
+                const color = VIOLATION_COLORS[vType] ?? "var(--color-accent)";
+                const label = VIOLATION_LABELS[vType] ?? type;
+                return (
+                  <div key={type} className="flex items-center gap-2">
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{ backgroundColor: color }}
+                    />
+                    <span className="text-[10px] text-[var(--color-ink-muted)]">
+                      {label}
+                    </span>
+                    <span className="ml-auto font-mono text-[9px] tabular-nums text-[var(--color-ink-faint)]">
+                      {count}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
