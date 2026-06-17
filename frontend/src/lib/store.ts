@@ -1,7 +1,7 @@
 /** Zustand store for VigilAI app state. */
 
 import { create } from "zustand";
-import type { ViolationRecord } from "../types/violation";
+import type { ASTraMAlert, CameraHealth, ViolationRecord } from "../types/violation";
 
 interface AppState {
   /** Demo mode toggle — uses hardcoded responses when backend is unavailable */
@@ -19,6 +19,20 @@ interface AppState {
   /** Last detection result */
   lastDetection: ViolationRecord[] | null;
   setLastDetection: (v: ViolationRecord[] | null) => void;
+
+  /** ASTraM real-time alerts (F6) */
+  alerts: ASTraMAlert[];
+  addAlert: (alert: ASTraMAlert) => void;
+  dismissAlert: (id: string) => void;
+  clearAlerts: () => void;
+
+  /** Camera health data (F9) */
+  cameras: CameraHealth[];
+  setCameras: (cameras: CameraHealth[]) => void;
+
+  /** ASTraM alert panel open state */
+  alertPanelOpen: boolean;
+  setAlertPanelOpen: (open: boolean) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -36,4 +50,21 @@ export const useAppStore = create<AppState>((set) => ({
 
   lastDetection: null,
   setLastDetection: (v) => set({ lastDetection: v }),
+
+  alerts: [],
+  addAlert: (alert) =>
+    set((state) => ({
+      alerts: [alert, ...state.alerts].slice(0, 50), // Keep last 50 alerts
+    })),
+  dismissAlert: (id) =>
+    set((state) => ({
+      alerts: state.alerts.filter((a) => a.id !== id),
+    })),
+  clearAlerts: () => set({ alerts: [] }),
+
+  cameras: [],
+  setCameras: (cameras) => set({ cameras }),
+
+  alertPanelOpen: false,
+  setAlertPanelOpen: (open) => set({ alertPanelOpen: open }),
 }));
