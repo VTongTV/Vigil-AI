@@ -17,7 +17,6 @@ import {
   XCircle,
   AlertTriangle,
   Zap,
-  ArrowRight,
 } from "lucide-react";
 import { detectViolation } from "@/lib/api";
 import type { DetectResponse, ViolationRecord } from "@/types/violation";
@@ -215,7 +214,7 @@ export default function Upload() {
                 <label className="mb-1.5 block text-[10px] font-medium tracking-wider text-[var(--color-ink-faint)] uppercase">
                   Camera ID
                 </label>
-                <Select value={cameraId} onValueChange={setCameraId}>
+                <Select value={cameraId} onValueChange={(val) => { if (val !== null) setCameraId(val); }}>
                   <SelectTrigger className="h-8 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50 text-xs">
                     <SelectValue placeholder="Select camera (optional)" />
                   </SelectTrigger>
@@ -312,7 +311,7 @@ export default function Upload() {
                     </span>
                   </div>
                   <div className="space-y-1.5">
-                    {PIPELINE_STAGES.map((stage, i) => {
+                    {PIPELINE_STAGES.map((stage) => {
                       const ms =
                         (result.timing_breakdown as unknown as Record<string, number>)[
                           stage.key

@@ -15,7 +15,6 @@ import {
   ShieldAlert,
   TrendingUp,
   Activity,
-  ChevronRight,
 } from "lucide-react";
 import { getAnalytics } from "@/lib/api";
 import type { AnalyticsOverview } from "@/types/violation";
@@ -27,9 +26,6 @@ import {
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-
 type StatCard = {
   label: string;
   value: string | number;

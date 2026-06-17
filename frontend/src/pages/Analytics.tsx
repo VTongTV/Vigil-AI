@@ -35,7 +35,6 @@ import { getAnalytics } from "@/lib/api";
 import type { AnalyticsOverview } from "@/types/violation";
 import { VIOLATION_LABELS, VIOLATION_COLORS } from "@/types/violation";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,

@@ -18,7 +18,6 @@ import {
   ChevronRight,
   History,
   AlertTriangle,
-  Sheet,
 } from "lucide-react";
 import { listViolations, actionViolation } from "@/lib/api";
 import type { ViolationRecord } from "@/types/violation";
@@ -53,14 +52,13 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const PAGE_SIZE = 20;
 
 type FilterState = {
-  violation_type: string;
-  status: string;
+  violation_type: string | null;
+  status: string | null;
   camera_id: string;
 };
 
@@ -90,7 +88,9 @@ export default function Violations() {
     setLoading(true);
     try {
       const res = await listViolations({
-        ...filters,
+        violation_type: filters.violation_type ?? undefined,
+        status: filters.status ?? undefined,
+        camera_id: filters.camera_id,
         page,
         page_size: PAGE_SIZE,
       });

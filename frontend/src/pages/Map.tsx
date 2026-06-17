@@ -15,9 +15,6 @@ import { listViolations } from "@/lib/api";
 import type { ViolationRecord, ViolationType } from "@/types/violation";
 import { VIOLATION_LABELS, VIOLATION_COLORS } from "@/types/violation";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-
 /** Bengaluru city-centre coordinates. */
 const BENGALURU_CENTER: [number, number] = [12.9716, 77.5946];
 

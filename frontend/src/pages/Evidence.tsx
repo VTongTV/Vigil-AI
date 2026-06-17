@@ -10,7 +10,7 @@
  */
 
 import { useState } from "react";
-import { FileImage, ZoomIn, Hash, Printer, Shield, Copy, Check } from "lucide-react";
+import { FileImage, ZoomIn, Printer, Shield, Copy, Check } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import type { ViolationRecord } from "@/types/violation";
 import {
@@ -21,9 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import AnnotatedViewer from "@/components/AnnotatedViewer";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 
 export default function Evidence() {
   const selectedViolation = useAppStore((s) => s.selectedViolation);

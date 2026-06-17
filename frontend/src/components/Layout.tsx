@@ -25,7 +25,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
-import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
@@ -147,8 +146,8 @@ export default function Layout() {
 
             if (collapsed) {
               return (
-                <Tooltip key={to} delayDuration={0}>
-                  <TooltipTrigger asChild>
+                <Tooltip key={to}>
+                  <TooltipTrigger>
                     {link}
                   </TooltipTrigger>
                   <TooltipContent side="right" className="text-xs">
@@ -232,8 +231,8 @@ export default function Layout() {
               </p>
             </>
           ) : (
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild>
+            <Tooltip>
+              <TooltipTrigger>
                 <p className="text-center font-mono text-[9px] tabular-nums text-[var(--color-accent)]">
                   {clock.slice(0, 5)}
                 </p>
