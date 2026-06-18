@@ -1,26 +1,16 @@
 /**
- * Dashboard — Interceptor Grid Command Center.
+ * Dashboard — Signal Console overview.
  *
- * Design direction: Industrial utilitarian + retro-futuristic.
- * Dense, information-first layout inspired by military C2 systems and CRT terminals.
- * - Amber CRT phosphor accent on stat cards
- * - Phosphor green LIVE indicator and monospace elements
- * - F8: Trend forecast arrows + sparklines on stat cards
- * - F9: Camera health panel with status indicators
- * - Grid pattern background hint (tactical graph paper)
- * - Amber glow on hover states
- * - Deep steel card backgrounds
+ * Design direction: refined gov-tech startup.
+ * Calm hierarchy, signal-blue emphasis, measured density, and clearer
+ * separation between monitoring data and operational status.
  */
 
 import { useEffect, useState } from "react";
 import {
   AlertTriangle,
-  Camera,
   IndianRupee,
   ShieldAlert,
-  TrendingUp,
-  TrendingDown,
-  Minus,
   Activity,
   Wifi,
   WifiOff,
@@ -42,6 +32,7 @@ import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { TrendArrow, CameraPulse } from "@/components/icons";
 
 type StatCard = {
   label: string;
@@ -55,16 +46,19 @@ type StatCard = {
   sparkline?: number[];
 };
 
-/** Map trend direction to icon component. */
+/** Map trend direction to animated icon component. */
 function TrendIcon({ direction }: { direction: "up" | "down" | "stable" }) {
-  switch (direction) {
-    case "up":
-      return <TrendingUp className="h-3 w-3 text-[var(--color-danger)]" />;
-    case "down":
-      return <TrendingDown className="h-3 w-3 text-[var(--color-success)]" />;
-    default:
-      return <Minus className="h-3 w-3 text-[var(--color-ink-faint)]" />;
-  }
+  return (
+    <TrendArrow
+      direction={direction}
+      className={cn(
+        "h-3 w-3",
+        direction === "up" && "text-[var(--color-danger)]",
+        direction === "down" && "text-[var(--color-success)]",
+        direction === "stable" && "text-[var(--color-ink-faint)]",
+      )}
+    />
+  );
 }
 
 /** Mini sparkline SVG from an array of values. */
@@ -161,7 +155,7 @@ export default function Dashboard() {
         <div className="space-y-3 text-center">
           <div className="mx-auto h-8 w-8 rounded-full border-2 border-t-transparent border-[var(--color-accent)] animate-spin" />
           <p className="text-xs tracking-wider text-[var(--color-ink-faint)] uppercase">
-            Loading interceptor grid
+            Loading command data
           </p>
         </div>
       </div>
@@ -227,14 +221,14 @@ export default function Dashboard() {
     {
       label: "Avg Confidence",
       value: `${avgConf.toFixed(1)}%`,
-      icon: TrendingUp,
+      icon: Activity,
       color: "var(--color-phosphor)",
       glow: "glow-phosphor",
     },
     {
       label: "Active Cameras",
       value: cameras.filter((c) => c.status === "active").length,
-      icon: Camera,
+      icon: CameraPulse,
       color: "var(--color-phosphor-bright)",
       glow: "glow-phosphor",
     },
@@ -254,11 +248,11 @@ export default function Dashboard() {
   const offlineCams = cameras.filter((c) => c.status === "offline").length;
 
   return (
-    <div className="p-5 grid-pattern min-h-full">
-      {/* Header — Interceptor Grid branding */}
+    <div className="min-h-full p-5 lg:p-6">
+      {/* Header */}
       <header className="mb-5">
         <div className="flex items-center gap-3">
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent)]/12 border border-[var(--color-accent)]/20">
+          <div className="relative flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent-soft)] border border-[var(--color-accent)]/20">
             <ShieldAlert className="h-4 w-4 text-[var(--color-accent)]" />
           </div>
           <div>
@@ -270,29 +264,27 @@ export default function Dashboard() {
             </p>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            {/* Phosphor green LIVE badge — CRT terminal aesthetic */}
             <Badge
               variant="outline"
-              className="border-[var(--color-phosphor)]/30 bg-[var(--color-phosphor)]/8 text-[10px] text-[var(--color-phosphor)] glow-phosphor"
+              className="border-[var(--color-success)]/30 bg-[var(--color-success-soft)] text-[10px] text-[var(--color-success)]"
             >
-              <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-[var(--color-phosphor)] pulse-dot" />
+              <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-[var(--color-success)] pulse-dot" />
               LIVE
             </Badge>
           </div>
         </div>
       </header>
 
-      {/* Stat cards — dense 4-column grid with trend arrows + sparklines */}
+      {/* Stat cards */}
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map(({ label, value, icon: Icon, color, glow, trend, trendDirection, trendPercentage, sparkline }) => (
           <Card
             key={label}
             className={cn(
-              "group relative overflow-hidden border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80 transition-all duration-300 hover:border-[var(--color-accent)]/20",
+              "group relative overflow-hidden border-[var(--rule-color)] bg-[var(--color-paper-1)] transition-all duration-300 hover:border-[var(--color-accent)]/25",
               glow,
             )}
           >
-            {/* Amber accent line on hover */}
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-accent)]/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <CardContent className="p-3.5">
               <div className="flex items-start justify-between">
@@ -427,7 +419,7 @@ export default function Dashboard() {
           <CardContent className="p-4">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="flex items-center gap-2 text-xs font-semibold text-[var(--color-ink)]">
-                <TrendingUp className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                <TrendArrow direction="up" className="h-3.5 w-3.5 text-[var(--color-accent)]" />
                 Daily Trend
               </h2>
               <span className="font-mono text-[10px] text-[var(--color-phosphor)]">
@@ -481,7 +473,7 @@ export default function Dashboard() {
         <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
           <CardContent className="p-4">
             <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold text-[var(--color-ink)]">
-              <Camera className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+              <CameraPulse className="h-3.5 w-3.5 text-[var(--color-accent)]" />
               Top Cameras
             </h2>
             <div className="space-y-2">

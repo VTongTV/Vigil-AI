@@ -137,7 +137,7 @@ export default function Violations() {
     <div className="p-5">
       <header className="mb-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent)]/15">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent-soft)] ring-1 ring-[var(--color-accent)]/15">
             <AlertTriangle className="h-4 w-4 text-[var(--color-accent)]" />
           </div>
           <div>
@@ -160,7 +160,7 @@ export default function Violations() {
             setFilters((f) => ({ ...f, violation_type: v === "__all__" ? "" : v }))
           }
         >
-          <SelectTrigger className="h-7 w-36 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50 text-[11px]">
+          <SelectTrigger className="h-7 w-36 border-[var(--rule-color)] bg-[var(--color-paper-2)] text-[11px]">
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
           <SelectContent>
@@ -178,7 +178,7 @@ export default function Violations() {
             setFilters((f) => ({ ...f, status: v === "__all__" ? "" : v }))
           }
         >
-          <SelectTrigger className="h-7 w-32 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50 text-[11px]">
+          <SelectTrigger className="h-7 w-32 border-[var(--rule-color)] bg-[var(--color-paper-2)] text-[11px]">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>
@@ -191,7 +191,7 @@ export default function Violations() {
       </div>
 
       {/* Table */}
-      <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 overflow-hidden">
+      <Card className="overflow-hidden border-[var(--rule-color)] bg-[var(--color-paper-1)]">
         <ScrollArea className="w-full">
           <Table>
             <TableHeader>

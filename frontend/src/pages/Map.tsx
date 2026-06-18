@@ -200,7 +200,7 @@ export default function Map() {
               "h-7 gap-1.5 text-[10px] font-semibold",
               viewMode === "markers"
                 ? "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-bright)]"
-                : "border-[var(--color-paper-3)] bg-[var(--color-paper-1)]/80 text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-2)]",
+                : "border-[var(--rule-color)] bg-[var(--color-paper-1)]/90 text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-2)]",
             )}
             variant={viewMode === "markers" ? "default" : "outline"}
           >
@@ -214,7 +214,7 @@ export default function Map() {
               "h-7 gap-1.5 text-[10px] font-semibold",
               viewMode === "heatmap"
                 ? "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-bright)]"
-                : "border-[var(--color-paper-3)] bg-[var(--color-paper-1)]/80 text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-2)]",
+                : "border-[var(--rule-color)] bg-[var(--color-paper-1)]/90 text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-2)]",
             )}
             variant={viewMode === "heatmap" ? "default" : "outline"}
           >
@@ -226,7 +226,7 @@ export default function Map() {
 
       {/* Bottom-left: marker count */}
       <div className="absolute bottom-4 left-4 z-[1000]">
-        <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/85 backdrop-blur-md">
+        <Card className="border-[var(--rule-color)] bg-[var(--color-paper-1)]/90 backdrop-blur-md">
           <CardContent className="px-3 py-1.5">
             <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-muted)]">
               {mapped.length}
@@ -245,7 +245,7 @@ export default function Map() {
 
       {/* Top-right: legend */}
       <div className="absolute right-4 top-4 z-[1000]">
-        <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/85 backdrop-blur-md">
+        <Card className="border-[var(--rule-color)] bg-[var(--color-paper-1)]/90 backdrop-blur-md">
           <CardContent className="p-3">
             <p className="mb-2 text-[9px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
               {viewMode === "heatmap" ? "Intensity" : "Legend"}
@@ -254,7 +254,7 @@ export default function Map() {
               <div className="space-y-1.5">
                 {/* Heatmap intensity gradient legend */}
                 <div className="h-2.5 w-full rounded-sm" style={{
-                  background: "linear-gradient(to right, #1a237e, #0d47a1, #00838f, #2e7d32, #f9a825, #e65100, #b71c1c, #d50000)",
+                  background: "linear-gradient(to right, #3b82f6, #06b6d4, #10b981, #84cc16, #f59e0b, #f97316, #ef4444, #f43f5e)",
                 }} />
                 <div className="flex justify-between text-[9px] text-[var(--color-ink-faint)]">
                   <span>Low</span>

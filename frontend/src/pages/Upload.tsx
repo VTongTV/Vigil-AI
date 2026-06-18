@@ -46,6 +46,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { UploadArrow } from "@/components/icons";
 
 const DEMO_CAMERAS = [
   { id: "MGROAD-01", name: "MG Road — Trinity Circle" },
@@ -210,8 +211,8 @@ export default function Upload() {
     <div className="p-5">
       <header className="mb-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent)]/15">
-            <Zap className="h-4 w-4 text-[var(--color-accent)]" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent-soft)] ring-1 ring-[var(--color-accent)]/15">
+            <UploadArrow className="h-4 w-4 text-[var(--color-accent)]" />
           </div>
           <div>
             <h1 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">
