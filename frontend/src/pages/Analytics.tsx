@@ -66,7 +66,7 @@ const CHART_TOOLTIP_STYLE = {
   background: "oklch(18% 0.01 260)",
   border: "1px solid oklch(28% 0.015 260)",
   borderRadius: "6px",
-  fontSize: "11px",
+  fontSize: "12px",
   color: "oklch(92% 0.01 260)",
   padding: "8px 12px",
 };
@@ -196,12 +196,12 @@ export default function Analytics() {
                   <CartesianGrid strokeDasharray="3 3" stroke="oklch(28% 0.015 260 / 0.4)" />
                   <XAxis
                     dataKey="name"
-                    tick={{ fill: "oklch(65% 0.02 260)", fontSize: 9 }}
+                    tick={{ fill: "oklch(65% 0.02 260)", fontSize: 11 }}
                     angle={-35}
                     textAnchor="end"
                     height={55}
                   />
-                  <YAxis tick={{ fill: "oklch(65% 0.02 260)", fontSize: 9 }} />
+                  <YAxis tick={{ fill: "oklch(65% 0.02 260)", fontSize: 11 }} />
                   <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
                   <Bar dataKey="value" radius={[3, 3, 0, 0]}>
                     {typeData.map((entry) => (
@@ -244,7 +244,7 @@ export default function Analytics() {
                     ))}
                   </Pie>
                   <Legend
-                    wrapperStyle={{ fontSize: "10px", color: "oklch(65% 0.02 260)" }}
+                    wrapperStyle={{ fontSize: "11px", color: "oklch(65% 0.02 260)" }}
                   />
                   <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
                 </PieChart>
@@ -265,9 +265,9 @@ export default function Analytics() {
                   <CartesianGrid strokeDasharray="3 3" stroke="oklch(28% 0.015 260 / 0.4)" />
                   <XAxis
                     dataKey="date"
-                    tick={{ fill: "oklch(65% 0.02 260)", fontSize: 9 }}
+                    tick={{ fill: "oklch(65% 0.02 260)", fontSize: 11 }}
                   />
-                  <YAxis tick={{ fill: "oklch(65% 0.02 260)", fontSize: 9 }} />
+                  <YAxis tick={{ fill: "oklch(65% 0.02 260)", fontSize: 11 }} />
                   <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
                   <Bar
                     dataKey="count"
@@ -324,19 +324,19 @@ export default function Analytics() {
             <IndianRupee className="h-3.5 w-3.5 text-[var(--color-warning)]" />
             ROI Calculator
           </h2>
-          <p className="mb-4 text-[10px] text-[var(--color-ink-faint)]">
+          <p className="mb-4 text-[11px] text-[var(--color-ink-faint)]">
             Projected financial impact — Bengaluru-wide deployment across 500 junctions
           </p>
           <Table>
             <TableHeader>
               <TableRow className="border-b-[var(--color-paper-3)]/60 hover:bg-transparent">
-                <TableHead className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
                   Metric
                 </TableHead>
-                <TableHead className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-accent)]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-accent)]">
                   Conservative
                 </TableHead>
-                <TableHead className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-success)]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-success)]">
                   Aggressive
                 </TableHead>
               </TableRow>
@@ -386,7 +386,7 @@ function StatBox({
             <Icon className="h-4 w-4" style={{ color }} />
           </div>
           <div>
-            <p className="text-[9px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
               {label}
             </p>
             <p className="font-mono text-lg font-bold tabular-nums tracking-tight text-[var(--color-ink)]">

@@ -128,7 +128,7 @@ export default function AnnotatedViewer({
 
       // Label background pill
       const text = `${label} ${conf}`;
-      ctx.font = "bold 11px 'DM Sans', system-ui, sans-serif";
+      ctx.font = "bold 13px 'DM Sans', system-ui, sans-serif";
       const textMetrics = ctx.measureText(text);
       const textH = 16;
       const textW = textMetrics.width + 10;
@@ -192,7 +192,7 @@ export default function AnnotatedViewer({
               key={mode}
               onClick={() => setViewMode(mode)}
               className={cn(
-                "flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-[10px] font-medium transition-all duration-200",
+                "flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-[11px] font-medium transition-all duration-200",
                 viewMode === mode
                   ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/25"
                   : "text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-3)]",
@@ -208,7 +208,7 @@ export default function AnnotatedViewer({
         {/* Opacity slider — only visible in overlay mode */}
         {viewMode === "overlay" && (
           <div className="flex items-center gap-2 ml-3">
-            <span className="text-[9px] text-[var(--color-ink-faint)] uppercase tracking-wider">
+            <span className="text-[11px] text-[var(--color-ink-faint)] uppercase tracking-wider">
               Opacity
             </span>
             <input
@@ -220,7 +220,7 @@ export default function AnnotatedViewer({
               onChange={(e) => setOverlayOpacity(parseFloat(e.target.value))}
               className="h-1 w-20 cursor-pointer appearance-none rounded-full bg-[var(--color-paper-3)] accent-[var(--color-accent)]"
             />
-            <span className="w-8 text-right font-mono text-[10px] tabular-nums text-[var(--color-ink-muted)]">
+            <span className="w-8 text-right font-mono text-[11px] tabular-nums text-[var(--color-ink-muted)]">
               {(overlayOpacity * 100).toFixed(0)}%
             </span>
           </div>

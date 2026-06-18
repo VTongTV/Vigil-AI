@@ -130,7 +130,7 @@ export default function ASTraMAlertFeed() {
           critical={criticalCount > 0}
         />
         {alerts.length > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-danger)] text-[8px] font-bold text-white">
+          <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-danger)] text-[11px] font-bold text-white">
             {alerts.length > 9 ? "9+" : alerts.length}
           </span>
         )}
@@ -142,11 +142,11 @@ export default function ASTraMAlertFeed() {
           <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--rule-color)] bg-[var(--color-paper-1)] px-3 py-2">
             <div className="flex items-center gap-2">
               <AlertBell className="h-3.5 w-3.5 text-[var(--color-accent)]" critical={criticalCount > 0} />
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
                 ASTraM Alerts
               </span>
               {criticalCount > 0 && (
-                <span className="rounded-full bg-[var(--color-danger-soft)] px-1.5 py-0.5 text-[9px] font-semibold text-[var(--color-danger)] ring-1 ring-[var(--color-danger)]/20">
+                <span className="rounded-full bg-[var(--color-danger-soft)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--color-danger)] ring-1 ring-[var(--color-danger)]/20">
                   {criticalCount} critical
                 </span>
               )}
@@ -217,18 +217,18 @@ function AlertCard({
               {vLabel}
             </span>
             {isCritical && (
-              <span className="shrink-0 rounded bg-[var(--color-danger-soft)] px-1 py-0.5 text-[8px] font-bold uppercase text-[var(--color-danger)] ring-1 ring-[var(--color-danger)]/20">
+              <span className="shrink-0 rounded bg-[var(--color-danger-soft)] px-1 py-0.5 text-[11px] font-bold uppercase text-[var(--color-danger)] ring-1 ring-[var(--color-danger)]/20">
                 Critical
               </span>
             )}
           </div>
-          <p className="text-[10px] text-[var(--color-ink-faint)] truncate">
+          <p className="text-[11px] text-[var(--color-ink-faint)] truncate">
             {alert.junction_name} · {alert.camera_id}
           </p>
           <div className="mt-0.5 flex items-center gap-2">
             <span
               className={cn(
-                "flex items-center gap-1 font-mono text-[10px] tabular-nums font-semibold",
+                "flex items-center gap-1 font-mono text-[11px] tabular-nums font-semibold",
                 isCritical ? "text-[var(--color-danger)]" : "text-[var(--color-warning)]",
               )}
             >
@@ -236,11 +236,11 @@ function AlertCard({
               {alert.danger_score}
             </span>
             {alert.license_plate && (
-              <span className="font-mono text-[9px] text-[var(--color-accent)]">
+              <span className="font-mono text-[11px] text-[var(--color-accent)]">
                 {alert.license_plate}
               </span>
             )}
-            <span className="ml-auto text-[9px] text-[var(--color-ink-faint)]">
+            <span className="ml-auto text-[11px] text-[var(--color-ink-faint)]">
               {timeAgo}
             </span>
           </div>

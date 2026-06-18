@@ -196,25 +196,25 @@ export default function Violations() {
           <Table>
             <TableHeader>
               <TableRow className="border-b-[var(--color-paper-3)]/60 hover:bg-transparent">
-                <TableHead className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
                   Type
                 </TableHead>
-                <TableHead className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
                   Confidence
                 </TableHead>
-                <TableHead className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
                   Plate
                 </TableHead>
-                <TableHead className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
                   Fine
                 </TableHead>
-                <TableHead className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
                   Camera
                 </TableHead>
-                <TableHead className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
                   Status
                 </TableHead>
-                <TableHead className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
                   Actions
                 </TableHead>
               </TableRow>
@@ -256,7 +256,7 @@ export default function Violations() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-3 flex items-center justify-between">
-          <p className="font-mono text-[10px] tabular-nums text-[var(--color-ink-faint)]">
+          <p className="font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
             Page {page} of {totalPages}
           </p>
           <div className="flex gap-1">
@@ -286,7 +286,7 @@ export default function Violations() {
       {auditLog.length > 0 && (
         <Card className="mt-5 border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
           <CardContent className="p-4">
-            <h2 className="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+            <h2 className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
               <History className="h-3 w-3" />
               Action Log
             </h2>
@@ -299,7 +299,7 @@ export default function Violations() {
                   <Badge
                     variant="outline"
                     className={cn(
-                      "text-[9px] font-semibold",
+                      "text-[11px] font-semibold",
                       entry.action === "approve"
                         ? "border-[var(--color-success)]/30 bg-[var(--color-success)]/10 text-[var(--color-success)]"
                         : "border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 text-[var(--color-danger)]",
@@ -313,7 +313,7 @@ export default function Violations() {
                   <span className="text-[var(--color-ink-faint)]">
                     by {entry.actor}
                   </span>
-                  <span className="ml-auto font-mono text-[9px] text-[var(--color-ink-faint)]">
+                  <span className="ml-auto font-mono text-[11px] text-[var(--color-ink-faint)]">
                     {entry.timestamp}
                   </span>
                 </div>
@@ -330,7 +330,7 @@ export default function Violations() {
             <SheetTitle className="text-sm text-[var(--color-ink)]">
               Violation Detail
             </SheetTitle>
-            <SheetDescription className="text-[10px] text-[var(--color-ink-faint)]">
+            <SheetDescription className="text-[11px] text-[var(--color-ink-faint)]">
               {detailViolation?.id}
             </SheetDescription>
           </SheetHeader>
@@ -400,7 +400,7 @@ function ViolationRow({
           <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-muted)]">
             {(v.confidence * 100).toFixed(0)}%
           </span>
-          <Badge variant="outline" className={cn("text-[8px]", tierConfig)}>
+          <Badge variant="outline" className={cn("text-[11px]", tierConfig)}>
             {v.confidence_tier}
           </Badge>
         </div>
@@ -415,7 +415,7 @@ function ViolationRow({
         {v.camera_id ?? "—"}
       </TableCell>
       <TableCell className="py-2">
-        <Badge variant="outline" className={cn("text-[9px]", statusConfig)}>
+        <Badge variant="outline" className={cn("text-[11px]", statusConfig)}>
           {v.status}
         </Badge>
       </TableCell>

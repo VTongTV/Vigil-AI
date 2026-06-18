@@ -115,7 +115,7 @@ function CameraStatusBadge({ status }: { status: CameraStatus }) {
 
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-medium"
+      className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] font-medium"
       style={{
         backgroundColor: `color-mix(in oklch, ${color} 10%, transparent)`,
         color,
@@ -290,7 +290,7 @@ export default function Dashboard() {
                 <div className="flex items-center gap-1.5">
                   {/* Trend arrow + percentage (F8) */}
                   {trendDirection && (
-                    <span className="flex items-center gap-1 rounded bg-[var(--color-paper-3)]/50 px-1.5 py-0.5 font-mono text-[9px] border border-[var(--color-paper-3)]/30">
+                    <span className="flex items-center gap-1 rounded bg-[var(--color-paper-3)]/50 px-1.5 py-0.5 font-mono text-[11px] border border-[var(--color-paper-3)]/30">
                       <TrendIcon direction={trendDirection} />
                       {trendPercentage !== undefined && (
                         <span
@@ -306,7 +306,7 @@ export default function Dashboard() {
                     </span>
                   )}
                   {trend && !trendDirection && (
-                    <span className="rounded bg-[var(--color-paper-3)]/50 px-1.5 py-0.5 font-mono text-[9px] text-[var(--color-ink-faint)] border border-[var(--color-paper-3)]/30">
+                    <span className="rounded bg-[var(--color-paper-3)]/50 px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-ink-faint)] border border-[var(--color-paper-3)]/30">
                       {trend}
                     </span>
                   )}
@@ -339,7 +339,7 @@ export default function Dashboard() {
                 <Activity className="h-3.5 w-3.5 text-[var(--color-accent)]" />
                 Violations by Type
               </h2>
-              <span className="font-mono text-[10px] tabular-nums text-[var(--color-phosphor)]">
+              <span className="font-mono text-[11px] tabular-nums text-[var(--color-phosphor)]">
                 {totalViolations} total
               </span>
             </div>
@@ -375,7 +375,7 @@ export default function Dashboard() {
                       <span className="w-8 shrink-0 text-right font-mono text-[11px] tabular-nums font-medium text-[var(--color-ink)]">
                         {count}
                       </span>
-                      <span className="w-10 shrink-0 text-right font-mono text-[10px] tabular-nums text-[var(--color-ink-faint)]">
+                      <span className="w-10 shrink-0 text-right font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
                         {pct.toFixed(0)}%
                       </span>
                       {/* Trend arrow per type (F8) */}
@@ -383,7 +383,7 @@ export default function Dashboard() {
                         <span className="w-8 shrink-0 flex items-center justify-end gap-0.5">
                           <TrendIcon direction={tf.trend_direction} />
                           <span className={cn(
-                            "font-mono text-[9px] tabular-nums",
+                            "font-mono text-[11px] tabular-nums",
                             tf.trend_direction === "up" && "text-[var(--color-danger)]",
                             tf.trend_direction === "down" && "text-[var(--color-success)]",
                             tf.trend_direction === "stable" && "text-[var(--color-ink-faint)]",
@@ -412,7 +412,7 @@ export default function Dashboard() {
                 <TrendArrow direction="up" className="h-3.5 w-3.5 text-[var(--color-accent)]" />
                 Daily Trend
               </h2>
-              <span className="font-mono text-[10px] text-[var(--color-phosphor)]">
+              <span className="font-mono text-[11px] text-[var(--color-phosphor)]">
                 21 days
               </span>
             </div>
@@ -428,7 +428,7 @@ export default function Dashboard() {
                       style={{ height: `${h}%` }}
                     >
                       <div className="absolute inset-0 rounded-sm bg-[var(--color-accent)]/40 transition-colors group-hover:bg-[var(--color-accent)]/70" />
-                      <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 rounded bg-[var(--color-paper-2)] px-1.5 py-0.5 font-mono text-[9px] tabular-nums text-[var(--color-accent)] opacity-0 shadow-lg ring-1 ring-[var(--color-paper-3)]/30 transition-opacity group-hover:opacity-100">
+                      <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 rounded bg-[var(--color-paper-2)] px-1.5 py-0.5 font-mono text-[11px] tabular-nums text-[var(--color-accent)] opacity-0 shadow-lg ring-1 ring-[var(--color-paper-3)]/30 transition-opacity group-hover:opacity-100">
                         {count}
                       </div>
                     </div>
@@ -446,7 +446,7 @@ export default function Dashboard() {
                 {recentDays.map(({ date }, i) => (
                   <div
                     key={date}
-                    className="flex-1 text-center font-mono text-[8px] text-[var(--color-ink-faint)]"
+                    className="flex-1 text-center font-mono text-[11px] text-[var(--color-ink-faint)]"
                   >
                     {i % 7 === 0 ? date.slice(8) : ""}
                   </div>
@@ -472,7 +472,7 @@ export default function Dashboard() {
                 const camHealth = cameras.find((c) => c.camera_id === cam.camera_id);
                 return (
                   <div key={cam.camera_id} className="flex items-center gap-2.5">
-                    <span className="w-4 text-right font-mono text-[10px] tabular-nums text-[var(--color-ink-faint)]">
+                    <span className="w-4 text-right font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
                       {i + 1}
                     </span>
                     <span className="w-32 truncate font-mono text-[11px] text-[var(--color-phosphor)]">
@@ -506,17 +506,17 @@ export default function Dashboard() {
             </h2>
             {/* Summary row */}
             <div className="mb-3 flex items-center gap-3">
-              <span className="flex items-center gap-1 text-[10px] text-[var(--color-success)]">
+              <span className="flex items-center gap-1 text-[11px] text-[var(--color-success)]">
                 <Wifi className="h-3 w-3" />
                 <span className="font-mono font-semibold">{activeCams}</span>
                 <span className="text-[var(--color-ink-faint)]">active</span>
               </span>
-              <span className="flex items-center gap-1 text-[10px] text-[var(--color-warning)]">
+              <span className="flex items-center gap-1 text-[11px] text-[var(--color-warning)]">
                 <Clock className="h-3 w-3" />
                 <span className="font-mono font-semibold">{idleCams}</span>
                 <span className="text-[var(--color-ink-faint)]">idle</span>
               </span>
-              <span className="flex items-center gap-1 text-[10px] text-[var(--color-danger)]">
+              <span className="flex items-center gap-1 text-[11px] text-[var(--color-danger)]">
                 <WifiOff className="h-3 w-3" />
                 <span className="font-mono font-semibold">{offlineCams}</span>
                 <span className="text-[var(--color-ink-faint)]">offline</span>
@@ -528,14 +528,14 @@ export default function Dashboard() {
                 cameras.map((cam) => (
                   <div key={cam.camera_id} className="flex items-center gap-2 py-0.5">
                     <CameraStatusBadge status={cam.status} />
-                    <span className="flex-1 truncate font-mono text-[10px] text-[var(--color-ink-muted)]">
+                    <span className="flex-1 truncate font-mono text-[11px] text-[var(--color-ink-muted)]">
                       {cam.junction_name}
                     </span>
-                    <span className="font-mono text-[9px] tabular-nums text-[var(--color-ink-faint)]">
+                    <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
                       {cam.violation_count_24h}v/24h
                     </span>
                     {cam.avg_latency_ms != null && (
-                      <span className="font-mono text-[8px] tabular-nums text-[var(--color-ink-faint)]">
+                      <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
                         {cam.avg_latency_ms}ms
                       </span>
                     )}

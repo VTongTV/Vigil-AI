@@ -111,7 +111,7 @@ export default function Evidence() {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-4">
         {/* Violation list — 1 col */}
         <div className="space-y-2 lg:col-span-1">
-          <h2 className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+          <h2 className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
             Detected Violations
           </h2>
           {violations.length === 0 ? (
@@ -121,7 +121,7 @@ export default function Evidence() {
                 <p className="text-center text-xs text-[var(--color-ink-muted)]">
                   No detection results yet.
                 </p>
-                <p className="text-center text-[10px] text-[var(--color-ink-faint)]">
+                <p className="text-center text-[11px] text-[var(--color-ink-faint)]">
                   Run detection from the Upload page.
                 </p>
               </CardContent>
@@ -166,7 +166,7 @@ export default function Evidence() {
               <Card className="border-[var(--rule-color)] bg-[var(--color-paper-1)]">
                 <CardContent className="p-4">
                   <div className="mb-3 flex items-center justify-between">
-                    <h3 className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                    <h3 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
                       <Shield className="h-3 w-3" />
                       Chain of Custody
                     </h3>
@@ -176,7 +176,7 @@ export default function Evidence() {
                         variant="outline"
                         size="sm"
                         className={cn(
-                          "h-6 border-[var(--color-accent)]/30 bg-[var(--color-accent)]/5 text-[10px] text-[var(--color-accent)] hover:bg-[var(--color-accent)]/15 hover:text-[var(--color-accent-bright)]",
+                          "h-6 border-[var(--color-accent)]/30 bg-[var(--color-accent)]/5 text-[11px] text-[var(--color-accent)] hover:bg-[var(--color-accent)]/15 hover:text-[var(--color-accent-bright)]",
                           firLoading && "opacity-60 cursor-wait",
                         )}
                         onClick={handleFirDownload}
@@ -193,7 +193,7 @@ export default function Evidence() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-6 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50 text-[10px] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
+                        className="h-6 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50 text-[11px] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
                         onClick={handlePrint}
                       >
                         <Printer className="mr-1.5 h-3 w-3" />
@@ -206,7 +206,7 @@ export default function Evidence() {
                   {firError && (
                     <div className="mb-3 flex items-center gap-2 rounded-md bg-[var(--color-danger)]/10 px-3 py-2">
                       <AlertCircle className="h-3.5 w-3.5 shrink-0 text-[var(--color-danger)]" />
-                      <span className="text-[10px] text-[var(--color-danger)]">{firError}</span>
+                      <span className="text-[11px] text-[var(--color-danger)]">{firError}</span>
                     </div>
                   )}
 
@@ -219,14 +219,14 @@ export default function Evidence() {
                           {hashPresent ? (
                             <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-success-soft)] px-2 py-0.5 ring-1 ring-[var(--color-success)]/20">
                               <IntegrityShield className="h-3 w-3 text-[var(--color-success)]" />
-                              <span className="text-[10px] font-medium text-[var(--color-success)]">
+                              <span className="text-[11px] font-medium text-[var(--color-success)]">
                                 Verified
                               </span>
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-warning-soft)] px-2 py-0.5 ring-1 ring-[var(--color-warning)]/20">
                               <AlertCircle className="h-3 w-3 text-[var(--color-warning)]" />
-                              <span className="text-[10px] font-medium text-[var(--color-warning)]">
+                              <span className="text-[11px] font-medium text-[var(--color-warning)]">
                                 No Hash
                               </span>
                             </span>
@@ -238,7 +238,7 @@ export default function Evidence() {
                       label="Evidence Hash"
                       value={
                         <div className="flex items-center gap-1.5">
-                          <span className="font-mono text-[10px] text-[var(--color-accent)]">
+                          <span className="font-mono text-[11px] text-[var(--color-accent)]">
                             {selectedViolation.evidence_hash
                               ? `${selectedViolation.evidence_hash.slice(0, 16)}…`
                               : "—"}
@@ -320,7 +320,7 @@ export default function Evidence() {
                   {/* AI Explanation */}
                   {selectedViolation.ai_explanation && (
                     <div className="mt-3 rounded-md border border-[var(--color-accent)]/15 bg-[var(--color-accent-soft)] p-2.5">
-                      <p className="mb-1 text-[9px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
+                      <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
                         AI Explanation
                       </p>
                       <p className="text-[11px] leading-relaxed text-[var(--color-ink-muted)]">
@@ -359,7 +359,7 @@ function MetaRow({
 }) {
   return (
     <div className="flex items-center justify-between py-1">
-      <span className="text-[10px] text-[var(--color-ink-faint)]">{label}</span>
+      <span className="text-[11px] text-[var(--color-ink-faint)]">{label}</span>
       {typeof value === "string" ? (
         <span className="text-[11px] text-[var(--color-ink)]">{value}</span>
       ) : (
@@ -383,12 +383,12 @@ function ViolationSummary({ violation: v }: { violation: ViolationRecord }) {
       />
       <div>
         <p className="text-[12px] font-medium text-[var(--color-ink)]">{vLabel}</p>
-        <p className="text-[10px] text-[var(--color-ink-faint)]">
+        <p className="text-[11px] text-[var(--color-ink-faint)]">
           {vSection} · {(v.confidence * 100).toFixed(0)}% · ₹
           {v.fine_amount.toLocaleString("en-IN")}
         </p>
         {v.license_plate && (
-          <p className="mt-0.5 font-mono text-[10px] text-[var(--color-accent)]">
+          <p className="mt-0.5 font-mono text-[11px] text-[var(--color-accent)]">
             {v.license_plate.text}
           </p>
         )}

@@ -528,7 +528,7 @@ export default function Upload() {
                 <p className="text-sm text-[var(--color-ink-muted)]">
                   Drop images or click to browse
                 </p>
-                <p className="mt-1 text-[10px] text-[var(--color-ink-faint)]">
+                <p className="mt-1 text-[11px] text-[var(--color-ink-faint)]">
                   JPEG / PNG, max 10MB each, up to {MAX_BATCH_SIZE} files
                 </p>
               </div>
@@ -556,7 +556,7 @@ export default function Upload() {
                     Demo Quick-Select
                   </p>
                 </div>
-                <p className="text-[10px] text-[var(--color-ink-faint)]">
+                <p className="text-[11px] text-[var(--color-ink-faint)]">
                   Click an example to load a demo image with matching camera
                 </p>
                 <div className="grid grid-cols-2 gap-1.5">
@@ -584,7 +584,7 @@ export default function Upload() {
                             {demo.label}
                           </span>
                         </div>
-                        <span className="text-[9px] text-[var(--color-ink-faint)] pl-3.5">
+                        <span className="text-[11px] text-[var(--color-ink-faint)] pl-3.5">
                           {demo.cameraId}
                         </span>
                       </button>
@@ -600,7 +600,7 @@ export default function Upload() {
             <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
               <CardContent className="p-3 space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
                     Batch Queue ({batchFiles.length}/{MAX_BATCH_SIZE})
                   </p>
                   <Button
@@ -608,7 +608,7 @@ export default function Upload() {
                     size="sm"
                     onClick={clearBatch}
                     disabled={batchRunning}
-                    className="h-5 text-[9px] text-[var(--color-ink-faint)] hover:text-[var(--color-danger)]"
+                    className="h-5 text-[11px] text-[var(--color-ink-faint)] hover:text-[var(--color-danger)]"
                   >
                     <Trash2 className="mr-1 h-3 w-3" />
                     Clear
@@ -640,7 +640,7 @@ export default function Upload() {
                         <Loader2 className="h-3 w-3 shrink-0 animate-spin text-[var(--color-accent)]" />
                       )}
                       {bf.status === "done" && bf.result && (
-                        <Badge variant="outline" className="text-[8px] h-4 border-[var(--color-accent)]/30 text-[var(--color-accent)]">
+                        <Badge variant="outline" className="text-[11px] h-4 border-[var(--color-accent)]/30 text-[var(--color-accent)]">
                           {bf.result.violations.length}V
                         </Badge>
                       )}
@@ -664,7 +664,7 @@ export default function Upload() {
                         style={{ width: `${(batchStats.done / batchStats.total) * 100}%` }}
                       />
                     </div>
-                    <p className="text-[9px] text-[var(--color-ink-faint)]">
+                    <p className="text-[11px] text-[var(--color-ink-faint)]">
                       Processing {batchStats.done + 1}/{batchStats.total}…
                     </p>
                   </div>
@@ -678,7 +678,7 @@ export default function Upload() {
             <CardContent className="space-y-3 p-3.5">
               {/* Camera select */}
               <div>
-                <label className="mb-1.5 block text-[10px] font-medium tracking-wider text-[var(--color-ink-faint)] uppercase">
+                <label className="mb-1.5 block text-[11px] font-medium tracking-wider text-[var(--color-ink-faint)] uppercase">
                   Camera ID
                 </label>
                 <Select value={cameraId} onValueChange={(val) => { if (val !== null) setCameraId(val); }}>
@@ -698,13 +698,13 @@ export default function Upload() {
               {/* Signal state */}
               <div className="flex items-center gap-2 rounded-md bg-[var(--color-paper-2)]/50 px-3 py-1.5">
                 <Camera className="h-3.5 w-3.5 text-[var(--color-ink-faint)]" />
-                <span className="text-[10px] text-[var(--color-ink-faint)] uppercase tracking-wider">
+                <span className="text-[11px] text-[var(--color-ink-faint)] uppercase tracking-wider">
                   Signal:
                 </span>
                 <Badge
                   variant="outline"
                   className={cn(
-                    "text-[9px] font-mono",
+                    "text-[11px] font-mono",
                     signalState === "red"
                       ? "border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 text-[var(--color-danger)]"
                       : signalState === "green"
@@ -746,7 +746,7 @@ export default function Upload() {
                   <p className="text-[11px] font-medium text-[var(--color-success)]">
                     Batch complete: {batchStats.totalViolations} violation(s) across {batchStats.done} image(s)
                   </p>
-                  <p className="text-[9px] text-[var(--color-success)]/70">
+                  <p className="text-[11px] text-[var(--color-success)]/70">
                     Total processing time: {batchStats.totalTime}ms
                     {batchStats.errors > 0 && ` · ${batchStats.errors} error(s)`}
                   </p>
@@ -770,7 +770,7 @@ export default function Upload() {
                 <span className="font-mono text-xs tabular-nums text-[var(--color-success)]/80">
                   {activeFile.result.processing_time_ms}ms
                 </span>
-                <span className="text-[10px] text-[var(--color-success)]/60">
+                <span className="text-[11px] text-[var(--color-success)]/60">
                   — {activeFile.file.name}
                 </span>
               </div>
@@ -779,10 +779,10 @@ export default function Upload() {
               <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
                 <CardContent className="p-4">
                   <div className="mb-3 flex items-center justify-between">
-                    <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                    <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
                       Pipeline Timing
                     </h3>
-                    <span className="font-mono text-[10px] tabular-nums text-[var(--color-accent)]">
+                    <span className="font-mono text-[11px] tabular-nums text-[var(--color-accent)]">
                       {activeFile.result.processing_time_ms}ms total
                     </span>
                   </div>
@@ -795,7 +795,7 @@ export default function Upload() {
                       const pct = Math.max((ms / maxMs) * 100, 3);
                       return (
                         <div key={stage.key} className="flex items-center gap-2">
-                          <span className="w-12 shrink-0 text-right font-mono text-[9px] font-medium text-[var(--color-ink-faint)]">
+                          <span className="w-12 shrink-0 text-right font-mono text-[11px] font-medium text-[var(--color-ink-faint)]">
                             {stage.abbr}
                           </span>
                           <div className="flex-1 overflow-hidden rounded-sm bg-[var(--color-paper-3)]/30">
@@ -808,7 +808,7 @@ export default function Upload() {
                               }}
                             />
                           </div>
-                          <span className="w-14 shrink-0 text-right font-mono text-[10px] tabular-nums text-[var(--color-ink-muted)]">
+                          <span className="w-14 shrink-0 text-right font-mono text-[11px] tabular-nums text-[var(--color-ink-muted)]">
                             {ms}ms
                           </span>
                         </div>
@@ -848,7 +848,7 @@ export default function Upload() {
                 <p className="mt-1 text-[11px] text-[var(--color-danger)]/70">
                   {activeFile.error}
                 </p>
-                <p className="mt-0.5 text-[10px] text-[var(--color-ink-faint)]">
+                <p className="mt-0.5 text-[11px] text-[var(--color-ink-faint)]">
                   — {activeFile.file.name}
                 </p>
               </div>
@@ -862,7 +862,7 @@ export default function Upload() {
                 <p className="text-sm text-[var(--color-ink-muted)]">
                   Upload images to see detection results
                 </p>
-                <p className="mt-1 text-[10px] text-[var(--color-ink-faint)]">
+                <p className="mt-1 text-[11px] text-[var(--color-ink-faint)]">
                   Select up to {MAX_BATCH_SIZE} files for batch processing
                 </p>
               </div>
@@ -900,11 +900,11 @@ function ViolationResultCard({ violation: v }: { violation: ViolationRecord }) {
               <span className="text-sm font-medium text-[var(--color-ink)]">
                 {vLabel}
               </span>
-              <Badge variant="outline" className={cn("text-[9px]", tierColor)}>
+              <Badge variant="outline" className={cn("text-[11px]", tierColor)}>
                 {v.confidence_tier}
               </Badge>
               {v.danger_score > 0 && (
-                <Badge variant="outline" className="text-[9px] border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
+                <Badge variant="outline" className="text-[11px] border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
                   ⚠ {v.danger_score}
                 </Badge>
               )}
@@ -918,12 +918,12 @@ function ViolationResultCard({ violation: v }: { violation: ViolationRecord }) {
               <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-muted)]">
                 {(v.confidence * 100).toFixed(0)}%
               </span>
-              <span className="font-mono text-[10px] text-[var(--color-ink-faint)]">
+              <span className="font-mono text-[11px] text-[var(--color-ink-faint)]">
                 {vSection}
               </span>
             </div>
           </div>
-          <div className="mt-1 flex items-center gap-4 text-[10px] text-[var(--color-ink-faint)]">
+          <div className="mt-1 flex items-center gap-4 text-[11px] text-[var(--color-ink-faint)]">
             <span>
               Fine: <span className="font-medium text-[var(--color-warning)]">₹{v.fine_amount.toLocaleString("en-IN")}</span>
             </span>

@@ -197,7 +197,7 @@ export default function Map() {
             size="sm"
             onClick={() => setViewMode("markers")}
             className={cn(
-              "h-7 gap-1.5 text-[10px] font-semibold",
+              "h-7 gap-1.5 text-[11px] font-semibold",
               viewMode === "markers"
                 ? "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-bright)]"
                 : "border-[var(--rule-color)] bg-[var(--color-paper-1)]/90 text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-2)]",
@@ -211,7 +211,7 @@ export default function Map() {
             size="sm"
             onClick={() => setViewMode("heatmap")}
             className={cn(
-              "h-7 gap-1.5 text-[10px] font-semibold",
+              "h-7 gap-1.5 text-[11px] font-semibold",
               viewMode === "heatmap"
                 ? "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-bright)]"
                 : "border-[var(--rule-color)] bg-[var(--color-paper-1)]/90 text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-2)]",
@@ -231,11 +231,11 @@ export default function Map() {
             <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-muted)]">
               {mapped.length}
             </span>
-            <span className="ml-1 text-[10px] text-[var(--color-ink-faint)]">
+            <span className="ml-1 text-[11px] text-[var(--color-ink-faint)]">
               violation{mapped.length !== 1 ? "s" : ""} mapped
             </span>
             {viewMode === "heatmap" && (
-              <span className="ml-2 text-[9px] text-[var(--color-accent)]">
+              <span className="ml-2 text-[11px] text-[var(--color-accent)]">
                 ● heatmap
               </span>
             )}
@@ -247,7 +247,7 @@ export default function Map() {
       <div className="absolute right-4 top-4 z-[1000]">
         <Card className="border-[var(--rule-color)] bg-[var(--color-paper-1)]/90 backdrop-blur-md">
           <CardContent className="p-3">
-            <p className="mb-2 text-[9px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
               {viewMode === "heatmap" ? "Intensity" : "Legend"}
             </p>
             {viewMode === "heatmap" ? (
@@ -256,11 +256,11 @@ export default function Map() {
                 <div className="h-2.5 w-full rounded-sm" style={{
                   background: "linear-gradient(to right, #3b82f6, #06b6d4, #10b981, #84cc16, #f59e0b, #f97316, #ef4444, #f43f5e)",
                 }} />
-                <div className="flex justify-between text-[9px] text-[var(--color-ink-faint)]">
+                <div className="flex justify-between text-[11px] text-[var(--color-ink-faint)]">
                   <span>Low</span>
                   <span>High</span>
                 </div>
-                <p className="pt-1 text-[9px] text-[var(--color-ink-faint)]">
+                <p className="pt-1 text-[11px] text-[var(--color-ink-faint)]">
                   Intensity based on danger score
                 </p>
               </div>
@@ -276,10 +276,10 @@ export default function Map() {
                         className="h-2 w-2 rounded-full"
                         style={{ backgroundColor: color }}
                       />
-                      <span className="text-[10px] text-[var(--color-ink-muted)]">
+                      <span className="text-[11px] text-[var(--color-ink-muted)]">
                         {label}
                       </span>
-                      <span className="ml-auto font-mono text-[9px] tabular-nums text-[var(--color-ink-faint)]">
+                      <span className="ml-auto font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
                         {count}
                       </span>
                     </div>

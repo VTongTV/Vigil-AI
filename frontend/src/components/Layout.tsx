@@ -169,7 +169,7 @@ export default function Layout() {
                 />
                 {!collapsed && <span className="truncate">{label}</span>}
                 {!collapsed && isActive && (
-                  <span className="ml-auto rounded bg-[var(--color-accent-soft)] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/20">
+                  <span className="ml-auto rounded bg-[var(--color-accent-soft)] px-1.5 py-0.5 font-mono text-[11px] font-semibold text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/20">
                     {short}
                   </span>
                 )}
@@ -287,7 +287,7 @@ export default function Layout() {
           ) : (
             <Tooltip>
               <TooltipTrigger>
-                <p className="text-center font-mono text-[10px] tabular-nums text-[var(--color-phosphor)]">
+                <p className="text-center font-mono text-[11px] tabular-nums text-[var(--color-phosphor)]">
                   {clock.slice(0, 5)}
                 </p>
               </TooltipTrigger>
