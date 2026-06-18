@@ -13,7 +13,7 @@ models:
   helmet:
     path: "weights/helmet.pt"
     device: "cuda"
-    conf_threshold: 0.30
+    conf_threshold: 0.15
     iou_threshold: 0.45
     resident: true
     classes: ["helmet", "no_helmet"]
