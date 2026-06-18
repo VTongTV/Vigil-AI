@@ -34,6 +34,7 @@ from backend.app.db.models import (
     FINE_SCHEDULE,
     get_confidence_tier,
 )
+from backend.app.core.violations import compute_danger_score, generate_ai_explanation
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -356,6 +357,21 @@ def generate_violations(total: int | None = None) -> list[dict[str, Any]]:
         # --- status ---
         status = _sample_status(rng)
 
+        # --- danger score & AI explanation ---
+        compound_factor = 1.0  # single violation per detection in seed data
+        danger_score = compute_danger_score(
+            violation_type=vtype,
+            confidence=confidence,
+            fine_amount=int(fine_info["amount"]),
+            compound_factor=compound_factor,
+        )
+        ai_explanation = generate_ai_explanation(
+            violation_type=vtype,
+            confidence=confidence,
+            bbox=[bbox["x1"], bbox["y1"], bbox["x2"], bbox["y2"]],
+            metadata=_build_metadata(vtype, rng),
+        )
+
         # --- record ---
         record_id = _generate_violation_id(ts, id_seq)
         violations.append({
@@ -380,11 +396,85 @@ def generate_violations(total: int | None = None) -> list[dict[str, Any]]:
             "timestamp": ts,
             "evidence_url": None,
             "evidence_hash": None,
+            "danger_score": danger_score,
+            "ai_explanation": ai_explanation,
+            "is_duplicate": 0,
+            "duplicate_group_id": None,
             "created_at": now,
             "updated_at": now,
         })
 
     logger.info("Generated %d violation records.", len(violations))
+
+    # --- Generate ~10 duplicate violations for dedup demo ---
+    # These are near-duplicates (same camera, same type, within 5 min of an
+    # existing violation) that the detection pipeline would mark as duplicates.
+    dup_count = 0
+    for v in violations[:50]:  # sample from the first 50
+        if dup_count >= 10:
+            break
+        if rng.random() > 0.25:
+            continue  # ~25% chance of creating a duplicate
+
+        id_seq += 1
+        dup_ts = v["timestamp"] + timedelta(seconds=rng.randint(30, 240))
+        dup_vtype = v["violation_type"]
+        dup_fine = FINE_SCHEDULE[dup_vtype]
+        dup_conf = round(min(v["confidence"] + rng.uniform(-0.05, 0.05), 0.99), 4)
+        dup_tier = get_confidence_tier(dup_conf)
+        dup_group = f"DUP-{v['camera_id']}-{v['timestamp'].strftime('%Y%m%d')}"
+        dup_bbox = _make_bbox(rng)
+        dup_meta = _build_metadata(dup_vtype, rng)
+
+        dup_danger = compute_danger_score(
+            violation_type=dup_vtype,
+            confidence=dup_conf,
+            fine_amount=int(dup_fine["amount"]),
+            compound_factor=1.0,
+        )
+        dup_explanation = generate_ai_explanation(
+            violation_type=dup_vtype,
+            confidence=dup_conf,
+            bbox=[dup_bbox["x1"], dup_bbox["y1"], dup_bbox["x2"], dup_bbox["y2"]],
+            metadata=dup_meta,
+        )
+
+        violations.append({
+            "id": _generate_violation_id(dup_ts, id_seq),
+            "violation_type": dup_vtype,
+            "confidence": dup_conf,
+            "confidence_tier": dup_tier,
+            "bbox": dup_bbox,
+            "person_bbox": None,
+            "violation_metadata": dup_meta,
+            "mv_act_section": dup_fine["section"],
+            "fine_amount": int(dup_fine["amount"]),
+            "license_plate_text": v["license_plate_text"],
+            "license_plate_confidence": v["license_plate_confidence"],
+            "license_plate_bbox": v["license_plate_bbox"],
+            "status": "pending",
+            "data_source": "seeded",
+            "camera_id": v["camera_id"],
+            "junction_name": v["junction_name"],
+            "latitude": v["latitude"],
+            "longitude": v["longitude"],
+            "timestamp": dup_ts,
+            "evidence_url": None,
+            "evidence_hash": None,
+            "danger_score": dup_danger,
+            "ai_explanation": dup_explanation,
+            "is_duplicate": 1,
+            "duplicate_group_id": dup_group,
+            "created_at": now,
+            "updated_at": now,
+        })
+        dup_count += 1
+
+    logger.info(
+        "Generated %d violation records (incl. %d duplicates).",
+        len(violations),
+        dup_count,
+    )
     return violations
 
 
@@ -444,6 +534,10 @@ def seed_database(violations: list[dict[str, Any]]) -> None:
                 timestamp=v["timestamp"],
                 evidence_url=v["evidence_url"],
                 evidence_hash=v["evidence_hash"],
+                danger_score=v["danger_score"],
+                ai_explanation=v["ai_explanation"],
+                is_duplicate=v["is_duplicate"],
+                duplicate_group_id=v["duplicate_group_id"],
                 created_at=v["created_at"],
                 updated_at=v["updated_at"],
             )
@@ -505,6 +599,13 @@ def print_summary(violations: list[dict[str, Any]]) -> None:
     # Plates
     plates = sum(1 for v in violations if v["license_plate_text"] is not None)
 
+    # Duplicates
+    dups = sum(1 for v in violations if v["is_duplicate"] == 1)
+
+    # Danger score stats
+    danger_scores = [v["danger_score"] for v in violations]
+    avg_danger = sum(danger_scores) / len(danger_scores) if danger_scores else 0
+
     logger.info("=" * 60)
     logger.info("SEED COMPLETE — SUMMARY")
     logger.info("=" * 60)
@@ -529,6 +630,8 @@ def print_summary(violations: list[dict[str, Any]]) -> None:
         logger.info("  %-12s %4d  (%5.1f%%)", tier, count, count / total * 100)
     logger.info("")
     logger.info("License plates generated: %d / %d (%.1f%%)", plates, total, plates / total * 100)
+    logger.info("Duplicates: %d / %d (%.1f%%)", dups, total, dups / total * 100)
+    logger.info("Avg danger score: %.1f (range %d-%d)", avg_danger, min(danger_scores), max(danger_scores))
     logger.info("=" * 60)
 
 
