@@ -3,10 +3,32 @@
 import { create } from "zustand";
 import type { ASTraMAlert, CameraHealth, ViolationRecord } from "../types/violation";
 
+export type Theme = "dark" | "light";
+
+function getInitialTheme(): Theme {
+  if (typeof window === "undefined") return "dark";
+  const stored = localStorage.getItem("vigilai_theme") as Theme | null;
+  if (stored === "dark" || stored === "light") return stored;
+  if (typeof window.matchMedia !== "function") return "dark";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function applyTheme(theme: Theme) {
+  if (typeof window === "undefined") return;
+  const root = document.documentElement;
+  root.classList.toggle("dark", theme === "dark");
+  root.setAttribute("data-theme", theme);
+}
+
 interface AppState {
   /** Demo mode toggle — uses hardcoded responses when backend is unavailable */
   demoMode: boolean;
   setDemoMode: (on: boolean) => void;
+
+  /** Color theme — dark (default) or light */
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
 
   /** Currently selected violation for evidence viewing */
   selectedViolation: ViolationRecord | null;
@@ -44,6 +66,21 @@ export const useAppStore = create<AppState>((set) => ({
 
   selectedViolation: null,
   setSelectedViolation: (v) => set({ selectedViolation: v }),
+
+  theme: getInitialTheme(),
+  setTheme: (theme) => {
+    localStorage.setItem("vigilai_theme", theme);
+    applyTheme(theme);
+    set({ theme });
+  },
+  toggleTheme: () => {
+    set((state) => {
+      const next = state.theme === "dark" ? "light" : "dark";
+      localStorage.setItem("vigilai_theme", next);
+      applyTheme(next);
+      return { theme: next };
+    });
+  },
 
   signalState: "unknown",
   setSignalState: (s) => set({ signalState: s }),
