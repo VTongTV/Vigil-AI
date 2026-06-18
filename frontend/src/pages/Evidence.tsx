@@ -1,16 +1,30 @@
 /**
  * Evidence page — displays annotated evidence images with chain-of-custody
- * metadata, print functionality, and the AnnotatedViewer for bbox overlays.
+ * metadata, integrity verification badge, FIR PDF generation, and the
+ * AnnotatedViewer for bbox overlays with split-view modes.
  *
  * Design: "Chain of Custody Console"
  * - Split layout: violation list + evidence viewer + metadata panel
  * - Hash displayed as monospace with copy affordance
+ * - Integrity badge: verified (green) or missing (amber)
+ * - FIR PDF download button
  * - Print button triggers browser dialog
  * - Clean metadata grid with labeled rows
  */
 
 import { useState } from "react";
-import { FileImage, ZoomIn, Printer, Shield, Copy, Check } from "lucide-react";
+import {
+  FileImage,
+  ZoomIn,
+  Printer,
+  Shield,
+  Copy,
+  Check,
+  FileDown,
+  ShieldCheck,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import type { ViolationRecord } from "@/types/violation";
 import {
@@ -19,6 +33,7 @@ import {
   VIOLATION_SECTIONS,
 } from "@/types/violation";
 import { cn } from "@/lib/utils";
+import { generateFirPdf } from "@/lib/api";
 import AnnotatedViewer from "@/components/AnnotatedViewer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,6 +44,8 @@ export default function Evidence() {
   const lastDetection = useAppStore((s) => s.lastDetection);
   const [viewingId, setViewingId] = useState<string | null>(null);
   const [copiedHash, setCopiedHash] = useState(false);
+  const [firLoading, setFirLoading] = useState(false);
+  const [firError, setFirError] = useState<string | null>(null);
 
   const violations = lastDetection ?? [];
 
@@ -47,6 +64,31 @@ export default function Evidence() {
       /* fallback: ignore */
     }
   };
+
+  /** Generate and download the FIR PDF for the selected violation. */
+  const handleFirDownload = async () => {
+    if (!selectedViolation) return;
+    setFirLoading(true);
+    setFirError(null);
+    try {
+      const blob = await generateFirPdf(selectedViolation.id);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `FIR_${selectedViolation.id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setFirError(err instanceof Error ? err.message : "FIR generation failed");
+    } finally {
+      setFirLoading(false);
+    }
+  };
+
+  /** Determine integrity status from evidence hash. */
+  const hashPresent = !!selectedViolation?.evidence_hash;
 
   return (
     <div className="p-5">
@@ -128,29 +170,84 @@ export default function Evidence() {
                       <Shield className="h-3 w-3" />
                       Chain of Custody
                     </h3>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-6 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50 text-[10px] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
-                      onClick={handlePrint}
-                    >
-                      <Printer className="mr-1.5 h-3 w-3" />
-                      Print Evidence
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      {/* FIR PDF Download Button (F2) */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={cn(
+                          "h-6 border-[var(--color-accent)]/30 bg-[var(--color-accent)]/5 text-[10px] text-[var(--color-accent)] hover:bg-[var(--color-accent)]/15 hover:text-[var(--color-accent-bright)]",
+                          firLoading && "opacity-60 cursor-wait",
+                        )}
+                        onClick={handleFirDownload}
+                        disabled={firLoading}
+                      >
+                        {firLoading ? (
+                          <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />
+                        ) : (
+                          <FileDown className="mr-1.5 h-3 w-3" />
+                        )}
+                        {firLoading ? "Generating..." : "FIR PDF"}
+                      </Button>
+                      {/* Print Button */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-6 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50 text-[10px] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
+                        onClick={handlePrint}
+                      >
+                        <Printer className="mr-1.5 h-3 w-3" />
+                        Print Evidence
+                      </Button>
+                    </div>
                   </div>
 
+                  {/* FIR error message */}
+                  {firError && (
+                    <div className="mb-3 flex items-center gap-2 rounded-md bg-[var(--color-danger)]/10 px-3 py-2">
+                      <AlertCircle className="h-3.5 w-3.5 shrink-0 text-[var(--color-danger)]" />
+                      <span className="text-[10px] text-[var(--color-danger)]">{firError}</span>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-2 gap-x-6 gap-y-2.5">
+                    {/* Integrity Badge (F1) — verified or missing */}
+                    <MetaRow
+                      label="Integrity"
+                      value={
+                        <div className="flex items-center gap-1.5">
+                          {hashPresent ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-success)]/10 px-2 py-0.5 ring-1 ring-[var(--color-success)]/20">
+                              <ShieldCheck className="h-3 w-3 text-[var(--color-success)]" />
+                              <span className="text-[10px] font-medium text-[var(--color-success)]">
+                                Verified
+                              </span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-warning)]/10 px-2 py-0.5 ring-1 ring-[var(--color-warning)]/20">
+                              <AlertCircle className="h-3 w-3 text-[var(--color-warning)]" />
+                              <span className="text-[10px] font-medium text-[var(--color-warning)]">
+                                No Hash
+                              </span>
+                            </span>
+                          )}
+                        </div>
+                      }
+                    />
                     <MetaRow
                       label="Evidence Hash"
                       value={
                         <div className="flex items-center gap-1.5">
                           <span className="font-mono text-[10px] text-[var(--color-accent)]">
-                            {selectedViolation.evidence_hash ?? "—"}
+                            {selectedViolation.evidence_hash
+                              ? `${selectedViolation.evidence_hash.slice(0, 16)}…`
+                              : "—"}
                           </span>
                           {selectedViolation.evidence_hash && (
                             <button
                               onClick={() => copyHash(selectedViolation.evidence_hash!)}
                               className="text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] transition-colors"
+                              title="Copy full hash"
                             >
                               {copiedHash ? (
                                 <Check className="h-3 w-3 text-[var(--color-success)]" />
@@ -195,6 +292,21 @@ export default function Evidence() {
                       }
                     />
                     <MetaRow
+                      label="Danger Score"
+                      value={
+                        <span className={cn(
+                          "font-mono text-[11px] font-semibold",
+                          selectedViolation.danger_score >= 80
+                            ? "text-[var(--color-danger)]"
+                            : selectedViolation.danger_score >= 40
+                              ? "text-[var(--color-warning)]"
+                              : "text-[var(--color-success)]",
+                        )}>
+                          {selectedViolation.danger_score}/100
+                        </span>
+                      }
+                    />
+                    <MetaRow
                       label="Fine Amount"
                       value={
                         <span className="font-medium text-[var(--color-warning)]">
@@ -203,6 +315,18 @@ export default function Evidence() {
                       }
                     />
                   </div>
+
+                  {/* AI Explanation */}
+                  {selectedViolation.ai_explanation && (
+                    <div className="mt-3 rounded-md border border-[var(--color-accent)]/15 bg-[var(--color-accent)]/5 p-2.5">
+                      <p className="mb-1 text-[9px] font-semibold uppercase tracking-wider text-[var(--color-accent)]/70">
+                        AI Explanation
+                      </p>
+                      <p className="text-[11px] leading-relaxed text-[var(--color-ink-muted)]">
+                        {selectedViolation.ai_explanation}
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
