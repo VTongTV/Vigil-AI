@@ -264,7 +264,7 @@ export default function Layout() {
                   : "bg-[var(--color-paper-4)]",
               )}
             />
-            {!collapsed && <span>Demo {demoMode ? "ON" : "OFF"}</span>}
+            {!collapsed && <span>Preview {demoMode ? "ON" : "OFF"}</span>}
           </button>
         </div>
 
@@ -318,7 +318,7 @@ export default function Layout() {
           <div className="pointer-events-none absolute right-4 top-4 z-50">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-warning-soft)] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--color-warning)] shadow-sm ring-1 ring-[var(--color-warning)]/20">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-warning)] pulse-dot" />
-              Demo
+              Preview
             </span>
           </div>
         )}
