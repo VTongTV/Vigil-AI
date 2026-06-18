@@ -15,9 +15,39 @@
 
 @custom-variant dark (&:is(.dark, .dark *));
 
-/* ── VigilAI Signal Console Theme ── */
+/* ── VigilAI Signal Console Theme ──
+ *
+ * All semantic colors + fonts are exposed to Tailwind as INLINE theme tokens
+ * (`@theme inline`). Inline tokens do NOT emit their own `:root` rule — they
+ * inline the `var(--color-*)` reference into each generated utility, so the
+ * utility value follows the cascade. This is what makes the `.dark` overrides
+ * in tokens.css win when the `.dark` class is toggled on <html>.
+ *
+ * Using a non-inline `@theme` block here would emit `:root { --color-paper:
+ * var(--color-paper) }` — a self-referential custom property that computes to
+ * its guaranteed-invalid value, destabilising the cascade so the theme toggle
+ * appears to do nothing.
+ */
 
 @theme {
+  /* Static text-size scale — bridges the bumped values defined in tokens.css
+   * so the `text-xs` / `text-sm` / `text-base` / ... named utilities resolve
+   * to the readable baseline (0.8125rem / 0.9375rem / 1.0625rem / ... at the
+   * 17px html root). Without this bridge, Tailwind falls back to its defaults
+   * (0.75 / 0.875 / 1.0rem) and the bumped scale is silently inert. */
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.3125rem;
+  --text-2xl: 1.5625rem;
+  --text-3xl: 1.9375rem;
+  --text-4xl: 2.3125rem;
+}
+
+/* ── VigilAI semantic tokens (cascade-following) + shadcn bridge ── */
+
+@theme inline {
   /* Paper / surface */
   --color-paper: var(--color-paper);
   --color-paper-1: var(--color-paper-1);
@@ -64,11 +94,8 @@
   --font-display: var(--font-display);
   --font-body: var(--font-body);
   --font-mono: var(--font-mono);
-}
 
-/* ── shadcn theme token bridge ── */
-
-@theme inline {
+  /* shadcn semantic tokens (also cascade-following) */
   --font-heading: var(--font-sans);
   --font-sans: var(--font-body);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -206,6 +233,11 @@ code, pre, .font-mono {
 .glow-accent {
   box-shadow: 0 0 0 1px var(--color-accent-soft),
               0 0 24px oklch(55% 0.20 250 / 0.15);
+}
+
+.glow-phosphor {
+  box-shadow: 0 0 0 1px var(--color-phosphor-soft),
+              0 0 24px oklch(55% 0.18 200 / 0.15);
 }
 
 .glow-danger {
