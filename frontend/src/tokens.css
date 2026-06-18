@@ -1,59 +1,68 @@
-/* Hallmark · macrostructure: Workbench (dashboard) · tone: utilitarian · anchor hue: warm
- * theme: Interceptor Grid · paper: oklch(13% 0.01 255) · accent: oklch(75% 0.18 85) amber CRT
- * secondary: oklch(65% 0.2 155) phosphor green · steel: oklch(15% 0.01 255)
- * display: Space Grotesk · body: IBM Plex Sans · mono: IBM Plex Mono
- * pre-emit critique: P5 H5 E5 S4 R5 V5
+/* Signal Console · macrostructure: Command dashboard · tone: refined gov-tech startup
+ * Theme: Signal Console · dark default, light twin engineered from ground up
+ * Primary signal: electric blue (#3b82f6) · status: emerald/amber/rose
+ * Display: Sora · Body: DM Sans · Mono: JetBrains Mono
  *
- * Design direction: "Interceptor Grid" — industrial utilitarian + retro-futuristic.
- * CRT amber phosphor on deep steel. Signal-state beacon. Scan-line texture.
- * Monochrome amber/green accent system. No decorative blue.
+ * Design direction: "Signal Console" — a refined gov-tech startup aesthetic.
+ * Deep ink surfaces, a single electric-blue signal line, generous whitespace,
+ * strong typographic hierarchy, and surgical color for status. The light mode
+ * is not a dark inversion; it uses warm paper, deep slate ink, and the same
+ * accent system, engineered independently for clarity in daylit ops centers.
  */
 
 :root {
-  /* Paper / surface — deep steel, cooler than Midnight */
-  --color-paper: oklch(13% 0.008 255);
-  --color-paper-1: oklch(16% 0.01 255);
-  --color-paper-2: oklch(20% 0.012 255);
-  --color-paper-3: oklch(26% 0.014 255);
-  --color-paper-4: oklch(32% 0.016 255);
+  /* ── Core color primitives (theme-agnostic) ── */
 
-  /* Ink / text — slightly warm neutral for amber harmony */
-  --color-ink: oklch(90% 0.008 75);
-  --color-ink-muted: oklch(62% 0.015 75);
-  --color-ink-faint: oklch(42% 0.015 75);
+  /* Signal accent — electric blue (the single memorable thread) */
+  --primitive-blue-50: oklch(97% 0.02 250);
+  --primitive-blue-100: oklch(93% 0.05 250);
+  --primitive-blue-200: oklch(86% 0.10 250);
+  --primitive-blue-300: oklch(77% 0.15 250);
+  --primitive-blue-400: oklch(68% 0.18 250);
+  --primitive-blue-500: oklch(60% 0.20 250);
+  --primitive-blue-600: oklch(52% 0.18 250);
+  --primitive-blue-700: oklch(44% 0.15 250);
+  --primitive-blue-800: oklch(36% 0.12 250);
+  --primitive-blue-900: oklch(28% 0.10 250);
 
-  /* Primary accent — amber CRT phosphor (the signature) */
-  --color-accent: oklch(75% 0.18 85);
-  --color-accent-dim: oklch(50% 0.12 85);
-  --color-accent-bright: oklch(85% 0.2 85);
+  /* Neutral ink scale */
+  --primitive-ink-50: oklch(98% 0.005 250);
+  --primitive-ink-100: oklch(96% 0.010 250);
+  --primitive-ink-200: oklch(91% 0.015 250);
+  --primitive-ink-300: oklch(82% 0.020 250);
+  --primitive-ink-400: oklch(67% 0.025 250);
+  --primitive-ink-500: oklch(53% 0.025 250);
+  --primitive-ink-600: oklch(41% 0.025 250);
+  --primitive-ink-700: oklch(31% 0.025 250);
+  --primitive-ink-800: oklch(22% 0.025 250);
+  --primitive-ink-900: oklch(15% 0.025 250);
+  --primitive-ink-950: oklch(10% 0.020 250);
 
-  /* Secondary accent — phosphor green (terminal/monospace/active) */
-  --color-phosphor: oklch(65% 0.2 155);
-  --color-phosphor-dim: oklch(40% 0.12 155);
-  --color-phosphor-bright: oklch(78% 0.22 155);
+  /* Semantic primitives */
+  --primitive-success: oklch(62% 0.18 155);
+  --primitive-success-dim: oklch(45% 0.12 155);
+  --primitive-success-bright: oklch(75% 0.22 155);
+  --primitive-warning: oklch(77% 0.18 85);
+  --primitive-warning-dim: oklch(55% 0.12 85);
+  --primitive-warning-bright: oklch(87% 0.20 85);
+  --primitive-danger: oklch(60% 0.22 25);
+  --primitive-danger-dim: oklch(42% 0.14 25);
+  --primitive-danger-bright: oklch(72% 0.26 25);
 
-  /* Semantic — violation types (kept for chart coding) */
-  --color-helmet: oklch(65% 0.2 25);     /* warm red */
-  --color-triple: oklch(75% 0.18 85);    /* amber — matches accent */
-  --color-wrong-side: oklch(65% 0.18 280); /* violet */
-  --color-parking: oklch(70% 0.15 90);   /* yellow-green */
-  --color-seatbelt: oklch(65% 0.18 320);  /* magenta */
-  --color-stopline: oklch(65% 0.15 210);  /* cyan */
-  --color-redlight: oklch(55% 0.22 20);  /* deep red */
-  --color-plate: oklch(65% 0.2 155);     /* phosphor green — matches secondary */
+  /* Violation type coding (intentional, not the accent) */
+  --primitive-helmet: oklch(60% 0.18 25);
+  --primitive-triple: oklch(72% 0.16 75);
+  --primitive-wrong-side: oklch(62% 0.16 280);
+  --primitive-parking: oklch(70% 0.14 95);
+  --primitive-seatbelt: oklch(62% 0.16 320);
+  --primitive-stopline: oklch(62% 0.14 210);
+  --primitive-redlight: oklch(55% 0.20 20);
+  --primitive-plate: oklch(62% 0.18 155);
 
-  /* Semantic — status (green/amber/red triad) */
-  --color-success: oklch(65% 0.2 155);
-  --color-warning: oklch(75% 0.18 85);
-  --color-danger: oklch(60% 0.22 25);
-
-  /* Focus — amber ring */
-  --color-focus: oklch(75% 0.18 85);
-
-  /* Fonts */
-  --font-display: "Space Grotesk", system-ui, sans-serif;
-  --font-body: "IBM Plex Sans", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", "Cascadia Code", monospace;
+  /* ── Typography ── */
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Code", monospace;
 
   /* Text scale (4pt base) */
   --text-xs: 0.75rem;
@@ -80,15 +89,16 @@
   --space-16: 4rem;
 
   /* Radius */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
 
   /* Easings */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
   --ease-in-out: cubic-bezier(0.87, 0, 0.13, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* Durations */
   --dur-fast: 150ms;
@@ -96,6 +106,180 @@
   --dur-slow: 400ms;
 
   /* Rule / border */
-  --rule-color: oklch(28% 0.014 255);
   --rule-width: 1px;
+}
+
+/* ───────────────────────────────────────────────────────────────────────── */
+/* LIGHT MODE (default, engineered from ground up)                              */
+/* ───────────────────────────────────────────────────────────────────────── */
+
+:root,
+[data-theme="light"] {
+  /* Paper / surface — warm white, not stark gray */
+  --color-paper: var(--primitive-ink-50);
+  --color-paper-1: var(--primitive-ink-100);
+  --color-paper-2: var(--primitive-ink-200);
+  --color-paper-3: var(--primitive-ink-300);
+  --color-paper-4: var(--primitive-ink-400);
+
+  /* Ink / text */
+  --color-ink: var(--primitive-ink-900);
+  --color-ink-muted: var(--primitive-ink-600);
+  --color-ink-faint: var(--primitive-ink-400);
+
+  /* Primary signal — electric blue */
+  --color-accent: var(--primitive-blue-500);
+  --color-accent-dim: var(--primitive-blue-700);
+  --color-accent-bright: var(--primitive-blue-400);
+  --color-accent-soft: var(--primitive-blue-100);
+
+  /* Secondary / active — cyan tint of the signal */
+  --color-phosphor: var(--primitive-blue-600);
+  --color-phosphor-dim: var(--primitive-blue-800);
+  --color-phosphor-bright: var(--primitive-blue-400);
+  --color-phosphor-soft: var(--primitive-blue-100);
+
+  /* Semantic — violation types */
+  --color-helmet: var(--primitive-helmet);
+  --color-triple: var(--primitive-triple);
+  --color-wrong-side: var(--primitive-wrong-side);
+  --color-parking: var(--primitive-parking);
+  --color-seatbelt: var(--primitive-seatbelt);
+  --color-stopline: var(--primitive-stopline);
+  --color-redlight: var(--primitive-redlight);
+  --color-plate: var(--primitive-plate);
+
+  /* Semantic — status */
+  --color-success: var(--primitive-success);
+  --color-success-soft: oklch(95% 0.04 155);
+  --color-warning: var(--primitive-warning);
+  --color-warning-soft: oklch(96% 0.05 85);
+  --color-danger: var(--primitive-danger);
+  --color-danger-soft: oklch(95% 0.04 25);
+
+  /* Focus ring */
+  --color-focus: var(--primitive-blue-500);
+
+  /* Rule / border */
+  --rule-color: var(--primitive-ink-200);
+
+  /* shadcn-compatible semantic tokens */
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
+  --card: #ffffff;
+  --card-foreground: var(--color-ink);
+  --popover: #ffffff;
+  --popover-foreground: var(--color-ink);
+  --primary: var(--color-accent);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-paper-1);
+  --secondary-foreground: var(--color-ink);
+  --muted: var(--color-paper-1);
+  --muted-foreground: var(--color-ink-muted);
+  --accent: var(--color-accent-soft);
+  --accent-foreground: var(--color-accent-dim);
+  --destructive: var(--color-danger);
+  --destructive-foreground: #ffffff;
+  --border: var(--rule-color);
+  --input: var(--rule-color);
+  --ring: var(--color-focus);
+  --radius: 0.5rem;
+  --chart-1: var(--color-accent);
+  --chart-2: var(--color-success);
+  --chart-3: var(--color-danger);
+  --chart-4: var(--color-warning);
+  --chart-5: var(--color-phosphor);
+  --sidebar: var(--color-paper-1);
+  --sidebar-foreground: var(--color-ink);
+  --sidebar-primary: var(--color-accent);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--color-paper-2);
+  --sidebar-accent-foreground: var(--color-ink);
+  --sidebar-border: var(--rule-color);
+  --sidebar-ring: var(--color-focus);
+}
+
+/* ───────────────────────────────────────────────────────────────────────── */
+/* DARK MODE (default, Signal Console night ops)                                */
+/* ───────────────────────────────────────────────────────────────────────── */
+
+.dark,
+[data-theme="dark"] {
+  /* Paper / surface — deep ink, not pure black */
+  --color-paper: var(--primitive-ink-950);
+  --color-paper-1: var(--primitive-ink-900);
+  --color-paper-2: var(--primitive-ink-800);
+  --color-paper-3: var(--primitive-ink-700);
+  --color-paper-4: var(--primitive-ink-600);
+
+  /* Ink / text — slightly cool */
+  --color-ink: var(--primitive-ink-50);
+  --color-ink-muted: var(--primitive-ink-300);
+  --color-ink-faint: var(--primitive-ink-500);
+
+  /* Primary signal — brighter electric blue in the dark */
+  --color-accent: var(--primitive-blue-400);
+  --color-accent-dim: var(--primitive-blue-600);
+  --color-accent-bright: var(--primitive-blue-300);
+  --color-accent-soft: var(--primitive-blue-900);
+
+  /* Secondary / active */
+  --color-phosphor: var(--primitive-blue-300);
+  --color-phosphor-dim: var(--primitive-blue-500);
+  --color-phosphor-bright: var(--primitive-blue-200);
+  --color-phosphor-soft: var(--primitive-blue-900);
+
+  /* Violation type coding stays identical for recognizability */
+  --color-helmet: var(--primitive-helmet);
+  --color-triple: var(--primitive-triple);
+  --color-wrong-side: var(--primitive-wrong-side);
+  --color-parking: var(--primitive-parking);
+  --color-seatbelt: var(--primitive-seatbelt);
+  --color-stopline: var(--primitive-stopline);
+  --color-redlight: var(--primitive-redlight);
+  --color-plate: var(--primitive-plate);
+
+  /* Semantic status (slightly brighter in dark) */
+  --color-success: var(--primitive-success-bright);
+  --color-success-soft: oklch(22% 0.04 155);
+  --color-warning: var(--primitive-warning-bright);
+  --color-warning-soft: oklch(22% 0.04 85);
+  --color-danger: var(--primitive-danger-bright);
+  --color-danger-soft: oklch(20% 0.04 25);
+
+  --color-focus: var(--primitive-blue-400);
+  --rule-color: var(--primitive-ink-800);
+
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
+  --card: var(--color-paper-1);
+  --card-foreground: var(--color-ink);
+  --popover: var(--color-paper-1);
+  --popover-foreground: var(--color-ink);
+  --primary: var(--color-accent);
+  --primary-foreground: var(--primitive-ink-950);
+  --secondary: var(--color-paper-2);
+  --secondary-foreground: var(--color-ink);
+  --muted: var(--color-paper-2);
+  --muted-foreground: var(--color-ink-muted);
+  --accent: var(--color-accent-soft);
+  --accent-foreground: var(--color-accent-bright);
+  --destructive: var(--color-danger);
+  --destructive-foreground: var(--primitive-ink-950);
+  --border: var(--rule-color);
+  --input: var(--rule-color);
+  --ring: var(--color-focus);
+  --chart-1: var(--color-accent);
+  --chart-2: var(--color-success);
+  --chart-3: var(--color-danger);
+  --chart-4: var(--color-warning);
+  --chart-5: var(--color-phosphor);
+  --sidebar: var(--color-paper);
+  --sidebar-foreground: var(--color-ink);
+  --sidebar-primary: var(--color-accent);
+  --sidebar-primary-foreground: var(--primitive-ink-950);
+  --sidebar-accent: var(--color-paper-2);
+  --sidebar-accent-foreground: var(--color-ink);
+  --sidebar-border: var(--rule-color);
+  --sidebar-ring: var(--color-focus);
 }
