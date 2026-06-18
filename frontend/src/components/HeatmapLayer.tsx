@@ -45,14 +45,14 @@ export default function HeatmapLayer({ points, options = {} }: HeatmapLayerProps
       max: 1.0,
       minOpacity: 0.15,
       gradient: {
-        0.2: "#1a237e",  // deep blue
-        0.4: "#0d47a1",  // blue
-        0.5: "#00838f",  // teal
-        0.6: "#2e7d32",  // green
-        0.7: "#f9a825",  // amber
-        0.8: "#e65100",  // orange
-        0.9: "#b71c1c",  // red
-        1.0: "#d50000",  // bright red
+        0.2: "#3b82f6",  // signal blue
+        0.4: "#06b6d4",  // cyan
+        0.5: "#10b981",  // emerald
+        0.6: "#84cc16",  // lime
+        0.7: "#f59e0b",  // amber
+        0.8: "#f97316",  // orange
+        0.9: "#ef4444",  // red
+        1.0: "#f43f5e",  // rose
       },
       ...options,
     });
