@@ -24,6 +24,7 @@ import {
   X,
   FileImage,
   Trash2,
+  ImagePlay,
 } from "lucide-react";
 import { detectViolation } from "@/lib/api";
 import type { DetectResponse, ViolationRecord } from "@/types/violation";
@@ -61,6 +62,72 @@ const DEMO_CAMERAS = [
   { id: "KORMANGALA-01", name: "Koramangala 100ft Road" },
 ];
 
+/** Demo image examples per violation type — for quick demo selection. */
+const DEMO_IMAGES: {
+  type: string;
+  label: string;
+  description: string;
+  cameraId: string;
+  placeholderText: string;
+}[] = [
+  {
+    type: "no_helmet",
+    label: "No Helmet — Two-wheeler",
+    description: "Rider without helmet on MG Road",
+    cameraId: "MGROAD-01",
+    placeholderText: "Two-wheeler rider\\nNo helmet\\nMG Road",
+  },
+  {
+    type: "no_helmet",
+    label: "No Helmet — Pillion",
+    description: "Pillion rider without helmet at Silk Board",
+    cameraId: "SILKBOARD-01",
+    placeholderText: "Pillion rider\\nNo helmet\\nSilk Board",
+  },
+  {
+    type: "triple_riding",
+    label: "Triple Riding",
+    description: "Three on a two-wheeler at Hebbal Flyover",
+    cameraId: "HEBBAL-01",
+    placeholderText: "Triple riding\\n3 on bike\\nHebbal",
+  },
+  {
+    type: "triple_riding",
+    label: "Triple Riding — Family",
+    description: "Family of three on bike at Whitefield",
+    cameraId: "WHITEFIELD-01",
+    placeholderText: "Family triple\\nOn two-wheeler\\nWhitefield",
+  },
+  {
+    type: "wrong_side_driving",
+    label: "Wrong Side Driving",
+    description: "Vehicle on wrong side at Electronic City",
+    cameraId: "ELECTRONIC-01",
+    placeholderText: "Wrong side\\nWrong lane\\nE-City",
+  },
+  {
+    type: "illegal_parking",
+    label: "Illegal Parking",
+    description: "Vehicle parked in no-parking zone, Koramangala",
+    cameraId: "KORMANGALA-01",
+    placeholderText: "Illegal park\\nNo-parking zone\\nKoramangala",
+  },
+  {
+    type: "no_seatbelt",
+    label: "No Seatbelt",
+    description: "Driver without seatbelt at Marathahalli",
+    cameraId: "MARATHAHALLI-01",
+    placeholderText: "No seatbelt\\nCar driver\\nMarathahalli",
+  },
+  {
+    type: "red_light_violation",
+    label: "Red Light Jump",
+    description: "Vehicle jumping red light at KR Puram",
+    cameraId: "KRPURAM-01",
+    placeholderText: "Red light jump\\nSignal violation\\nKR Puram",
+  },
+];
+
 /** Maximum number of files in a batch. */
 const MAX_BATCH_SIZE = 10;
 
@@ -87,6 +154,75 @@ interface BatchFile {
   error: string | null;
 }
 
+/** Create a placeholder demo image File using canvas. */
+async function createDemoImageFile(
+  demo: (typeof DEMO_IMAGES)[number],
+): Promise<File> {
+  const canvas = document.createElement("canvas");
+  canvas.width = 640;
+  canvas.height = 480;
+  const ctx = canvas.getContext("2d")!;
+
+  // Background — dark gray with slight gradient
+  const grad = ctx.createLinearGradient(0, 0, 0, 480);
+  grad.addColorStop(0, "#1a1a2e");
+  grad.addColorStop(1, "#16213e");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 640, 480);
+
+  // Road-like strip at bottom
+  ctx.fillStyle = "#2d3436";
+  ctx.fillRect(0, 320, 640, 160);
+  // Road markings
+  ctx.strokeStyle = "#636e72";
+  ctx.lineWidth = 2;
+  ctx.setLineDash([20, 15]);
+  ctx.beginPath();
+  ctx.moveTo(0, 400);
+  ctx.lineTo(640, 400);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Violation type label
+  const vColor =
+    VIOLATION_COLORS[demo.type as keyof typeof VIOLATION_COLORS] ?? "#00d4ff";
+  ctx.fillStyle = vColor;
+  ctx.font = "bold 28px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(demo.label, 320, 120);
+
+  // Description
+  ctx.fillStyle = "#b2bec3";
+  ctx.font = "18px system-ui, sans-serif";
+  ctx.fillText(demo.description, 320, 165);
+
+  // Camera badge
+  ctx.fillStyle = "#00d4ff";
+  ctx.font = "14px monospace";
+  ctx.fillText(`📷 ${demo.cameraId}`, 320, 210);
+
+  // VigilAI watermark
+  ctx.fillStyle = "#636e72";
+  ctx.font = "12px monospace";
+  ctx.textAlign = "right";
+  ctx.fillText("VigilAI Demo", 630, 470);
+  ctx.textAlign = "center";
+
+  // Bounding box overlay (decorative)
+  ctx.strokeStyle = vColor;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6, 4]);
+  ctx.strokeRect(180, 60, 280, 240);
+  ctx.setLineDash([]);
+
+  // Convert canvas to File
+  const blob = await new Promise<Blob>((resolve) => {
+    canvas.toBlob((b) => resolve(b!), "image/jpeg", 0.85);
+  });
+  const fileName = `demo_${demo.type}_${demo.cameraId.toLowerCase()}.jpg`;
+  return new File([blob], fileName, { type: "image/jpeg" });
+}
+
 export default function Upload() {
   const [batchFiles, setBatchFiles] = useState<BatchFile[]>([]);
   const [cameraId, setCameraId] = useState("");
@@ -98,6 +234,7 @@ export default function Upload() {
   const fileRef = useRef<HTMLInputElement>(null);
   const signalState = useAppStore((s) => s.signalState);
   const setLastDetection = useAppStore((s) => s.setLastDetection);
+  const demoMode = useAppStore((s) => s.demoMode);
 
   /** Add files to the batch (respects MAX_BATCH_SIZE). */
   const addFiles = useCallback((files: FileList | File[]) => {
@@ -117,6 +254,16 @@ export default function Upload() {
       ];
     });
   }, []);
+
+  /** Load a demo image into the batch queue. */
+  const loadDemoImage = useCallback(
+    async (demo: (typeof DEMO_IMAGES)[number]) => {
+      const file = await createDemoImageFile(demo);
+      setCameraId(demo.cameraId);
+      addFiles([file]);
+    },
+    [addFiles],
+  );
 
   /** Remove a file from the batch by index. */
   const removeFile = useCallback((index: number) => {
@@ -218,7 +365,7 @@ export default function Upload() {
             <h1 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">
               Detect Violations
             </h1>
-            <p className="text-[11px] text-[var(--color-ink-faint)]">
+            <p className="text-[12px] text-[var(--color-ink-faint)]">
               Upload up to {MAX_BATCH_SIZE} traffic camera images for batch violation detection
             </p>
           </div>
@@ -286,6 +433,55 @@ export default function Upload() {
               }}
             />
           </div>
+
+          {/* Demo image quick-select (demo mode only) */}
+          {demoMode && (
+            <Card className="border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5">
+              <CardContent className="p-3 space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <ImagePlay className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
+                    Demo Quick-Select
+                  </p>
+                </div>
+                <p className="text-[10px] text-[var(--color-ink-faint)]">
+                  Click an example to load a demo image with matching camera
+                </p>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {DEMO_IMAGES.map((demo) => {
+                    const vColor =
+                      VIOLATION_COLORS[demo.type as keyof typeof VIOLATION_COLORS] ?? "var(--color-accent)";
+                    return (
+                      <button
+                        key={`${demo.type}-${demo.cameraId}`}
+                        onClick={() => loadDemoImage(demo)}
+                        disabled={batchRunning}
+                        className={cn(
+                          "group flex flex-col items-start gap-0.5 rounded-md border px-2.5 py-2 text-left transition-all duration-200",
+                          "border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70",
+                          "hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent)]/5",
+                          "disabled:opacity-50 disabled:cursor-not-allowed",
+                        )}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className="h-2 w-2 shrink-0 rounded-full"
+                            style={{ backgroundColor: vColor }}
+                          />
+                          <span className="text-[11px] font-medium text-[var(--color-ink)] truncate">
+                            {demo.label}
+                          </span>
+                        </div>
+                        <span className="text-[9px] text-[var(--color-ink-faint)] pl-3.5">
+                          {demo.cameraId}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Batch file list */}
           {batchFiles.length > 0 && (
