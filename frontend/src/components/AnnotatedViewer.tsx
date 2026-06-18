@@ -128,7 +128,7 @@ export default function AnnotatedViewer({
 
       // Label background pill
       const text = `${label} ${conf}`;
-      ctx.font = "bold 11px 'IBM Plex Sans', sans-serif";
+      ctx.font = "bold 11px 'DM Sans', system-ui, sans-serif";
       const textMetrics = ctx.measureText(text);
       const textH = 16;
       const textW = textMetrics.width + 10;
@@ -186,7 +186,7 @@ export default function AnnotatedViewer({
     <div ref={containerRef} className={className}>
       {/* View mode toggle bar */}
       <div className="mb-2 flex items-center gap-2">
-        <div className="flex rounded-md border border-[var(--color-paper-3)]/60 bg-[var(--color-paper-2)]/40 p-0.5">
+        <div className="flex rounded-md border border-[var(--rule-color)] bg-[var(--color-paper-2)] p-0.5">
           {viewModes.map(({ mode, label, icon: Icon }) => (
             <button
               key={mode}
@@ -194,8 +194,8 @@ export default function AnnotatedViewer({
               className={cn(
                 "flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-[10px] font-medium transition-all duration-200",
                 viewMode === mode
-                  ? "bg-[var(--color-accent)]/15 text-[var(--color-accent)] shadow-[inset_0_0_0_1px_oklch(75%_0.18_85/0.2)]"
-                  : "text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-3)]/30",
+                  ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/25"
+                  : "text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-3)]",
               )}
               title={label}
             >
@@ -218,7 +218,7 @@ export default function AnnotatedViewer({
               step={0.05}
               value={overlayOpacity}
               onChange={(e) => setOverlayOpacity(parseFloat(e.target.value))}
-              className="h-1 w-20 cursor-pointer appearance-none rounded-full bg-[var(--color-paper-3)]/60 accent-[var(--color-accent)]"
+              className="h-1 w-20 cursor-pointer appearance-none rounded-full bg-[var(--color-paper-3)] accent-[var(--color-accent)]"
             />
             <span className="w-8 text-right font-mono text-[10px] tabular-nums text-[var(--color-ink-muted)]">
               {(overlayOpacity * 100).toFixed(0)}%

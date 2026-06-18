@@ -21,7 +21,6 @@ import {
   Copy,
   Check,
   FileDown,
-  ShieldCheck,
   AlertCircle,
   Loader2,
 } from "lucide-react";
@@ -37,6 +36,7 @@ import { generateFirPdf } from "@/lib/api";
 import AnnotatedViewer from "@/components/AnnotatedViewer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ShieldCheck as IntegrityShield, DangerGauge } from "@/components/icons";
 
 export default function Evidence() {
   const selectedViolation = useAppStore((s) => s.selectedViolation);
@@ -94,7 +94,7 @@ export default function Evidence() {
     <div className="p-5">
       <header className="mb-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent)]/15">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent-soft)] ring-1 ring-[var(--color-accent)]/15">
             <FileImage className="h-4 w-4 text-[var(--color-accent)]" />
           </div>
           <div>
@@ -115,7 +115,7 @@ export default function Evidence() {
             Detected Violations
           </h2>
           {violations.length === 0 ? (
-            <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/50">
+            <Card className="border-[var(--rule-color)] bg-[var(--color-paper-1)]">
               <CardContent className="flex flex-col items-center justify-center p-8">
                 <FileImage className="mb-2 h-8 w-8 text-[var(--color-ink-faint)]" />
                 <p className="text-center text-xs text-[var(--color-ink-muted)]">
@@ -137,8 +137,8 @@ export default function Evidence() {
                 className={cn(
                   "w-full rounded-md border p-2.5 text-left transition-all duration-200",
                   viewingId === v.id
-                    ? "border-[var(--color-accent)]/40 bg-[var(--color-accent)]/8 ring-1 ring-[var(--color-accent)]/20"
-                    : "border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/50 hover:bg-[var(--color-paper-2)]/40",
+                    ? "border-[var(--color-accent)]/30 bg-[var(--color-accent-soft)] ring-1 ring-[var(--color-accent)]/20"
+                    : "border-[var(--rule-color)] bg-[var(--color-paper-1)] hover:bg-[var(--color-paper-2)]",
                 )}
               >
                 <ViolationSummary violation={v} />
@@ -152,7 +152,7 @@ export default function Evidence() {
           {selectedViolation?.evidence_url ? (
             <div className="space-y-4">
               {/* Annotated evidence image */}
-              <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 overflow-hidden">
+              <Card className="overflow-hidden border-[var(--rule-color)] bg-[var(--color-paper-1)]">
                 <CardContent className="p-2">
                   <AnnotatedViewer
                     imageUrl={`http://localhost:8000${selectedViolation.evidence_url}`}
@@ -163,7 +163,7 @@ export default function Evidence() {
               </Card>
 
               {/* Chain of Custody metadata */}
-              <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
+              <Card className="border-[var(--rule-color)] bg-[var(--color-paper-1)]">
                 <CardContent className="p-4">
                   <div className="mb-3 flex items-center justify-between">
                     <h3 className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
@@ -217,14 +217,14 @@ export default function Evidence() {
                       value={
                         <div className="flex items-center gap-1.5">
                           {hashPresent ? (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-success)]/10 px-2 py-0.5 ring-1 ring-[var(--color-success)]/20">
-                              <ShieldCheck className="h-3 w-3 text-[var(--color-success)]" />
+                            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-success-soft)] px-2 py-0.5 ring-1 ring-[var(--color-success)]/20">
+                              <IntegrityShield className="h-3 w-3 text-[var(--color-success)]" />
                               <span className="text-[10px] font-medium text-[var(--color-success)]">
                                 Verified
                               </span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-warning)]/10 px-2 py-0.5 ring-1 ring-[var(--color-warning)]/20">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-warning-soft)] px-2 py-0.5 ring-1 ring-[var(--color-warning)]/20">
                               <AlertCircle className="h-3 w-3 text-[var(--color-warning)]" />
                               <span className="text-[10px] font-medium text-[var(--color-warning)]">
                                 No Hash
@@ -295,13 +295,14 @@ export default function Evidence() {
                       label="Danger Score"
                       value={
                         <span className={cn(
-                          "font-mono text-[11px] font-semibold",
+                          "inline-flex items-center gap-1 font-mono text-[11px] font-semibold",
                           selectedViolation.danger_score >= 80
                             ? "text-[var(--color-danger)]"
                             : selectedViolation.danger_score >= 40
                               ? "text-[var(--color-warning)]"
                               : "text-[var(--color-success)]",
                         )}>
+                          <DangerGauge size={14} value={selectedViolation.danger_score} />
                           {selectedViolation.danger_score}/100
                         </span>
                       }
@@ -318,8 +319,8 @@ export default function Evidence() {
 
                   {/* AI Explanation */}
                   {selectedViolation.ai_explanation && (
-                    <div className="mt-3 rounded-md border border-[var(--color-accent)]/15 bg-[var(--color-accent)]/5 p-2.5">
-                      <p className="mb-1 text-[9px] font-semibold uppercase tracking-wider text-[var(--color-accent)]/70">
+                    <div className="mt-3 rounded-md border border-[var(--color-accent)]/15 bg-[var(--color-accent-soft)] p-2.5">
+                      <p className="mb-1 text-[9px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
                         AI Explanation
                       </p>
                       <p className="text-[11px] leading-relaxed text-[var(--color-ink-muted)]">
@@ -331,9 +332,9 @@ export default function Evidence() {
               </Card>
             </div>
           ) : (
-            <Card className="flex h-80 items-center justify-center border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/30">
+            <Card className="flex h-80 items-center justify-center border-[var(--rule-color)] bg-[var(--color-paper-1)]">
               <div className="text-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-paper-3)]/30">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-paper-2)]">
                   <ZoomIn className="h-5 w-5 text-[var(--color-ink-faint)]" />
                 </div>
                 <p className="text-sm text-[var(--color-ink-muted)]">

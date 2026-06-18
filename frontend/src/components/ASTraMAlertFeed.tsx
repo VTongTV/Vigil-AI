@@ -10,12 +10,13 @@
  */
 
 import { useEffect, useRef } from "react";
-import { Bell, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import type { ASTraMAlert } from "@/types/violation";
 import { VIOLATION_LABELS, VIOLATION_COLORS } from "@/types/violation";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
+import { AlertBell, DangerGauge } from "@/components/icons";
 
 /** Threshold for "critical" alerts that trigger audio beep. */
 const CRITICAL_DANGER_THRESHOLD = 80;
@@ -120,11 +121,14 @@ export default function ASTraMAlertFeed() {
         className={cn(
           "pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full shadow-lg transition-all duration-200",
           criticalCount > 0
-            ? "bg-[var(--color-danger)]/90 text-white pulse-dot-shadow"
-            : "bg-[var(--color-paper-2)]/90 text-[var(--color-ink-muted)] border border-[var(--color-paper-3)]/60 hover:text-[var(--color-ink)]",
+            ? "bg-[var(--color-danger)] text-white hover:bg-[var(--color-danger-bright)]"
+            : "bg-[var(--color-paper-1)] text-[var(--color-ink-muted)] border border-[var(--rule-color)] hover:text-[var(--color-ink)]",
         )}
       >
-        <Bell className="h-4 w-4" />
+        <AlertBell
+          className="h-4 w-4"
+          critical={criticalCount > 0}
+        />
         {alerts.length > 0 && (
           <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-danger)] text-[8px] font-bold text-white">
             {alerts.length > 9 ? "9+" : alerts.length}
@@ -134,15 +138,15 @@ export default function ASTraMAlertFeed() {
 
       {/* Alert feed panel */}
       {alertPanelOpen && (
-        <Card className="pointer-events-auto w-80 max-h-96 overflow-y-auto border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/95 backdrop-blur-xl shadow-2xl">
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--color-paper-3)]/40 bg-[var(--color-paper-1)]/95 px-3 py-2 backdrop-blur-xl">
+        <Card className="pointer-events-auto w-80 max-h-96 overflow-y-auto border-[var(--rule-color)] bg-[var(--color-paper-1)] shadow-2xl">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--rule-color)] bg-[var(--color-paper-1)] px-3 py-2">
             <div className="flex items-center gap-2">
-              <Bell className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+              <AlertBell className="h-3.5 w-3.5 text-[var(--color-accent)]" critical={criticalCount > 0} />
               <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
                 ASTraM Alerts
               </span>
               {criticalCount > 0 && (
-                <span className="rounded-full bg-[var(--color-danger)]/15 px-1.5 py-0.5 text-[9px] font-semibold text-[var(--color-danger)]">
+                <span className="rounded-full bg-[var(--color-danger-soft)] px-1.5 py-0.5 text-[9px] font-semibold text-[var(--color-danger)] ring-1 ring-[var(--color-danger)]/20">
                   {criticalCount} critical
                 </span>
               )}
@@ -196,8 +200,8 @@ function AlertCard({
       className={cn(
         "group relative rounded-md border p-2 transition-all duration-200",
         isCritical
-          ? "border-[var(--color-danger)]/30 bg-[var(--color-danger)]/5"
-          : "border-[var(--color-paper-3)]/40 bg-[var(--color-paper-2)]/30",
+          ? "border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)]"
+          : "border-[var(--rule-color)] bg-[var(--color-paper-2)]",
       )}
     >
       <div className="flex items-start gap-2">
@@ -213,7 +217,7 @@ function AlertCard({
               {vLabel}
             </span>
             {isCritical && (
-              <span className="shrink-0 rounded bg-[var(--color-danger)]/15 px-1 py-0.5 text-[8px] font-bold uppercase text-[var(--color-danger)]">
+              <span className="shrink-0 rounded bg-[var(--color-danger-soft)] px-1 py-0.5 text-[8px] font-bold uppercase text-[var(--color-danger)] ring-1 ring-[var(--color-danger)]/20">
                 Critical
               </span>
             )}
@@ -222,11 +226,14 @@ function AlertCard({
             {alert.junction_name} · {alert.camera_id}
           </p>
           <div className="mt-0.5 flex items-center gap-2">
-            <span className={cn(
-              "font-mono text-[10px] tabular-nums font-semibold",
-              isCritical ? "text-[var(--color-danger)]" : "text-[var(--color-warning)]",
-            )}>
-              ⚠ {alert.danger_score}
+            <span
+              className={cn(
+                "flex items-center gap-1 font-mono text-[10px] tabular-nums font-semibold",
+                isCritical ? "text-[var(--color-danger)]" : "text-[var(--color-warning)]",
+              )}
+            >
+              <DangerGauge size={12} value={alert.danger_score} />
+              {alert.danger_score}
             </span>
             {alert.license_plate && (
               <span className="font-mono text-[9px] text-[var(--color-accent)]">

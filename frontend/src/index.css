@@ -6,57 +6,62 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ── VigilAI Interceptor Grid Theme ── */
+/* ── VigilAI Signal Console Theme ── */
 
 @theme {
-  /* Paper / surface — deep steel */
-  --color-paper: oklch(13% 0.008 255);
-  --color-paper-1: oklch(16% 0.01 255);
-  --color-paper-2: oklch(20% 0.012 255);
-  --color-paper-3: oklch(26% 0.014 255);
-  --color-paper-4: oklch(32% 0.016 255);
+  /* Paper / surface */
+  --color-paper: var(--color-paper);
+  --color-paper-1: var(--color-paper-1);
+  --color-paper-2: var(--color-paper-2);
+  --color-paper-3: var(--color-paper-3);
+  --color-paper-4: var(--color-paper-4);
 
-  /* Ink / text — warm neutral */
-  --color-ink: oklch(90% 0.008 75);
-  --color-ink-muted: oklch(62% 0.015 75);
-  --color-ink-faint: oklch(42% 0.015 75);
+  /* Ink / text */
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-ink-faint: var(--color-ink-faint);
 
-  /* Primary accent — amber CRT */
-  --color-accent: oklch(75% 0.18 85);
-  --color-accent-dim: oklch(50% 0.12 85);
-  --color-accent-bright: oklch(85% 0.2 85);
+  /* Primary signal — electric blue */
+  --color-accent: var(--color-accent);
+  --color-accent-dim: var(--color-accent-dim);
+  --color-accent-bright: var(--color-accent-bright);
+  --color-accent-soft: var(--color-accent-soft);
 
-  /* Secondary accent — phosphor green */
-  --color-phosphor: oklch(65% 0.2 155);
-  --color-phosphor-dim: oklch(40% 0.12 155);
-  --color-phosphor-bright: oklch(78% 0.22 155);
+  /* Secondary — cyan signal tint */
+  --color-phosphor: var(--color-phosphor);
+  --color-phosphor-dim: var(--color-phosphor-dim);
+  --color-phosphor-bright: var(--color-phosphor-bright);
+  --color-phosphor-soft: var(--color-phosphor-soft);
 
   /* Semantic — violation types */
-  --color-helmet: oklch(65% 0.2 25);
-  --color-triple: oklch(75% 0.18 85);
-  --color-wrong-side: oklch(65% 0.18 280);
-  --color-parking: oklch(70% 0.15 90);
-  --color-seatbelt: oklch(65% 0.18 320);
-  --color-stopline: oklch(65% 0.15 210);
-  --color-redlight: oklch(55% 0.22 20);
-  --color-plate: oklch(65% 0.2 155);
+  --color-helmet: var(--color-helmet);
+  --color-triple: var(--color-triple);
+  --color-wrong-side: var(--color-wrong-side);
+  --color-parking: var(--color-parking);
+  --color-seatbelt: var(--color-seatbelt);
+  --color-stopline: var(--color-stopline);
+  --color-redlight: var(--color-redlight);
+  --color-plate: var(--color-plate);
 
   /* Semantic — status */
-  --color-success: oklch(65% 0.2 155);
-  --color-warning: oklch(75% 0.18 85);
-  --color-danger: oklch(60% 0.22 25);
+  --color-success: var(--color-success);
+  --color-success-soft: var(--color-success-soft);
+  --color-warning: var(--color-warning);
+  --color-warning-soft: var(--color-warning-soft);
+  --color-danger: var(--color-danger);
+  --color-danger-soft: var(--color-danger-soft);
 
   /* Fonts */
-  --font-display: "Space Grotesk", system-ui, sans-serif;
-  --font-body: "IBM Plex Sans", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", "Cascadia Code", monospace;
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
 }
 
-/* ── shadcn dark-mode overrides (Interceptor Grid palette) ── */
+/* ── shadcn theme token bridge ── */
 
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: 'Geist Variable', sans-serif;
+  --font-sans: var(--font-body);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -74,6 +79,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -95,76 +101,6 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-}
-
-/* Interceptor Grid dark theme — amber primary, phosphor green secondary */
-.dark {
-  --background: oklch(11% 0.008 255);
-  --foreground: oklch(90% 0.008 75);
-  --card: oklch(14% 0.01 255);
-  --card-foreground: oklch(90% 0.008 75);
-  --popover: oklch(14% 0.01 255);
-  --popover-foreground: oklch(90% 0.008 75);
-  --primary: oklch(75% 0.18 85);
-  --primary-foreground: oklch(11% 0.008 85);
-  --secondary: oklch(20% 0.012 255);
-  --secondary-foreground: oklch(82% 0.01 75);
-  --muted: oklch(18% 0.01 255);
-  --muted-foreground: oklch(58% 0.015 75);
-  --accent: oklch(20% 0.012 255);
-  --accent-foreground: oklch(82% 0.01 75);
-  --destructive: oklch(60% 0.22 25);
-  --border: oklch(26% 0.014 255);
-  --input: oklch(26% 0.014 255);
-  --ring: oklch(75% 0.18 85);
-  --chart-1: oklch(75% 0.18 85);
-  --chart-2: oklch(65% 0.2 155);
-  --chart-3: oklch(65% 0.2 25);
-  --chart-4: oklch(70% 0.15 90);
-  --chart-5: oklch(65% 0.18 280);
-  --sidebar: oklch(12% 0.008 255);
-  --sidebar-foreground: oklch(82% 0.01 75);
-  --sidebar-primary: oklch(75% 0.18 85);
-  --sidebar-primary-foreground: oklch(11% 0.008 85);
-  --sidebar-accent: oklch(20% 0.012 255);
-  --sidebar-accent-foreground: oklch(82% 0.01 75);
-  --sidebar-border: oklch(24% 0.012 255);
-  --sidebar-ring: oklch(75% 0.18 85);
-}
-
-:root {
-  --background: oklch(11% 0.008 255);
-  --foreground: oklch(90% 0.008 75);
-  --card: oklch(14% 0.01 255);
-  --card-foreground: oklch(90% 0.008 75);
-  --popover: oklch(14% 0.01 255);
-  --popover-foreground: oklch(90% 0.008 75);
-  --primary: oklch(75% 0.18 85);
-  --primary-foreground: oklch(11% 0.008 85);
-  --secondary: oklch(20% 0.012 255);
-  --secondary-foreground: oklch(82% 0.01 75);
-  --muted: oklch(18% 0.01 255);
-  --muted-foreground: oklch(58% 0.015 75);
-  --accent: oklch(20% 0.012 255);
-  --accent-foreground: oklch(82% 0.01 75);
-  --destructive: oklch(60% 0.22 25);
-  --border: oklch(26% 0.014 255);
-  --input: oklch(26% 0.014 255);
-  --ring: oklch(75% 0.18 85);
-  --chart-1: oklch(75% 0.18 85);
-  --chart-2: oklch(65% 0.2 155);
-  --chart-3: oklch(65% 0.2 25);
-  --chart-4: oklch(70% 0.15 90);
-  --chart-5: oklch(65% 0.18 280);
-  --radius: 0.5rem;
-  --sidebar: oklch(12% 0.008 255);
-  --sidebar-foreground: oklch(82% 0.01 75);
-  --sidebar-primary: oklch(75% 0.18 85);
-  --sidebar-primary-foreground: oklch(11% 0.008 85);
-  --sidebar-accent: oklch(20% 0.012 255);
-  --sidebar-accent-foreground: oklch(82% 0.01 75);
-  --sidebar-border: oklch(24% 0.012 255);
-  --sidebar-ring: oklch(75% 0.18 85);
 }
 
 @layer base {
@@ -191,17 +127,92 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
 code, pre, .font-mono {
   font-family: var(--font-mono);
 }
 
+/* ── Signal line (the differentiation anchor) ── */
+
+.signal-line {
+  position: relative;
+}
+
+.signal-line::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--color-accent) 0%,
+    var(--color-phosphor) 50%,
+    var(--color-accent) 100%
+  );
+  opacity: 0.6;
+}
+
+.signal-line-bottom::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-accent) 50%,
+    transparent 100%
+  );
+  opacity: 0.4;
+}
+
+/* ── Card surfaces ── */
+
+.surface-raised {
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px oklch(0% 0 0 / 0.04), 0 1px 3px oklch(0% 0 0 / 0.02);
+}
+
+.dark .surface-raised {
+  box-shadow: 0 1px 2px oklch(0% 0 0 / 0.20), 0 1px 3px oklch(0% 0 0 / 0.12);
+}
+
+.surface-glass {
+  background: var(--color-paper-1);
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  border: 1px solid var(--border);
+}
+
+/* ── Glow effects (surgical, not decorative) ── */
+
+.glow-accent {
+  box-shadow: 0 0 0 1px var(--color-accent-soft),
+              0 0 24px oklch(55% 0.20 250 / 0.15);
+}
+
+.glow-danger {
+  box-shadow: 0 0 0 1px var(--color-danger-soft),
+              0 0 24px color-mix(in oklch, var(--primitive-danger-dim) 25%, transparent);
+}
+
+.glow-success {
+  box-shadow: 0 0 0 1px var(--color-success-soft),
+              0 0 24px color-mix(in oklch, var(--primitive-success-dim) 25%, transparent);
+}
+
 /* ── Scrollbar ── */
 
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -217,147 +228,32 @@ code, pre, .font-mono {
   background: var(--color-ink-faint);
 }
 
-/* ── Glass card effect (amber-tinted) ── */
-
-.glass {
-  background: oklch(16% 0.012 255 / 0.6);
-  backdrop-filter: blur(16px) saturate(1.2);
-  -webkit-backdrop-filter: blur(16px) saturate(1.2);
-  border: 1px solid oklch(28% 0.014 255 / 0.4);
-}
-
-.glass-subtle {
-  background: oklch(16% 0.012 255 / 0.35);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid oklch(26% 0.014 255 / 0.3);
-}
-
-/* ── Glow effects (amber CRT primary) ── */
-
-.glow-accent {
-  box-shadow: 0 0 20px oklch(75% 0.18 85 / 0.15),
-              0 0 60px oklch(75% 0.18 85 / 0.05);
-}
-
-.glow-danger {
-  box-shadow: 0 0 20px oklch(60% 0.22 25 / 0.15),
-              0 0 60px oklch(60% 0.22 25 / 0.05);
-}
-
-.glow-success {
-  box-shadow: 0 0 20px oklch(65% 0.2 155 / 0.15),
-              0 0 60px oklch(65% 0.2 155 / 0.05);
-}
-
-.glow-phosphor {
-  box-shadow: 0 0 20px oklch(65% 0.2 155 / 0.2),
-              0 0 60px oklch(65% 0.2 155 / 0.08);
-}
-
-/* ── Accent line (amber) ── */
-
-.accent-line-top {
-  position: relative;
-}
-
-.accent-line-top::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    oklch(75% 0.18 85 / 0),
-    oklch(75% 0.18 85 / 0.8),
-    oklch(75% 0.18 85 / 0)
-  );
-}
-
-/* ── CRT scan-line overlay (static texture — the signature) ── */
-
-.scan-overlay {
-  position: relative;
-}
-
-.scan-overlay::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  background: repeating-linear-gradient(
-    0deg,
-    oklch(11% 0.008 255 / 0) 0px,
-    oklch(11% 0.008 255 / 0) 1px,
-    oklch(11% 0.008 255 / 0.03) 1px,
-    oklch(11% 0.008 255 / 0.03) 2px
-  );
-  mix-blend-mode: multiply;
-}
-
-/* ── Animated scan line (subtle sweep) ── */
-
-@keyframes scan-line {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100%); }
-}
-
-.scan-line::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    oklch(75% 0.18 85 / 0.02) 0%,
-    oklch(75% 0.18 85 / 0.05) 50%,
-    oklch(75% 0.18 85 / 0.02) 100%
-  );
-  height: 40px;
-  animation: scan-line 6s linear infinite;
-  pointer-events: none;
-}
-
 /* ── Pulse dot ── */
 
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
 }
 
 .pulse-dot {
   animation: pulse-dot 2s ease-in-out infinite;
 }
 
-/* ── Beacon pulse (signal state indicator) ── */
+/* ── Beacon pulse (status indicator) ── */
 
 @keyframes beacon-pulse {
   0%, 100% {
-    box-shadow: 0 0 4px currentColor,
-                0 0 8px currentColor;
+    box-shadow: 0 0 0 0 currentColor;
     opacity: 1;
   }
   50% {
-    box-shadow: 0 0 8px currentColor,
-                0 0 16px currentColor,
-                0 0 24px currentColor;
-    opacity: 0.8;
+    box-shadow: 0 0 0 6px currentColor;
+    opacity: 0.7;
   }
 }
 
 .beacon {
   animation: beacon-pulse 2.5s ease-in-out infinite;
-}
-
-/* ── Grid pattern overlay (tactical graph paper) ── */
-
-.grid-pattern {
-  background-image:
-    linear-gradient(oklch(28% 0.014 255 / 0.15) 1px, transparent 1px),
-    linear-gradient(90deg, oklch(28% 0.014 255 / 0.15) 1px, transparent 1px);
-  background-size: 24px 24px;
 }
 
 /* ── Shimmer loading ── */
@@ -378,31 +274,34 @@ code, pre, .font-mono {
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
-/* ── Phosphor text (CRT terminal green on monospace) ── */
+/* ── Status pills ── */
 
-.text-phosphor {
-  color: oklch(65% 0.2 155);
-}
-
-/* ── Amber text (CRT amber phosphor) ── */
-
-.text-amber {
-  color: oklch(75% 0.18 85);
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* ── Steel divider ── */
 
 .steel-divider {
-  border-color: oklch(24% 0.012 255 / 0.6);
+  border-color: var(--rule-color);
 }
 
 /* ── Reduced motion ── */
 
 @media (prefers-reduced-motion: reduce) {
-  .scan-line::after,
   .pulse-dot,
   .beacon,
-  .shimmer {
+  .shimmer,
+  .signal-line::before,
+  .signal-line-bottom::after {
     animation: none;
   }
 }
@@ -417,7 +316,115 @@ code, pre, .font-mono {
   .no-print {
     display: none !important;
   }
-  .scan-overlay::before {
-    display: none;
-  }
+}
+
+/* ── Animated SVG icons ── */
+
+@keyframes vigil-logo-pulse {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.05); }
+}
+
+.vigil-logo-ring {
+  animation: vigil-logo-pulse 3s ease-in-out infinite;
+  transform-origin: center;
+}
+.vigil-logo-ring:nth-child(2) { animation-delay: 0s; }
+.vigil-logo-ring:nth-child(3) { animation-delay: 0.4s; }
+.vigil-logo-ring:nth-child(4) { animation-delay: 0.8s; }
+
+@keyframes alert-bell-swing {
+  0%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(8deg); }
+  30% { transform: rotate(-6deg); }
+  50% { transform: rotate(4deg); }
+  70% { transform: rotate(-2deg); }
+  90% { transform: rotate(1deg); }
+}
+
+.alert-bell-body {
+  transform-origin: 12px 4px;
+  animation: alert-bell-swing 2s ease-in-out infinite;
+}
+
+.alert-bell-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes shield-check-draw {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.shield-check {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 0;
+  animation: shield-check-draw 0.6s var(--ease-out) forwards;
+}
+
+@keyframes shield-shimmer {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+.shield-shell {
+  animation: shield-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes danger-gauge-fill {
+  0% { stroke-dashoffset: 60; }
+  100% { stroke-dashoffset: var(--gauge-offset, 0); }
+}
+
+.danger-gauge-arc {
+  --gauge-offset: 0;
+  animation: danger-gauge-fill 1s var(--ease-out) forwards;
+}
+
+.danger-gauge-needle {
+  transition: transform 0.8s var(--ease-spring);
+}
+
+@keyframes trend-bob-up {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@keyframes trend-bob-down {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(2px); }
+}
+
+.trend-arrow-up {
+  animation: trend-bob-up 2s ease-in-out infinite;
+}
+
+.trend-arrow-down {
+  animation: trend-bob-down 2s ease-in-out infinite;
+}
+
+.trend-arrow-stable {
+  opacity: 0.7;
+}
+
+@keyframes camera-lens-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.camera-lens {
+  animation: camera-lens-blink 4s ease-in-out infinite;
+}
+
+.camera-status-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes upload-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.upload-arrow-shaft {
+  animation: upload-bob 1.8s ease-in-out infinite;
 }
