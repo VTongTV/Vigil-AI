@@ -130,10 +130,10 @@ export default function Layout() {
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <h1 className="font-display text-sm font-semibold leading-tight text-[var(--color-ink)]">
+              <h1 className="font-display text-[15px] font-semibold leading-tight text-[var(--color-ink)]">
                 VigilAI
               </h1>
-              <p className="text-[10px] font-medium uppercase tracking-widest text-[var(--color-ink-faint)]">
+              <p className="text-[11px] font-medium uppercase tracking-widest text-[var(--color-ink-faint)]">
                 Bengaluru Traffic Police
               </p>
             </div>
@@ -153,7 +153,7 @@ export default function Layout() {
                 end={to === "/"}
                 className={() =>
                   cn(
-                    "group flex items-center gap-3 rounded-md px-2.5 py-2 text-[13px] font-medium transition-all duration-200",
+                    "group flex items-center gap-3 rounded-md px-2.5 py-2.5 text-[14px] font-medium transition-all duration-200",
                     isActive
                       ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/25"
                       : "text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-2)] hover:text-[var(--color-ink)]",
@@ -169,7 +169,7 @@ export default function Layout() {
                 />
                 {!collapsed && <span className="truncate">{label}</span>}
                 {!collapsed && isActive && (
-                  <span className="ml-auto rounded bg-[var(--color-accent-soft)] px-1.5 py-0.5 font-mono text-[9px] font-semibold text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/20">
+                  <span className="ml-auto rounded bg-[var(--color-accent-soft)] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/20">
                     {short}
                   </span>
                 )}
@@ -194,7 +194,7 @@ export default function Layout() {
         {/* Signal state toggle */}
         {!collapsed && (
           <div className="border-t border-[var(--rule-color)] px-3 py-3">
-            <p className="mb-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-ink-faint)]">
+            <p className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-[var(--color-ink-faint)]">
               <Radio className="h-3 w-3" />
               Signal State
             </p>
@@ -204,7 +204,7 @@ export default function Layout() {
                   key={state}
                   onClick={() => setSignalState(state)}
                   className={cn(
-                    "flex-1 rounded-md px-2 py-1.5 text-[10px] font-semibold capitalize transition-all duration-200",
+                    "flex-1 rounded-md px-2 py-1.5 text-[11px] font-semibold capitalize transition-all duration-200",
                     signalState === state
                       ? state === "red"
                         ? "bg-[var(--color-danger-soft)] text-[var(--color-danger)] ring-1 ring-[var(--color-danger)]/30"
@@ -232,7 +232,7 @@ export default function Layout() {
           <button
             onClick={toggleTheme}
             className={cn(
-              "flex items-center justify-center gap-2 rounded-md px-2 py-1.5 text-[11px] font-medium transition-all duration-200",
+              "flex items-center justify-center gap-2 rounded-md px-2 py-1.5 text-[12px] font-medium transition-all duration-200",
               "bg-[var(--color-paper-2)] text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-3)] hover:text-[var(--color-ink)]",
               collapsed && "px-0",
             )}
@@ -249,7 +249,7 @@ export default function Layout() {
           <button
             onClick={() => setDemoMode(!demoMode)}
             className={cn(
-              "flex items-center justify-center gap-2 rounded-md px-2 py-1.5 text-[11px] font-medium transition-all duration-200",
+              "flex items-center justify-center gap-2 rounded-md px-2 py-1.5 text-[12px] font-medium transition-all duration-200",
               demoMode
                 ? "bg-[var(--color-warning-soft)] text-[var(--color-warning)] ring-1 ring-[var(--color-warning)]/20"
                 : "bg-[var(--color-paper-2)] text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-3)] hover:text-[var(--color-ink)]",
@@ -277,17 +277,17 @@ export default function Layout() {
         >
           {!collapsed ? (
             <>
-              <p className="font-mono text-[11px] tabular-nums tracking-tight text-[var(--color-phosphor)]">
+              <p className="font-mono text-[12px] tabular-nums tracking-tight text-[var(--color-phosphor)]">
                 {clock}
               </p>
-              <p className="mt-0.5 text-[10px] text-[var(--color-ink-faint)]">
+              <p className="mt-0.5 text-[11px] text-[var(--color-ink-faint)]">
                 {date} · BTP Command Center
               </p>
             </>
           ) : (
             <Tooltip>
               <TooltipTrigger>
-                <p className="text-center font-mono text-[9px] tabular-nums text-[var(--color-phosphor)]">
+                <p className="text-center font-mono text-[10px] tabular-nums text-[var(--color-phosphor)]">
                   {clock.slice(0, 5)}
                 </p>
               </TooltipTrigger>
@@ -316,7 +316,7 @@ export default function Layout() {
         {/* DEMO badge */}
         {demoMode && (
           <div className="pointer-events-none absolute right-4 top-4 z-50">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-warning-soft)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--color-warning)] shadow-sm ring-1 ring-[var(--color-warning)]/20">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-warning-soft)] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--color-warning)] shadow-sm ring-1 ring-[var(--color-warning)]/20">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-warning)] pulse-dot" />
               Demo
             </span>

@@ -31,7 +31,6 @@ import {
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { TrendArrow, CameraPulse } from "@/components/icons";
 
 type StatCard = {
@@ -259,18 +258,9 @@ export default function Dashboard() {
             <h1 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">
               Command Center
             </h1>
-            <p className="text-[11px] text-[var(--color-ink-faint)]">
+            <p className="text-[12px] text-[var(--color-ink-faint)]">
               Real-time traffic violation interception — Bengaluru Traffic Police
             </p>
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <Badge
-              variant="outline"
-              className="border-[var(--color-success)]/30 bg-[var(--color-success-soft)] text-[10px] text-[var(--color-success)]"
-            >
-              <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-[var(--color-success)] pulse-dot" />
-              LIVE
-            </Badge>
           </div>
         </div>
       </header>
@@ -323,7 +313,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="mt-2 font-mono text-xl font-bold tabular-nums tracking-tight text-[var(--color-ink)]">
+                <p className="mt-2 font-mono text-[22px] font-bold tabular-nums tracking-tight text-[var(--color-ink)]">
                   {value}
                 </p>
                 {/* Sparkline (F8) */}
@@ -331,7 +321,7 @@ export default function Dashboard() {
                   <Sparkline data={sparkline} color={color} className="mb-1" />
                 )}
               </div>
-              <p className="mt-0.5 text-[10px] tracking-wider text-[var(--color-ink-faint)] uppercase">
+              <p className="mt-0.5 text-[11px] tracking-wider text-[var(--color-ink-faint)] uppercase">
                 {label}
               </p>
             </CardContent>
@@ -345,7 +335,7 @@ export default function Dashboard() {
         <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80 lg:col-span-3">
           <CardContent className="p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 text-xs font-semibold text-[var(--color-ink)]">
+              <h2 className="flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
                 <Activity className="h-3.5 w-3.5 text-[var(--color-accent)]" />
                 Violations by Type
               </h2>
@@ -418,7 +408,7 @@ export default function Dashboard() {
         <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80 lg:col-span-2">
           <CardContent className="p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 text-xs font-semibold text-[var(--color-ink)]">
+              <h2 className="flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
                 <TrendArrow direction="up" className="h-3.5 w-3.5 text-[var(--color-accent)]" />
                 Daily Trend
               </h2>
@@ -472,7 +462,7 @@ export default function Dashboard() {
         {/* Top cameras */}
         <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
           <CardContent className="p-4">
-            <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold text-[var(--color-ink)]">
+            <h2 className="mb-3 flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
               <CameraPulse className="h-3.5 w-3.5 text-[var(--color-accent)]" />
               Top Cameras
             </h2>
@@ -510,7 +500,7 @@ export default function Dashboard() {
         {/* Camera health panel (F9) */}
         <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
           <CardContent className="p-4">
-            <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold text-[var(--color-ink)]">
+            <h2 className="mb-3 flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
               <Wifi className="h-3.5 w-3.5 text-[var(--color-accent)]" />
               Camera Health
             </h2>
@@ -563,7 +553,7 @@ export default function Dashboard() {
         {/* Status breakdown */}
         <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
           <CardContent className="p-4">
-            <h2 className="mb-3 text-xs font-semibold text-[var(--color-ink)]">
+            <h2 className="mb-3 text-[13px] font-semibold text-[var(--color-ink)]">
               Review Status
             </h2>
             <div className="space-y-3">
