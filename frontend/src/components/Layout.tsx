@@ -30,6 +30,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import ASTraMAlertFeed from "@/components/ASTraMAlertFeed";
 
 const NAV_ITEMS = [
   { to: "/", label: "Command Center", icon: LayoutDashboard, short: "CMD" },
@@ -284,6 +285,9 @@ export default function Layout() {
         )}
         <Outlet />
       </main>
+
+      {/* ASTraM floating alert feed (F6) */}
+      <ASTraMAlertFeed />
     </div>
   );
 }
