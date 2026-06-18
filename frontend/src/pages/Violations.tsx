@@ -83,6 +83,7 @@ export default function Violations() {
   const [auditLog, setAuditLog] = useState<AuditEntry[]>([]);
   const [detailViolation, setDetailViolation] = useState<ViolationRecord | null>(null);
   const setSelectedViolation = useAppStore((s) => s.setSelectedViolation);
+  const demoMode = useAppStore((s) => s.demoMode);
 
   const fetchViolations = useCallback(async () => {
     setLoading(true);
@@ -102,7 +103,7 @@ export default function Violations() {
     } finally {
       setLoading(false);
     }
-  }, [filters, page]);
+  }, [filters, page, demoMode]);
 
   useEffect(() => {
     fetchViolations();

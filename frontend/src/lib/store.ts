@@ -62,6 +62,9 @@ export const useAppStore = create<AppState>((set) => ({
   setDemoMode: (on) => {
     localStorage.setItem("vigilai_demo", String(on));
     set({ demoMode: on });
+    if (!on && typeof window !== "undefined") {
+      window.location.reload();
+    }
   },
 
   selectedViolation: null,
