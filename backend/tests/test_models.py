@@ -94,6 +94,6 @@ class TestViolationEnums:
 
     def test_enum_count(self) -> None:
         assert len(ViolationTypeDB) == 8
-        assert len(ViolationStatusDB) == 3
+        assert len(ViolationStatusDB) == 5
         assert len(ConfidenceTierDB) == 3
         assert len(DataSourceDB) == 2
