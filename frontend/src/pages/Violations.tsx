@@ -369,7 +369,9 @@ function ViolationRow({
 
   const statusConfig = {
     pending: "border-[var(--color-warning)]/30 bg-[var(--color-warning)]/10 text-[var(--color-warning)]",
+    under_review: "border-blue-400/30 bg-blue-400/10 text-blue-400",
     approved: "border-[var(--color-success)]/30 bg-[var(--color-success)]/10 text-[var(--color-success)]",
+    issued: "border-purple-400/30 bg-purple-400/10 text-purple-400",
     rejected: "border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 text-[var(--color-danger)]",
   }[v.status] ?? "";
 
