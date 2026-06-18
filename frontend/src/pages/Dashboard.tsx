@@ -133,6 +133,7 @@ export default function Dashboard() {
   const [cameras, setCameras] = useState<CameraHealth[]>([]);
   const [loading, setLoading] = useState(true);
   const setCamerasStore = useAppStore((s) => s.setCameras);
+  const demoMode = useAppStore((s) => s.demoMode);
 
   useEffect(() => {
     Promise.all([
@@ -146,7 +147,7 @@ export default function Dashboard() {
         setCamerasStore(camList);
       })
       .finally(() => setLoading(false));
-  }, [setCamerasStore]);
+  }, [setCamerasStore, demoMode]);
 
   if (loading) {
     return (

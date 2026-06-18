@@ -34,6 +34,7 @@ import {
 import { getAnalytics } from "@/lib/api";
 import type { AnalyticsOverview } from "@/types/violation";
 import { VIOLATION_LABELS, VIOLATION_COLORS } from "@/types/violation";
+import { useAppStore } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -81,6 +82,7 @@ export default function Analytics() {
   const [analytics, setAnalytics] = useState<AnalyticsOverview | null>(null);
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState(30);
+  const demoMode = useAppStore((s) => s.demoMode);
 
   useEffect(() => {
     setLoading(true);
@@ -88,7 +90,7 @@ export default function Analytics() {
       .then(setAnalytics)
       .catch(() => setAnalytics(null))
       .finally(() => setLoading(false));
-  }, [days]);
+  }, [days, demoMode]);
 
   if (loading && !analytics) {
     return (

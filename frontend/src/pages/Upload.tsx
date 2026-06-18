@@ -266,72 +266,14 @@ interface BatchFile {
   error: string | null;
 }
 
-/** Create a placeholder demo image File using canvas. */
+/** Fetch a real demo image from public/demo/. Fails if the image does not exist. */
 async function createDemoImageFile(
   demo: (typeof DEMO_IMAGES)[number],
 ): Promise<File> {
-  const canvas = document.createElement("canvas");
-  canvas.width = 640;
-  canvas.height = 480;
-  const ctx = canvas.getContext("2d")!;
-
-  // Background — dark gray with slight gradient
-  const grad = ctx.createLinearGradient(0, 0, 0, 480);
-  grad.addColorStop(0, "#1a1a2e");
-  grad.addColorStop(1, "#16213e");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 640, 480);
-
-  // Road-like strip at bottom
-  ctx.fillStyle = "#2d3436";
-  ctx.fillRect(0, 320, 640, 160);
-  // Road markings
-  ctx.strokeStyle = "#636e72";
-  ctx.lineWidth = 2;
-  ctx.setLineDash([20, 15]);
-  ctx.beginPath();
-  ctx.moveTo(0, 400);
-  ctx.lineTo(640, 400);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Violation type label
-  const vColor =
-    VIOLATION_COLORS[demo.type as keyof typeof VIOLATION_COLORS] ?? "#00d4ff";
-  ctx.fillStyle = vColor;
-  ctx.font = "bold 28px system-ui, sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText(demo.label, 320, 120);
-
-  // Description
-  ctx.fillStyle = "#b2bec3";
-  ctx.font = "18px system-ui, sans-serif";
-  ctx.fillText(demo.description, 320, 165);
-
-  // Camera badge
-  ctx.fillStyle = "#00d4ff";
-  ctx.font = "14px monospace";
-  ctx.fillText(`📷 ${demo.cameraId}`, 320, 210);
-
-  // VigilAI watermark
-  ctx.fillStyle = "#636e72";
-  ctx.font = "12px monospace";
-  ctx.textAlign = "right";
-  ctx.fillText("VigilAI Demo", 630, 470);
-  ctx.textAlign = "center";
-
-  // Bounding box overlay (decorative)
-  ctx.strokeStyle = vColor;
-  ctx.lineWidth = 2;
-  ctx.setLineDash([6, 4]);
-  ctx.strokeRect(180, 60, 280, 240);
-  ctx.setLineDash([]);
-
-  // Convert canvas to File
-  const blob = await new Promise<Blob>((resolve) => {
-    canvas.toBlob((b) => resolve(b!), "image/jpeg", 0.85);
-  });
   const fileName = `demo_${demo.type}_${demo.cameraId.toLowerCase()}.jpg`;
+  const res = await fetch(`/demo/${fileName}`);
+  if (!res.ok) throw new Error(`Demo image not found: ${fileName}`);
+  const blob = await res.blob();
   return new File([blob], fileName, { type: "image/jpeg" });
 }
 
@@ -370,9 +312,13 @@ export default function Upload() {
   /** Load a demo image into the batch queue. */
   const loadDemoImage = useCallback(
     async (demo: (typeof DEMO_IMAGES)[number]) => {
-      const file = await createDemoImageFile(demo);
-      setCameraId(demo.cameraId);
-      addFiles([file]);
+      try {
+        const file = await createDemoImageFile(demo);
+        setCameraId(demo.cameraId);
+        addFiles([file]);
+      } catch (err) {
+        alert(err instanceof Error ? err.message : "Failed to load demo image.");
+      }
     },
     [addFiles],
   );
@@ -484,10 +430,10 @@ export default function Upload() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
-        {/* Upload panel — 2 cols */}
-        <div className="space-y-4 lg:col-span-2">
-          {/* Drop zone */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        {/* Left Side: 2x2 Symmetrical Grid for Inputs & Queues */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {/* Top Left: Drop zone */}
           <div
             onDragOver={(e) => {
               e.preventDefault();
@@ -501,7 +447,7 @@ export default function Upload() {
             }}
             onClick={() => fileRef.current?.click()}
             className={cn(
-              "group relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-all duration-300",
+              "group relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-all duration-300 h-[280px]",
               dragOver
                 ? "border-[var(--color-accent)] bg-[var(--color-accent)]/5"
                 : batchFiles.length > 0
@@ -546,135 +492,8 @@ export default function Upload() {
             />
           </div>
 
-          {/* Demo image quick-select (demo mode only) */}
-          {demoMode && (
-            <Card className="border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5">
-              <CardContent className="p-3 space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <ImagePlay className="h-3.5 w-3.5 text-[var(--color-accent)]" />
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
-                    Demo Quick-Select
-                  </p>
-                </div>
-                <p className="text-[11px] text-[var(--color-ink-faint)]">
-                  Click an example to load a demo image with matching camera
-                </p>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {DEMO_IMAGES.map((demo) => {
-                    const vColor =
-                      VIOLATION_COLORS[demo.type as keyof typeof VIOLATION_COLORS] ?? "var(--color-accent)";
-                    return (
-                      <button
-                        key={`${demo.type}-${demo.cameraId}`}
-                        onClick={() => loadDemoImage(demo)}
-                        disabled={batchRunning}
-                        className={cn(
-                          "group flex flex-col items-start gap-0.5 rounded-md border px-2.5 py-2 text-left transition-all duration-200",
-                          "border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70",
-                          "hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent)]/5",
-                          "disabled:opacity-50 disabled:cursor-not-allowed",
-                        )}
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <span
-                            className="h-2 w-2 shrink-0 rounded-full"
-                            style={{ backgroundColor: vColor }}
-                          />
-                          <span className="text-[11px] font-medium text-[var(--color-ink)] truncate">
-                            {demo.label}
-                          </span>
-                        </div>
-                        <span className="text-[11px] text-[var(--color-ink-faint)] pl-3.5">
-                          {demo.cameraId}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Batch file list */}
-          {batchFiles.length > 0 && (
-            <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
-              <CardContent className="p-3 space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                    Batch Queue ({batchFiles.length}/{MAX_BATCH_SIZE})
-                  </p>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearBatch}
-                    disabled={batchRunning}
-                    className="h-5 text-[11px] text-[var(--color-ink-faint)] hover:text-[var(--color-danger)]"
-                  >
-                    <Trash2 className="mr-1 h-3 w-3" />
-                    Clear
-                  </Button>
-                </div>
-                <div className="max-h-52 space-y-1.5 overflow-y-auto pr-1">
-                  {batchFiles.map((bf, i) => (
-                    <div
-                      key={i}
-                      onClick={() => setActiveIndex(i)}
-                      className={cn(
-                        "flex items-center gap-2 rounded-md px-2 py-1.5 cursor-pointer transition-colors",
-                        activeIndex === i
-                          ? "bg-[var(--color-accent)]/10 ring-1 ring-[var(--color-accent)]/30"
-                          : "hover:bg-[var(--color-paper-2)]/50",
-                      )}
-                    >
-                      <FileImage className="h-3.5 w-3.5 shrink-0 text-[var(--color-ink-faint)]" />
-                      <span className="flex-1 truncate text-[11px] text-[var(--color-ink-muted)]">
-                        {bf.file.name}
-                      </span>
-                      {bf.status === "done" && (
-                        <CheckCircle2 className="h-3 w-3 shrink-0 text-[var(--color-success)]" />
-                      )}
-                      {bf.status === "error" && (
-                        <XCircle className="h-3 w-3 shrink-0 text-[var(--color-danger)]" />
-                      )}
-                      {bf.status === "processing" && (
-                        <Loader2 className="h-3 w-3 shrink-0 animate-spin text-[var(--color-accent)]" />
-                      )}
-                      {bf.status === "done" && bf.result && (
-                        <Badge variant="outline" className="text-[11px] h-4 border-[var(--color-accent)]/30 text-[var(--color-accent)]">
-                          {bf.result.violations.length}V
-                        </Badge>
-                      )}
-                      {!batchRunning && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); removeFile(i); }}
-                          className="shrink-0 text-[var(--color-ink-faint)] hover:text-[var(--color-danger)]"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                {/* Batch progress */}
-                {batchRunning && (
-                  <div className="space-y-1">
-                    <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/50">
-                      <div
-                        className="h-full rounded-full bg-[var(--color-accent)] transition-all duration-500"
-                        style={{ width: `${(batchStats.done / batchStats.total) * 100}%` }}
-                      />
-                    </div>
-                    <p className="text-[11px] text-[var(--color-ink-faint)]">
-                      Processing {batchStats.done + 1}/{batchStats.total}…
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Controls */}
-          <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
+          {/* Bottom Left: Controls */}
+          <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 h-[280px] flex flex-col justify-between">
             <CardContent className="space-y-3 p-3.5">
               {/* Camera select */}
               <div>
@@ -754,10 +573,144 @@ export default function Upload() {
               )}
             </CardContent>
           </Card>
+
+          {/* Top Right: Demo image quick-select */}
+          <Card className="flex flex-col border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5 h-[280px]">
+            <CardContent className="p-3 flex flex-col flex-1 overflow-hidden space-y-2.5">
+              <div className="shrink-0 space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <ImagePlay className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
+                    Demo Quick-Select
+                  </p>
+                </div>
+                <p className="text-[11px] text-[var(--color-ink-faint)]">
+                  Click an example to load a demo image with matching camera
+                </p>
+              </div>
+              <div className="grid grid-cols-1 gap-1.5 overflow-y-auto pr-1 flex-1 min-h-0">
+                {DEMO_IMAGES.map((demo) => {
+                  const vColor =
+                    VIOLATION_COLORS[demo.type as keyof typeof VIOLATION_COLORS] ?? "var(--color-accent)";
+                  return (
+                    <button
+                      key={`${demo.type}-${demo.cameraId}`}
+                      onClick={() => loadDemoImage(demo)}
+                      disabled={batchRunning}
+                      className={cn(
+                        "group flex flex-col items-start gap-0.5 rounded-md border px-2.5 py-2 text-left transition-all duration-200",
+                        "border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70",
+                        "hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent)]/5",
+                        "disabled:opacity-50 disabled:cursor-not-allowed",
+                      )}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className="h-2 w-2 shrink-0 rounded-full"
+                          style={{ backgroundColor: vColor }}
+                        />
+                        <span className="text-[11px] font-medium text-[var(--color-ink)] truncate">
+                          {demo.label}
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-[var(--color-ink-faint)] pl-3.5">
+                        {demo.cameraId}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Bottom Right: Batch file list (Always render for symmetry) */}
+          <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 flex flex-col h-[280px]">
+            <CardContent className="p-3 flex flex-col flex-1 overflow-hidden space-y-2">
+              <div className="shrink-0 flex items-center justify-between">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                  Batch Queue ({batchFiles.length}/{MAX_BATCH_SIZE})
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearBatch}
+                  disabled={batchRunning || batchFiles.length === 0}
+                  className="h-5 text-[11px] text-[var(--color-ink-faint)] hover:text-[var(--color-danger)]"
+                >
+                  <Trash2 className="mr-1 h-3 w-3" />
+                  Clear
+                </Button>
+              </div>
+              <div className="space-y-1.5 overflow-y-auto pr-1 flex-1 min-h-0">
+                {batchFiles.length === 0 ? (
+                  <div className="h-full flex items-center justify-center text-center">
+                    <p className="text-[11px] text-[var(--color-ink-faint)]">
+                      Queue is empty. <br /> Select images or drop them above.
+                    </p>
+                  </div>
+                ) : (
+                  batchFiles.map((bf, i) => (
+                    <div
+                      key={i}
+                      onClick={() => setActiveIndex(i)}
+                      className={cn(
+                        "flex items-center gap-2 rounded-md px-2 py-1.5 cursor-pointer transition-colors",
+                        activeIndex === i
+                          ? "bg-[var(--color-accent)]/10 ring-1 ring-[var(--color-accent)]/30"
+                          : "hover:bg-[var(--color-paper-2)]/50",
+                      )}
+                    >
+                      <FileImage className="h-3.5 w-3.5 shrink-0 text-[var(--color-ink-faint)]" />
+                      <span className="flex-1 truncate text-[11px] text-[var(--color-ink-muted)]">
+                        {bf.file.name}
+                      </span>
+                      {bf.status === "done" && (
+                        <CheckCircle2 className="h-3 w-3 shrink-0 text-[var(--color-success)]" />
+                      )}
+                      {bf.status === "error" && (
+                        <XCircle className="h-3 w-3 shrink-0 text-[var(--color-danger)]" />
+                      )}
+                      {bf.status === "processing" && (
+                        <Loader2 className="h-3 w-3 shrink-0 animate-spin text-[var(--color-accent)]" />
+                      )}
+                      {bf.status === "done" && bf.result && (
+                        <Badge variant="outline" className="text-[11px] h-4 border-[var(--color-accent)]/30 text-[var(--color-accent)]">
+                          {bf.result.violations.length}V
+                        </Badge>
+                      )}
+                      {!batchRunning && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); removeFile(i); }}
+                          className="shrink-0 text-[var(--color-ink-faint)] hover:text-[var(--color-danger)]"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+              {/* Batch progress */}
+              {batchRunning && (
+                <div className="shrink-0 space-y-1 pt-2">
+                  <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/50">
+                    <div
+                      className="h-full rounded-full bg-[var(--color-accent)] transition-all duration-500"
+                      style={{ width: `${(batchStats.done / batchStats.total) * 100}%` }}
+                    />
+                  </div>
+                  <p className="text-[11px] text-[var(--color-ink-faint)]">
+                    Processing {batchStats.done + 1}/{batchStats.total}…
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Results panel — 3 cols */}
-        <div className="lg:col-span-3">
+        {/* Right Side: Results panel */}
+        <div className="flex flex-col gap-4">
+
           {activeFile?.result ? (
             <div className="space-y-4">
               {/* Result summary */}
@@ -853,8 +806,30 @@ export default function Upload() {
                 </p>
               </div>
             </Card>
+          ) : activeFile ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 rounded-lg bg-[var(--color-paper-3)]/30 px-4 py-2.5 ring-1 ring-[var(--color-paper-4)]/50">
+                <FileImage className="h-4 w-4 text-[var(--color-ink-faint)]" />
+                <span className="text-sm font-medium text-[var(--color-ink)]">
+                  Ready for detection
+                </span>
+                <Separator orientation="vertical" className="h-4 bg-[var(--color-paper-4)]" />
+                <span className="text-[11px] text-[var(--color-ink-faint)]">
+                  {activeFile.file.name}
+                </span>
+              </div>
+              <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 overflow-hidden flex flex-col items-center justify-center p-2 min-h-[400px]">
+                {activeFile.preview && (
+                  <img
+                    src={activeFile.preview}
+                    alt="Preview"
+                    className="max-h-[600px] w-auto rounded object-contain"
+                  />
+                )}
+              </Card>
+            </div>
           ) : (
-            <Card className="flex h-80 items-center justify-center border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/30">
+            <Card className="flex h-[584px] items-center justify-center border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/30">
               <div className="text-center">
                 <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-paper-3)]/30">
                   <AlertTriangle className="h-5 w-5 text-[var(--color-ink-faint)]" />
