@@ -1,7 +1,7 @@
-"""GET /api/v1/violations — List, filter, approve, and reject violations.
+"""GET /api/v1/violations — List, filter, review, approve, issue, and reject violations.
 
 Provides CRUD operations for violation records with filtering,
-pagination, and approve/reject actions.
+pagination, dedup hiding, and enhanced officer audit actions.
 """
 
 import logging
@@ -29,18 +29,27 @@ from backend.app.schemas import (
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+# Valid status transitions per action
+ACTION_STATUS_MAP: dict[str, ViolationStatusDB] = {
+    "review": ViolationStatusDB.UNDER_REVIEW,
+    "approve": ViolationStatusDB.APPROVED,
+    "issue": ViolationStatusDB.ISSUED,
+    "reject": ViolationStatusDB.REJECTED,
+}
+
 
 @router.get("/violations", response_model=ViolationListResponse)
 async def list_violations(
     violation_type: Optional[str] = Query(None, description="Filter by violation type"),
-    status: Optional[str] = Query(None, description="Filter by status: pending, approved, rejected"),
+    status: Optional[str] = Query(None, description="Filter by status"),
     camera_id: Optional[str] = Query(None, description="Filter by camera ID"),
     confidence_tier: Optional[str] = Query(None, description="Filter by tier: high, medium, low"),
+    hide_duplicates: bool = Query(True, description="Hide duplicate violations (F7)"),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     db: Session = Depends(get_db),
 ):
-    """List violations with filtering and pagination."""
+    """List violations with filtering, pagination, and optional dedup hiding."""
     query = db.query(ViolationRecordDB)
 
     if violation_type:
@@ -51,6 +60,8 @@ async def list_violations(
         query = query.filter(ViolationRecordDB.camera_id == camera_id)
     if confidence_tier:
         query = query.filter(ViolationRecordDB.confidence_tier == confidence_tier)
+    if hide_duplicates:
+        query = query.filter(ViolationRecordDB.is_duplicate == 0)
 
     total = query.count()
     records = (
@@ -88,28 +99,49 @@ async def action_violation(
     request: ViolationActionRequest,
     db: Session = Depends(get_db),
 ):
-    """Approve or reject a violation."""
+    """Review, approve, issue, or reject a violation (F12 Enhanced Audit).
+
+    Supported actions:
+        - review: pending → under_review
+        - approve: under_review → approved
+        - issue: approved → issued
+        - reject: any → rejected
+    """
     record = db.query(ViolationRecordDB).filter(ViolationRecordDB.id == violation_id).first()
     if not record:
         raise HTTPException(status_code=404, detail=f"Violation {violation_id} not found")
 
-    new_status = "approved" if request.action == "approve" else "rejected"
+    # Validate action
+    if request.action not in ACTION_STATUS_MAP:
+        raise HTTPException(status_code=400, detail=f"Invalid action: {request.action}")
+
+    new_status = ACTION_STATUS_MAP[request.action].value
     record.status = new_status
 
-    # Create audit log
+    # Create audit log with officer_id
     audit = AuditLogDB(
         violation_id=violation_id,
         action=request.action,
-        actor="officer_001",
-        detail={"reason": request.reason},
+        actor=request.officer_id or "system",
+        detail={
+            "reason": request.reason,
+            "previous_status": record.status if isinstance(record.status, str) else record.status.value,
+        },
     )
     db.add(audit)
     db.commit()
 
+    action_labels = {
+        "review": "sent for review",
+        "approve": "approved",
+        "issue": "issued (challan generated)",
+        "reject": "rejected",
+    }
+
     return ViolationActionResponse(
         id=violation_id,
         status=ViolationStatus(new_status),
-        message=f"Violation {new_status} successfully",
+        message=f"Violation {action_labels.get(request.action, request.action)} successfully",
     )
 
 
@@ -149,4 +181,8 @@ def _db_record_to_schema(record: ViolationRecordDB) -> ViolationRecord:
         timestamp=record.timestamp or datetime.now(timezone.utc),
         evidence_url=record.evidence_url,
         evidence_hash=record.evidence_hash,
+        danger_score=record.danger_score or 0,
+        ai_explanation=record.ai_explanation,
+        is_duplicate=bool(record.is_duplicate),
+        duplicate_group_id=record.duplicate_group_id,
     )

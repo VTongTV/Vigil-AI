@@ -8,7 +8,10 @@
 
 import type {
   AnalyticsOverview,
+  ASTraMAlert,
+  CameraHealth,
   DetectResponse,
+  TrendForecast,
   ViolationRecord,
 } from "../types/violation";
 
@@ -31,7 +34,7 @@ function seqId(): string {
 }
 
 // ---------------------------------------------------------------------------
-// MOCK_VIOLATIONS — 5 typical detections
+// MOCK_VIOLATIONS — 6 typical detections with new fields
 // ---------------------------------------------------------------------------
 
 export const MOCK_VIOLATIONS: ViolationRecord[] = [
@@ -54,7 +57,11 @@ export const MOCK_VIOLATIONS: ViolationRecord[] = [
     longitude: 77.6085,
     timestamp: "2026-06-17T09:14:32Z",
     evidence_url: null,
-    evidence_hash: null,
+    evidence_hash: "a3f2c8d9e1b4f6a7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
+    danger_score: 46,
+    ai_explanation: "No helmet detected on rider at bbox (312,184)-(427,340) with 91% confidence. Person bounding box confirms motorcycle rider. Fine: ₹500 under S.129.",
+    is_duplicate: false,
+    duplicate_group_id: null,
   },
   {
     id: seqId(),
@@ -67,7 +74,7 @@ export const MOCK_VIOLATIONS: ViolationRecord[] = [
     mv_act_section: "S.184",
     fine_amount: 1000,
     license_plate: null,
-    status: "pending",
+    status: "under_review",
     data_source: "live",
     camera_id: "SILKBOARD-01",
     junction_name: "Silk Board Junction",
@@ -75,7 +82,11 @@ export const MOCK_VIOLATIONS: ViolationRecord[] = [
     longitude: 77.6228,
     timestamp: "2026-06-17T10:02:15Z",
     evidence_url: null,
-    evidence_hash: null,
+    evidence_hash: "b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5",
+    danger_score: 108,
+    ai_explanation: "Triple riding detected: 3 persons on single motorcycle at bbox (502,210)-(680,395). High danger due to compound violation factor (1.5x). Fine: ₹1,000 under S.184.",
+    is_duplicate: false,
+    duplicate_group_id: null,
   },
   {
     id: seqId(),
@@ -88,7 +99,7 @@ export const MOCK_VIOLATIONS: ViolationRecord[] = [
     mv_act_section: "S.184",
     fine_amount: 1000,
     license_plate: null,
-    status: "pending",
+    status: "approved",
     data_source: "live",
     camera_id: "HEBBAL-01",
     junction_name: "Hebbal Flyover",
@@ -96,7 +107,11 @@ export const MOCK_VIOLATIONS: ViolationRecord[] = [
     longitude: 77.5970,
     timestamp: "2026-06-17T08:45:50Z",
     evidence_url: null,
-    evidence_hash: null,
+    evidence_hash: "c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+    danger_score: 88,
+    ai_explanation: "Wrong-side driving detected: vehicle in contraflow lane at bbox (120,260)-(310,430). Confidence 88% with lane-position heuristic (0.75x discount applied). Fine: ₹1,000 under S.184.",
+    is_duplicate: false,
+    duplicate_group_id: null,
   },
   {
     id: seqId(),
@@ -109,7 +124,7 @@ export const MOCK_VIOLATIONS: ViolationRecord[] = [
     mv_act_section: "S.122",
     fine_amount: 200,
     license_plate: null,
-    status: "pending",
+    status: "issued",
     data_source: "live",
     camera_id: "WHITEFIELD-01",
     junction_name: "Whitefield Main Road",
@@ -117,7 +132,11 @@ export const MOCK_VIOLATIONS: ViolationRecord[] = [
     longitude: 77.7500,
     timestamp: "2026-06-17T11:30:05Z",
     evidence_url: null,
-    evidence_hash: null,
+    evidence_hash: "d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7",
+    danger_score: 12,
+    ai_explanation: "Illegal parking detected: stationary vehicle in no-parking zone at bbox (700,310)-(900,480). Low confidence (58%) — zone-based heuristic. Fine: ₹200 under S.122.",
+    is_duplicate: false,
+    duplicate_group_id: null,
   },
   {
     id: seqId(),
@@ -142,7 +161,36 @@ export const MOCK_VIOLATIONS: ViolationRecord[] = [
     longitude: 77.6604,
     timestamp: "2026-06-17T12:05:44Z",
     evidence_url: null,
-    evidence_hash: null,
+    evidence_hash: "e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8",
+    danger_score: 43,
+    ai_explanation: "No helmet detected on rider at bbox (240,150)-(360,320) with 85% confidence. License plate KA01AB1234 read with 93% OCR confidence. Fine: ₹500 under S.129.",
+    is_duplicate: false,
+    duplicate_group_id: null,
+  },
+  {
+    id: seqId(),
+    violation_type: "no_helmet",
+    confidence: 0.89,
+    confidence_tier: "high",
+    bbox: { x1: 320, y1: 190, x2: 435, y2: 345 },
+    person_bbox: { x1: 300, y1: 125, x2: 455, y2: 405 },
+    metadata: {},
+    mv_act_section: "S.129",
+    fine_amount: 500,
+    license_plate: null,
+    status: "rejected",
+    data_source: "live",
+    camera_id: "MGROAD-01",
+    junction_name: "MG Road — Trinity Circle",
+    latitude: 12.9758,
+    longitude: 77.6085,
+    timestamp: "2026-06-17T09:14:40Z",
+    evidence_url: null,
+    evidence_hash: "f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9",
+    danger_score: 45,
+    ai_explanation: "No helmet detected on rider at bbox (320,190)-(435,345) with 89% confidence. Duplicate of earlier detection at same camera within 5 min. Fine: ₹500 under S.129.",
+    is_duplicate: true,
+    duplicate_group_id: "DUP-MGROAD-01-20260617",
   },
 ];
 
@@ -167,8 +215,53 @@ export const MOCK_DETECT_RESPONSE: DetectResponse = {
 };
 
 // ---------------------------------------------------------------------------
-// MOCK_ANALYTICS
+// MOCK_ANALYTICS — with trend_forecast
 // ---------------------------------------------------------------------------
+
+const MOCK_TREND_FORECAST: TrendForecast[] = [
+  {
+    violation_type: "no_helmet",
+    trend_direction: "up",
+    trend_percentage: 15.2,
+    forecast: [
+      { date: daysAgo(-1), predicted_count: 22 },
+      { date: daysAgo(-2), predicted_count: 20 },
+      { date: daysAgo(-3), predicted_count: 19 },
+      { date: daysAgo(-4), predicted_count: 21 },
+      { date: daysAgo(-5), predicted_count: 20 },
+      { date: daysAgo(-6), predicted_count: 19 },
+      { date: daysAgo(-7), predicted_count: 18 },
+    ],
+  },
+  {
+    violation_type: "triple_riding",
+    trend_direction: "down",
+    trend_percentage: 8.3,
+    forecast: [
+      { date: daysAgo(-1), predicted_count: 7 },
+      { date: daysAgo(-2), predicted_count: 8 },
+      { date: daysAgo(-3), predicted_count: 7 },
+      { date: daysAgo(-4), predicted_count: 8 },
+      { date: daysAgo(-5), predicted_count: 7 },
+      { date: daysAgo(-6), predicted_count: 8 },
+      { date: daysAgo(-7), predicted_count: 8 },
+    ],
+  },
+  {
+    violation_type: "wrong_side_driving",
+    trend_direction: "stable",
+    trend_percentage: 2.1,
+    forecast: [
+      { date: daysAgo(-1), predicted_count: 6 },
+      { date: daysAgo(-2), predicted_count: 5 },
+      { date: daysAgo(-3), predicted_count: 6 },
+      { date: daysAgo(-4), predicted_count: 5 },
+      { date: daysAgo(-5), predicted_count: 6 },
+      { date: daysAgo(-6), predicted_count: 5 },
+      { date: daysAgo(-7), predicted_count: 6 },
+    ],
+  },
+];
 
 export const MOCK_ANALYTICS: AnalyticsOverview = {
   total_violations: 281,
@@ -188,8 +281,10 @@ export const MOCK_ANALYTICS: AnalyticsOverview = {
     low: 24,
   },
   violations_by_status: {
-    pending: 228,
+    pending: 180,
+    under_review: 35,
     approved: 42,
+    issued: 13,
     rejected: 11,
   },
   avg_confidence: 0.74,
@@ -210,4 +305,169 @@ export const MOCK_ANALYTICS: AnalyticsOverview = {
     { camera_id: "WHITEFIELD-01", count: 39 },
     { camera_id: "KORMANGALA-01", count: 34 },
   ],
+  trend_forecast: MOCK_TREND_FORECAST,
 };
+
+// ---------------------------------------------------------------------------
+// MOCK_CAMERAS — 10 Bengaluru junctions with health status
+// ---------------------------------------------------------------------------
+
+export const MOCK_CAMERAS: CameraHealth[] = [
+  {
+    camera_id: "MGROAD-01",
+    junction_name: "MG Road — Trinity Circle",
+    latitude: 12.9758,
+    longitude: 77.6045,
+    status: "active",
+    last_seen: new Date().toISOString(),
+    violation_count_24h: 64,
+    avg_latency_ms: 342,
+  },
+  {
+    camera_id: "SILKBOARD-01",
+    junction_name: "Silk Board Junction",
+    latitude: 12.9177,
+    longitude: 77.6238,
+    status: "active",
+    last_seen: new Date(Date.now() - 120000).toISOString(),
+    violation_count_24h: 52,
+    avg_latency_ms: 389,
+  },
+  {
+    camera_id: "HEBBAL-01",
+    junction_name: "Hebbal Flyover",
+    latitude: 13.0358,
+    longitude: 77.597,
+    status: "idle",
+    last_seen: new Date(Date.now() - 1800000).toISOString(),
+    violation_count_24h: 45,
+    avg_latency_ms: 412,
+  },
+  {
+    camera_id: "WHITEFIELD-01",
+    junction_name: "Whitefield Main Road",
+    latitude: 12.9698,
+    longitude: 77.75,
+    status: "active",
+    last_seen: new Date(Date.now() - 60000).toISOString(),
+    violation_count_24h: 39,
+    avg_latency_ms: 356,
+  },
+  {
+    camera_id: "ELECTRONIC-01",
+    junction_name: "Electronic City Phase 1",
+    latitude: 12.8456,
+    longitude: 77.6603,
+    status: "idle",
+    last_seen: new Date(Date.now() - 2400000).toISOString(),
+    violation_count_24h: 28,
+    avg_latency_ms: 478,
+  },
+  {
+    camera_id: "MARATHAHALLI-01",
+    junction_name: "Marathahalli Bridge",
+    latitude: 12.9591,
+    longitude: 77.6974,
+    status: "offline",
+    last_seen: new Date(Date.now() - 7200000).toISOString(),
+    violation_count_24h: 0,
+    avg_latency_ms: null,
+  },
+  {
+    camera_id: "KRPURAM-01",
+    junction_name: "KR Puram Railway Junction",
+    latitude: 12.997,
+    longitude: 77.6844,
+    status: "active",
+    last_seen: new Date(Date.now() - 180000).toISOString(),
+    violation_count_24h: 18,
+    avg_latency_ms: 395,
+  },
+  {
+    camera_id: "YELAHANKA-01",
+    junction_name: "Yelahanka New Town",
+    latitude: 13.1007,
+    longitude: 77.5963,
+    status: "offline",
+    last_seen: new Date(Date.now() - 14400000).toISOString(),
+    violation_count_24h: 0,
+    avg_latency_ms: null,
+  },
+  {
+    camera_id: "BANNERGHATTA-01",
+    junction_name: "Bannerghatta Road — Jayadeva",
+    latitude: 12.9135,
+    longitude: 77.5985,
+    status: "active",
+    last_seen: new Date(Date.now() - 90000).toISOString(),
+    violation_count_24h: 22,
+    avg_latency_ms: 367,
+  },
+  {
+    camera_id: "KORMANGALA-01",
+    junction_name: "Koramangala 100ft Road",
+    latitude: 12.9352,
+    longitude: 77.6245,
+    status: "idle",
+    last_seen: new Date(Date.now() - 3600000).toISOString(),
+    violation_count_24h: 13,
+    avg_latency_ms: 445,
+  },
+];
+
+// ---------------------------------------------------------------------------
+// MOCK_ASTRAM_ALERTS — Real-time violation alerts
+// ---------------------------------------------------------------------------
+
+export const MOCK_ASTRAM_ALERTS: ASTraMAlert[] = [
+  {
+    id: "alert-001",
+    violation_type: "no_helmet",
+    camera_id: "MGROAD-01",
+    junction_name: "MG Road — Trinity Circle",
+    danger_score: 46,
+    confidence: 0.91,
+    timestamp: new Date().toISOString(),
+    license_plate: null,
+  },
+  {
+    id: "alert-002",
+    violation_type: "triple_riding",
+    camera_id: "SILKBOARD-01",
+    junction_name: "Silk Board Junction",
+    danger_score: 108,
+    confidence: 0.72,
+    timestamp: new Date(Date.now() - 15000).toISOString(),
+    license_plate: null,
+  },
+  {
+    id: "alert-003",
+    violation_type: "wrong_side_driving",
+    camera_id: "HEBBAL-01",
+    junction_name: "Hebbal Flyover",
+    danger_score: 88,
+    confidence: 0.88,
+    timestamp: new Date(Date.now() - 45000).toISOString(),
+    license_plate: null,
+  },
+  {
+    id: "alert-004",
+    violation_type: "no_helmet",
+    camera_id: "ELECTRONIC-01",
+    junction_name: "Electronic City Phase 1",
+    danger_score: 43,
+    confidence: 0.85,
+    timestamp: new Date(Date.now() - 90000).toISOString(),
+    license_plate: "KA01AB1234",
+  },
+  {
+    id: "alert-005",
+    violation_type: "illegal_parking",
+    camera_id: "WHITEFIELD-01",
+    junction_name: "Whitefield Main Road",
+    danger_score: 12,
+    confidence: 0.58,
+    timestamp: new Date(Date.now() - 180000).toISOString(),
+    license_plate: null,
+  },
+];

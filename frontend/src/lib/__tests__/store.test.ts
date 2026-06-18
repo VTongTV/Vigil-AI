@@ -45,6 +45,10 @@ function makeViolation(overrides: Partial<ViolationRecord> = {}): ViolationRecor
     timestamp: '2026-06-15T10:30:00Z',
     evidence_url: null,
     evidence_hash: null,
+    danger_score: 65,
+    ai_explanation: 'AI-detected helmet non-compliance with high confidence.',
+    is_duplicate: false,
+    duplicate_group_id: null,
     ...overrides,
   };
 }

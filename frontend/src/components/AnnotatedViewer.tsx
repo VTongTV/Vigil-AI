@@ -2,13 +2,23 @@
  * AnnotatedViewer — renders an image with violation bounding boxes overlaid
  * using a canvas positioned on top of the image element.
  *
+ * F11: Split-View Modes
+ * - Original: image only, no canvas overlay
+ * - Annotated: image + full-opacity bbox overlay (default)
+ * - Overlay: image + adjustable-opacity bbox overlay with slider
+ *
  * Bounding boxes are normalized (0–1) and scaled to the image's display
  * dimensions at render time.
  */
 
 import { useRef, useEffect, useCallback, useState } from "react";
+import { Eye, Layers, Image } from "lucide-react";
 import type { ViolationRecord, ViolationType } from "@/types/violation";
 import { VIOLATION_COLORS, VIOLATION_LABELS } from "@/types/violation";
+import { cn } from "@/lib/utils";
+
+/** View mode for the evidence image. */
+type ViewMode = "original" | "annotated" | "overlay";
 
 /** Resolved CSS color values for each violation type (cached). */
 const RESOLVED_COLORS: Partial<Record<ViolationType, string>> = {};
@@ -49,8 +59,8 @@ export interface AnnotatedViewerProps {
  * AnnotatedViewer
  *
  * Renders an image with a canvas overlay that draws violation bounding boxes.
- * The canvas is absolutely positioned and sized to match the image's display
- * dimensions. On resize, the overlay is recalculated.
+ * Three view modes: Original (no overlay), Annotated (full overlay),
+ * Overlay (adjustable opacity overlay with slider).
  */
 export default function AnnotatedViewer({
   imageUrl,
@@ -62,6 +72,8 @@ export default function AnnotatedViewer({
   const imgRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [imgSize, setImgSize] = useState<{ w: number; h: number } | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>("annotated");
+  const [overlayOpacity, setOverlayOpacity] = useState(0.6);
 
   /** Map violation types to resolved canvas stroke colors. */
   const getStrokeColor = useCallback((type: ViolationType): string => {
@@ -86,6 +98,13 @@ export default function AnnotatedViewer({
     if (!ctx) return;
 
     ctx.clearRect(0, 0, w, h);
+
+    // Skip drawing if in original mode
+    if (viewMode === "original") return;
+
+    // Apply opacity for overlay mode
+    const alpha = viewMode === "overlay" ? overlayOpacity : 1.0;
+    ctx.globalAlpha = alpha;
 
     for (const v of violations) {
       const { x1, y1, x2, y2 } = v.bbox;
@@ -125,7 +144,10 @@ export default function AnnotatedViewer({
       ctx.fillStyle = "#fff";
       ctx.fillText(text, bx + 5, labelY + 12);
     }
-  }, [violations, imgSize, getStrokeColor]);
+
+    // Reset global alpha
+    ctx.globalAlpha = 1.0;
+  }, [violations, imgSize, getStrokeColor, viewMode, overlayOpacity]);
 
   /** Handle image load — capture display dimensions and trigger draw. */
   const handleLoad = useCallback(() => {
@@ -134,7 +156,7 @@ export default function AnnotatedViewer({
     setImgSize({ w: img.clientWidth, h: img.clientHeight });
   }, []);
 
-  // Redraw when image size or violations change
+  // Redraw when image size, violations, view mode, or opacity change
   useEffect(() => {
     draw();
   }, [draw]);
@@ -154,8 +176,58 @@ export default function AnnotatedViewer({
     return () => observer.disconnect();
   }, []);
 
+  const viewModes: { mode: ViewMode; label: string; icon: React.ElementType }[] = [
+    { mode: "original", label: "Original", icon: Image },
+    { mode: "annotated", label: "Annotated", icon: Eye },
+    { mode: "overlay", label: "Overlay", icon: Layers },
+  ];
+
   return (
     <div ref={containerRef} className={className}>
+      {/* View mode toggle bar */}
+      <div className="mb-2 flex items-center gap-2">
+        <div className="flex rounded-md border border-[var(--color-paper-3)]/60 bg-[var(--color-paper-2)]/40 p-0.5">
+          {viewModes.map(({ mode, label, icon: Icon }) => (
+            <button
+              key={mode}
+              onClick={() => setViewMode(mode)}
+              className={cn(
+                "flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-[10px] font-medium transition-all duration-200",
+                viewMode === mode
+                  ? "bg-[var(--color-accent)]/15 text-[var(--color-accent)] shadow-[inset_0_0_0_1px_oklch(75%_0.18_85/0.2)]"
+                  : "text-[var(--color-ink-faint)] hover:text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-3)]/30",
+              )}
+              title={label}
+            >
+              <Icon className="h-3 w-3" />
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Opacity slider — only visible in overlay mode */}
+        {viewMode === "overlay" && (
+          <div className="flex items-center gap-2 ml-3">
+            <span className="text-[9px] text-[var(--color-ink-faint)] uppercase tracking-wider">
+              Opacity
+            </span>
+            <input
+              type="range"
+              min={0.1}
+              max={1.0}
+              step={0.05}
+              value={overlayOpacity}
+              onChange={(e) => setOverlayOpacity(parseFloat(e.target.value))}
+              className="h-1 w-20 cursor-pointer appearance-none rounded-full bg-[var(--color-paper-3)]/60 accent-[var(--color-accent)]"
+            />
+            <span className="w-8 text-right font-mono text-[10px] tabular-nums text-[var(--color-ink-muted)]">
+              {(overlayOpacity * 100).toFixed(0)}%
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Image + canvas */}
       <div className="relative inline-block w-full">
         <img
           ref={imgRef}
@@ -167,6 +239,7 @@ export default function AnnotatedViewer({
         <canvas
           ref={canvasRef}
           className="pointer-events-none absolute left-0 top-0 h-full w-full"
+          style={{ opacity: viewMode === "original" ? 0 : 1 }}
         />
       </div>
     </div>

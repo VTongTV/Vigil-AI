@@ -40,10 +40,16 @@ class ConfidenceTier(str, Enum):
 
 
 class ViolationStatus(str, Enum):
-    """Review status of a violation."""
+    """Review status of a violation.
+
+    Flow: pending → under_review → approved → issued
+    Any status can transition to rejected.
+    """
 
     PENDING = "pending"
+    UNDER_REVIEW = "under_review"
     APPROVED = "approved"
+    ISSUED = "issued"
     REJECTED = "rejected"
 
 
@@ -86,6 +92,10 @@ class ViolationRecord(BaseModel):
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     evidence_url: Optional[str] = None
     evidence_hash: Optional[str] = None
+    danger_score: int = Field(default=0, ge=0, le=100)
+    ai_explanation: Optional[str] = None
+    is_duplicate: bool = False
+    duplicate_group_id: Optional[str] = None
 
 
 class ImageDimensions(BaseModel):
@@ -127,18 +137,28 @@ class ViolationListResponse(BaseModel):
 
 
 class ViolationActionRequest(BaseModel):
-    """Request to approve or reject a violation."""
+    """Request to action a violation (review, approve, issue, reject)."""
 
-    action: str = Field(..., pattern="^(approve|reject)$")
+    action: str = Field(..., pattern="^(review|approve|issue|reject)$")
     reason: Optional[str] = None
+    officer_id: Optional[str] = None
 
 
 class ViolationActionResponse(BaseModel):
-    """Response after approving or rejecting a violation."""
+    """Response after actioning a violation."""
 
     id: str
     status: ViolationStatus
     message: str
+
+
+class TrendForecast(BaseModel):
+    """7-day trend forecast for a single violation type."""
+
+    violation_type: str
+    trend_direction: str  # "up", "down", "stable"
+    trend_percentage: float  # e.g. 15.2 means ↑15.2%
+    forecast: list[dict]  # [{date, predicted_count}]
 
 
 class AnalyticsOverview(BaseModel):
@@ -152,6 +172,35 @@ class AnalyticsOverview(BaseModel):
     total_fines: int
     daily_counts: list[dict]
     top_cameras: list[dict]
+    trend_forecast: list[TrendForecast] = Field(default_factory=list)
+
+
+class CameraStatus(str, Enum):
+    """Camera health status."""
+
+    ACTIVE = "active"
+    IDLE = "idle"
+    OFFLINE = "offline"
+
+
+class CameraHealth(BaseModel):
+    """Health status of a single traffic camera."""
+
+    camera_id: str
+    junction_name: str
+    latitude: float
+    longitude: float
+    status: CameraStatus
+    last_seen: Optional[datetime] = None
+    violation_count_24h: int = 0
+    avg_latency_ms: Optional[float] = None
+
+
+class CameraListResponse(BaseModel):
+    """Response from GET /api/v1/cameras."""
+
+    total: int
+    cameras: list[CameraHealth]
 
 
 class HealthResponse(BaseModel):

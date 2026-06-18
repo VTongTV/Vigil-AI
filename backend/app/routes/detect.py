@@ -23,7 +23,7 @@ from backend.app.core.evidence import (
 )
 from backend.app.core.ocr import process_plates
 from backend.app.core.preprocessing import preprocess_image
-from backend.app.core.violations import detect_all_violations
+from backend.app.core.violations import compute_danger_score, detect_all_violations, generate_ai_explanation
 from backend.app.db.database import SessionLocal
 from backend.app.db.models import (
     FINE_SCHEDULE,
@@ -167,6 +167,24 @@ async def detect_violations(
         fine_info = FINE_SCHEDULE.get(v_type, {"section": "177", "amount": 200})
         conf = v["confidence"]
         tier = get_confidence_tier(conf)
+        v_meta = v.get("metadata", {})
+
+        # Compute danger score (F3)
+        compound_factor = 1.5 if len(violations) > 1 else 1.0
+        danger_score = compute_danger_score(
+            violation_type=v_type,
+            confidence=conf,
+            fine_amount=int(fine_info["amount"]),
+            compound_factor=compound_factor,
+        )
+
+        # Generate AI explanation (F4)
+        ai_explanation = generate_ai_explanation(
+            violation_type=v_type,
+            confidence=conf,
+            bbox=v["bbox"],
+            metadata=v_meta,
+        )
 
         # Try to associate a plate with this violation
         plate_result = None
@@ -193,7 +211,7 @@ async def detect_violations(
                 x1=v["person_bbox"][0], y1=v["person_bbox"][1],
                 x2=v["person_bbox"][2], y2=v["person_bbox"][3],
             ) if v.get("person_bbox") and isinstance(v["person_bbox"], list) else None,
-            metadata=v.get("metadata", {}),
+            metadata=v_meta,
             mv_act_section=str(fine_info["section"]),
             fine_amount=int(fine_info["amount"]),
             license_plate=plate_result,
@@ -206,11 +224,16 @@ async def detect_violations(
             timestamp=now,
             evidence_url=evidence_url,
             evidence_hash=evidence_hash,
+            danger_score=danger_score,
+            ai_explanation=ai_explanation,
         )
         violation_records.append(record)
 
         # Persist to database
         _save_violation_to_db(record, v, plate_results, camera_id)
+
+    # Smart Deduplication (F7): Mark duplicates by (camera_id, plate, type) within 5-min window
+    _mark_duplicates(violation_records, camera_id)
 
     total_ms = int((time.time() - start_time) * 1000)
 
@@ -277,11 +300,100 @@ def _save_violation_to_db(
             timestamp=record.timestamp,
             evidence_url=record.evidence_url,
             evidence_hash=record.evidence_hash,
+            danger_score=record.danger_score,
+            ai_explanation=record.ai_explanation,
+            is_duplicate=1 if record.is_duplicate else 0,
+            duplicate_group_id=record.duplicate_group_id,
         )
         db.add(db_record)
         db.commit()
     except Exception as e:
         db.rollback()
         logger.error("Failed to save violation to DB: %s", e)
+    finally:
+        db.close()
+
+
+def _mark_duplicates(
+    violation_records: list[ViolationRecord],
+    camera_id: Optional[str],
+) -> None:
+    """Mark duplicate violations based on (camera_id, plate, type) grouping.
+
+    Groups violations by (camera_id, license_plate.text, violation_type).
+    First occurrence in each group is the original; subsequent ones are
+    marked as duplicates with a shared duplicate_group_id.
+
+    Also queries the DB for recent (5-minute window) violations to detect
+    cross-request duplicates.
+
+    Args:
+        violation_records: List of ViolationRecord to deduplicate.
+        camera_id: Camera identifier for the current detection.
+    """
+    from datetime import timedelta
+
+    # Group current violations by (camera_id, plate_text, violation_type)
+    group_key_counts: dict[str, int] = {}
+    plate_text = None
+
+    # First pass: determine groups within current batch
+    for record in violation_records:
+        plate_text = record.license_plate.text if record.license_plate else ""
+        key = f"{camera_id or 'none'}:{plate_text}:{record.violation_type.value}"
+
+        if key not in group_key_counts:
+            group_key_counts[key] = 0
+            record.is_duplicate = False
+            record.duplicate_group_id = None
+        else:
+            group_key_counts[key] += 1
+            record.is_duplicate = True
+            record.duplicate_group_id = f"dup_{key}"
+
+        # Also set the group_id on the first occurrence if there are subsequent ones
+        if group_key_counts[key] > 0:
+            for prev_record in violation_records:
+                prev_plate = prev_record.license_plate.text if prev_record.license_plate else ""
+                prev_key = f"{prev_record.camera_id or 'none'}:{prev_plate}:{prev_record.violation_type.value}"
+                if prev_key == key and not prev_record.is_duplicate:
+                    prev_record.duplicate_group_id = f"dup_{key}"
+                    break
+
+    # Second pass: check DB for recent duplicates within 5-minute window
+    db = SessionLocal()
+    try:
+        five_min_ago = datetime.now(timezone.utc) - timedelta(minutes=5)
+        for record in violation_records:
+            if record.is_duplicate:
+                continue  # Already marked as duplicate within batch
+
+            plate_text = record.license_plate.text if record.license_plate else ""
+            if not plate_text and not camera_id:
+                continue  # No meaningful grouping possible
+
+            # Query DB for matching violations in last 5 minutes
+            existing = (
+                db.query(ViolationRecordDB)
+                .filter(
+                    ViolationRecordDB.violation_type == record.violation_type.value,
+                    ViolationRecordDB.camera_id == camera_id,
+                    ViolationRecordDB.license_plate_text == plate_text,
+                    ViolationRecordDB.timestamp >= five_min_ago,
+                    ViolationRecordDB.id != record.id,
+                )
+                .first()
+            )
+
+            if existing:
+                record.is_duplicate = True
+                group_id = existing.duplicate_group_id or f"dup_{existing.id}"
+                record.duplicate_group_id = group_id
+                if not existing.duplicate_group_id:
+                    existing.duplicate_group_id = group_id
+                    existing.is_duplicate = 1
+                    db.commit()
+    except Exception as e:
+        logger.error("Failed to check DB duplicates: %s", e)
     finally:
         db.close()

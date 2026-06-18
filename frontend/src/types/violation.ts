@@ -12,7 +12,8 @@ export type ViolationType =
 
 export type DataSource = "seeded" | "live";
 export type ConfidenceTier = "high" | "medium" | "low";
-export type ViolationStatus = "pending" | "approved" | "rejected";
+export type ViolationStatus = "pending" | "under_review" | "approved" | "issued" | "rejected";
+export type CameraStatus = "active" | "idle" | "offline";
 
 export interface Bbox {
   x1: number;
@@ -47,6 +48,10 @@ export interface ViolationRecord {
   timestamp: string;
   evidence_url: string | null;
   evidence_hash: string | null;
+  danger_score: number;
+  ai_explanation: string | null;
+  is_duplicate: boolean;
+  duplicate_group_id: string | null;
 }
 
 export interface ImageDimensions {
@@ -79,6 +84,13 @@ export interface ViolationListResponse {
   violations: ViolationRecord[];
 }
 
+export interface TrendForecast {
+  violation_type: string;
+  trend_direction: "up" | "down" | "stable";
+  trend_percentage: number;
+  forecast: { date: string; predicted_count: number }[];
+}
+
 export interface AnalyticsOverview {
   total_violations: number;
   violations_by_type: Record<string, number>;
@@ -88,6 +100,34 @@ export interface AnalyticsOverview {
   total_fines: number;
   daily_counts: { date: string; count: number }[];
   top_cameras: { camera_id: string; count: number }[];
+  trend_forecast: TrendForecast[];
+}
+
+export interface CameraHealth {
+  camera_id: string;
+  junction_name: string;
+  latitude: number;
+  longitude: number;
+  status: CameraStatus;
+  last_seen: string | null;
+  violation_count_24h: number;
+  avg_latency_ms: number | null;
+}
+
+export interface CameraListResponse {
+  total: number;
+  cameras: CameraHealth[];
+}
+
+export interface ASTraMAlert {
+  id: string;
+  violation_type: ViolationType;
+  camera_id: string;
+  junction_name: string;
+  danger_score: number;
+  confidence: number;
+  timestamp: string;
+  license_plate: string | null;
 }
 
 export const VIOLATION_LABELS: Record<ViolationType, string> = {
@@ -121,4 +161,20 @@ export const VIOLATION_SECTIONS: Record<ViolationType, string> = {
   stop_line_violation: "S.184",
   red_light_violation: "S.184",
   license_plate_mismatch: "S.177",
+};
+
+export const STATUS_LABELS: Record<ViolationStatus, string> = {
+  pending: "Pending",
+  under_review: "Under Review",
+  approved: "Approved",
+  issued: "Issued",
+  rejected: "Rejected",
+};
+
+export const STATUS_COLORS: Record<ViolationStatus, string> = {
+  pending: "#f59e0b",
+  under_review: "#3b82f6",
+  approved: "#10b981",
+  issued: "#06b6d4",
+  rejected: "#ef4444",
 };

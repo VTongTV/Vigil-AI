@@ -44,10 +44,16 @@ class DataSourceDB(str, PyEnum):
 
 
 class ViolationStatusDB(str, PyEnum):
-    """Database enum for violation review status."""
+    """Database enum for violation review status.
+
+    Flow: pending → under_review → approved → issued
+    Any status can transition to rejected.
+    """
 
     PENDING = "pending"
+    UNDER_REVIEW = "under_review"
     APPROVED = "approved"
+    ISSUED = "issued"
     REJECTED = "rejected"
 
 
@@ -87,6 +93,10 @@ class ViolationRecordDB(Base):
     timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
     evidence_url = Column(String, nullable=True)
     evidence_hash = Column(String, nullable=True)
+    danger_score = Column(Integer, nullable=True, default=0)
+    ai_explanation = Column(String, nullable=True)
+    is_duplicate = Column(Integer, nullable=False, default=0)  # SQLite: 0=False, 1=True
+    duplicate_group_id = Column(String, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 

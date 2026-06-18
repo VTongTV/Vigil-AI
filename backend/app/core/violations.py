@@ -18,6 +18,121 @@ from backend.app.config import get_violation_config
 logger = logging.getLogger(__name__)
 
 
+# --- Danger Score Computation (F3) ---
+
+
+def compute_danger_score(
+    violation_type: str,
+    confidence: float,
+    fine_amount: int,
+    compound_factor: float = 1.0,
+) -> int:
+    """Compute a danger/severity score (0-100) for a violation.
+
+    Formula: min(100, fine_amount / 10 * confidence * compound_factor)
+    compound_factor = 1.5 when multiple violations on same person, 1.0 otherwise.
+
+    Args:
+        violation_type: Type of violation detected.
+        confidence: Detection confidence (0.0 - 1.0).
+        fine_amount: Fine amount in INR from FINE_SCHEDULE.
+        compound_factor: Multiplier for compound violations (default 1.0).
+
+    Returns:
+        Integer danger score in [0, 100].
+    """
+    raw_score = (fine_amount / 10.0) * confidence * compound_factor
+    return min(100, max(0, int(raw_score)))
+
+
+# --- AI Explanation Generation (F4) ---
+
+
+def generate_ai_explanation(
+    violation_type: str,
+    confidence: float,
+    bbox: list[float],
+    metadata: dict,
+) -> str:
+    """Generate a human-readable explanation for a detected violation.
+
+    Produces a clear, court-admissible explanation describing what was
+    detected, where in the image, and with what confidence.
+
+    Args:
+        violation_type: Type of violation detected.
+        confidence: Detection confidence (0.0 - 1.0).
+        bbox: Normalized bounding box [x1, y1, x2, y2].
+        metadata: Additional detection metadata dict.
+
+    Returns:
+        Human-readable explanation string.
+    """
+    conf_pct = f"{confidence:.0%}"
+    region = f"({bbox[0]:.2f},{bbox[1]:.2f})→({bbox[2]:.2f},{bbox[3]:.2f})"
+
+    if violation_type == "no_helmet":
+        head_region = ""
+        person_bbox = metadata.get("person_bbox")
+        if person_bbox and isinstance(person_bbox, list):
+            head_region = f" Person region ({person_bbox[0]:.2f},{person_bbox[1]:.2f})→({person_bbox[2]:.2f},{person_bbox[3]:.2f})."
+        return (
+            f"Person detected at {region}.{head_region} "
+            f"No helmet overlap found on head region. "
+            f"Classified as no_helmet with {conf_pct} confidence."
+        )
+
+    elif violation_type == "triple_riding":
+        rider_count = metadata.get("rider_count", 3)
+        return (
+            f"Rider group at {region} contains {rider_count} person heads. "
+            f"{rider_count} riders detected on single two-wheeler. "
+            f"Classified as triple_riding with {conf_pct} confidence."
+        )
+
+    elif violation_type == "wrong_side_driving":
+        lane_id = metadata.get("lane_id", "unknown")
+        return (
+            f"Vehicle at {region} detected in wrong-side lane zone '{lane_id}'. "
+            f"Classified as wrong_side_driving with {conf_pct} confidence."
+        )
+
+    elif violation_type == "illegal_parking":
+        zone_name = metadata.get("zone_name", "No Parking Zone")
+        return (
+            f"Vehicle at {region} detected stationary in '{zone_name}'. "
+            f"Classified as illegal_parking with {conf_pct} confidence."
+        )
+
+    elif violation_type == "no_seatbelt":
+        return (
+            f"Occupant at {region} detected without seatbelt (best-effort detection). "
+            f"Classified as no_seatbelt with {conf_pct} confidence."
+        )
+
+    elif violation_type == "stop_line_violation":
+        zone_id = metadata.get("zone_id", "unknown")
+        return (
+            f"Vehicle at {region} detected past stop-line zone '{zone_id}'. "
+            f"Classified as stop_line_violation with {conf_pct} confidence."
+        )
+
+    elif violation_type == "red_light_violation":
+        signal = metadata.get("signal_state", "red")
+        return (
+            f"Vehicle at {region} crossed stop-line during {signal} signal. "
+            f"Classified as red_light_violation with {conf_pct} confidence."
+        )
+
+    elif violation_type == "license_plate_mismatch":
+        return (
+            f"License plate at {region} failed format validation. "
+            f"Classified as license_plate_mismatch with {conf_pct} confidence."
+        )
+
+    return f"Violation at {region} classified as {violation_type} with {conf_pct} confidence."
+
+
 def compute_iou(box_a: list[float], box_b: list[float]) -> float:
     """Compute Intersection over Union between two [x1, y1, x2, y2] bboxes.
 
