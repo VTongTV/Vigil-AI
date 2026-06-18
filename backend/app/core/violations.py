@@ -264,25 +264,23 @@ def detect_helmet_violations(
         ]
 
         # Check helmet overlap with head region
-        has_helmet = False
         has_no_helmet = False
         no_helmet_conf = 0.0
 
         for h_det in helmet_boxes:
             h_bbox = h_det["bbox"]
-            h_class = h_det["class_name"].lower()
+            h_class = h_det["class_name"].lower().replace("_", " ")
             h_conf = h_det["confidence"]
 
-            iou = compute_iou(head_bbox, h_bbox)
+            h_cx, h_cy = bbox_center(h_bbox)
 
-            if iou >= iou_threshold:
-                if "without" in h_class or "no_helmet" in h_class:
+            # Center-point association: is helmet center inside the head region?
+            if head_bbox[0] <= h_cx <= head_bbox[2] and head_bbox[1] <= h_cy <= head_bbox[3]:
+                if "no helmet" in h_class or "without" in h_class:
                     has_no_helmet = True
                     no_helmet_conf = max(no_helmet_conf, h_conf)
-                elif "with" in h_class or "helmet" in h_class:
-                    has_helmet = True
 
-        # Determine violation
+        # Determine violation (Positive-Only Flag)
         if has_no_helmet:
             violations.append({
                 "type": "no_helmet",
@@ -291,16 +289,6 @@ def detect_helmet_violations(
                 "person_bbox": [p_bbox[0] / img_w, p_bbox[1] / img_h,
                                 p_bbox[2] / img_w, p_bbox[3] / img_h],
                 "confidence": no_helmet_conf,
-            })
-        elif not has_helmet:
-            # No helmet detection at all — conservative: flag as violation
-            violations.append({
-                "type": "no_helmet",
-                "bbox": [p_bbox[0] / img_w, p_bbox[1] / img_h,
-                         p_bbox[2] / img_w, p_bbox[3] / img_h],
-                "person_bbox": [p_bbox[0] / img_w, p_bbox[1] / img_h,
-                                p_bbox[2] / img_w, p_bbox[3] / img_h],
-                "confidence": p_conf * 0.8,
             })
 
     return violations
