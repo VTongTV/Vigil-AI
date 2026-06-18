@@ -5,6 +5,8 @@
  * Dense, information-first layout inspired by military C2 systems and CRT terminals.
  * - Amber CRT phosphor accent on stat cards
  * - Phosphor green LIVE indicator and monospace elements
+ * - F8: Trend forecast arrows + sparklines on stat cards
+ * - F9: Camera health panel with status indicators
  * - Grid pattern background hint (tactical graph paper)
  * - Amber glow on hover states
  * - Deep steel card backgrounds
@@ -17,18 +19,30 @@ import {
   IndianRupee,
   ShieldAlert,
   TrendingUp,
+  TrendingDown,
+  Minus,
   Activity,
+  Wifi,
+  WifiOff,
+  Clock,
 } from "lucide-react";
-import { getAnalytics } from "@/lib/api";
-import type { AnalyticsOverview } from "@/types/violation";
+import { getAnalytics, listCameras } from "@/lib/api";
+import type {
+  AnalyticsOverview,
+  CameraHealth,
+  CameraStatus,
+  TrendForecast,
+} from "@/types/violation";
 import {
   VIOLATION_LABELS,
   VIOLATION_COLORS,
   type ViolationType,
 } from "@/types/violation";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
 type StatCard = {
   label: string;
   value: string | number;
@@ -36,18 +50,110 @@ type StatCard = {
   color: string;
   glow: string;
   trend?: string;
+  trendDirection?: "up" | "down" | "stable";
+  trendPercentage?: number;
+  sparkline?: number[];
 };
+
+/** Map trend direction to icon component. */
+function TrendIcon({ direction }: { direction: "up" | "down" | "stable" }) {
+  switch (direction) {
+    case "up":
+      return <TrendingUp className="h-3 w-3 text-[var(--color-danger)]" />;
+    case "down":
+      return <TrendingDown className="h-3 w-3 text-[var(--color-success)]" />;
+    default:
+      return <Minus className="h-3 w-3 text-[var(--color-ink-faint)]" />;
+  }
+}
+
+/** Mini sparkline SVG from an array of values. */
+function Sparkline({
+  data,
+  color,
+  width = 60,
+  height = 20,
+  className,
+}: {
+  data: number[];
+  color: string;
+  width?: number;
+  height?: number;
+  className?: string;
+}) {
+  if (data.length < 2) return null;
+  const max = Math.max(...data, 1);
+  const min = Math.min(...data, 0);
+  const range = max - min || 1;
+  const step = width / (data.length - 1);
+
+  const points = data
+    .map((v, i) => `${i * step},${height - ((v - min) / range) * height}`)
+    .join(" ");
+
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      className={cn("overflow-visible", className)}
+    >
+      <polyline
+        points={points}
+        fill="none"
+        stroke={color}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity={0.7}
+      />
+    </svg>
+  );
+}
+
+/** Camera status indicator. */
+function CameraStatusBadge({ status }: { status: CameraStatus }) {
+  const config: Record<CameraStatus, { icon: React.ElementType; color: string; label: string }> = {
+    active: { icon: Wifi, color: "var(--color-success)", label: "Active" },
+    idle: { icon: Clock, color: "var(--color-warning)", label: "Idle" },
+    offline: { icon: WifiOff, color: "var(--color-danger)", label: "Offline" },
+  };
+  const { icon: Icon, color, label } = config[status];
+
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-medium"
+      style={{
+        backgroundColor: `color-mix(in oklch, ${color} 10%, transparent)`,
+        color,
+        border: `1px solid color-mix(in oklch, ${color} 20%, transparent)`,
+      }}
+    >
+      <Icon className="h-2.5 w-2.5" />
+      {label}
+    </span>
+  );
+}
 
 export default function Dashboard() {
   const [analytics, setAnalytics] = useState<AnalyticsOverview | null>(null);
+  const [cameras, setCameras] = useState<CameraHealth[]>([]);
   const [loading, setLoading] = useState(true);
+  const setCamerasStore = useAppStore((s) => s.setCameras);
 
   useEffect(() => {
-    getAnalytics(30)
-      .then(setAnalytics)
-      .catch(() => setAnalytics(null))
+    Promise.all([
+      getAnalytics(30).catch(() => null),
+      listCameras().catch(() => ({ total: 0, cameras: [] })),
+    ])
+      .then(([analyticsData, camerasData]) => {
+        if (analyticsData) setAnalytics(analyticsData);
+        const camList = camerasData?.cameras ?? [];
+        setCameras(camList);
+        setCamerasStore(camList);
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [setCamerasStore]);
 
   if (loading) {
     return (
@@ -65,7 +171,39 @@ export default function Dashboard() {
   const totalViolations = analytics?.total_violations ?? 0;
   const totalFines = analytics?.total_fines ?? 0;
   const avgConf = (analytics?.avg_confidence ?? 0) * 100;
-  const cameraCount = analytics?.top_cameras.length ?? 0;
+
+  // Extract trend data for stat cards
+  const trendMap: Record<string, TrendForecast> = {};
+  for (const tf of analytics?.trend_forecast ?? []) {
+    trendMap[tf.violation_type] = tf;
+  }
+
+  // Overall trend: average of all violation type trends
+  const overallTrend = analytics?.trend_forecast?.length
+    ? analytics.trend_forecast.reduce((acc, tf) => {
+        if (tf.trend_direction === "up") return acc + 1;
+        if (tf.trend_direction === "down") return acc - 1;
+        return acc;
+      }, 0) > 0
+      ? "up" as const
+      : analytics.trend_forecast.reduce((acc, tf) => {
+            if (tf.trend_direction === "up") return acc + 1;
+            if (tf.trend_direction === "down") return acc - 1;
+            return acc;
+          }, 0) < 0
+        ? "down" as const
+        : "stable" as const
+    : undefined;
+
+  const overallTrendPct = analytics?.trend_forecast?.length
+    ? Math.round(
+        analytics.trend_forecast.reduce((acc, tf) => acc + tf.trend_percentage, 0) /
+          analytics.trend_forecast.length,
+      )
+    : undefined;
+
+  // Sparkline data from daily_counts
+  const sparklineData = analytics?.daily_counts?.map((d) => d.count) ?? [];
 
   const stats: StatCard[] = [
     {
@@ -75,6 +213,9 @@ export default function Dashboard() {
       color: "var(--color-accent)",
       glow: "glow-accent",
       trend: "30d",
+      trendDirection: overallTrend,
+      trendPercentage: overallTrendPct,
+      sparkline: sparklineData,
     },
     {
       label: "Fines Imposed",
@@ -92,7 +233,7 @@ export default function Dashboard() {
     },
     {
       label: "Active Cameras",
-      value: cameraCount,
+      value: cameras.filter((c) => c.status === "active").length,
       icon: Camera,
       color: "var(--color-phosphor-bright)",
       glow: "glow-phosphor",
@@ -106,6 +247,11 @@ export default function Dashboard() {
   const dailyCounts = analytics?.daily_counts ?? [];
   const maxDaily = Math.max(...dailyCounts.map((d) => d.count), 1);
   const recentDays = [...dailyCounts].reverse().slice(0, 21);
+
+  // Camera health summary
+  const activeCams = cameras.filter((c) => c.status === "active").length;
+  const idleCams = cameras.filter((c) => c.status === "idle").length;
+  const offlineCams = cameras.filter((c) => c.status === "offline").length;
 
   return (
     <div className="p-5 grid-pattern min-h-full">
@@ -136,9 +282,9 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Stat cards — dense 4-column grid */}
+      {/* Stat cards — dense 4-column grid with trend arrows + sparklines */}
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {stats.map(({ label, value, icon: Icon, color, glow, trend }) => (
+        {stats.map(({ label, value, icon: Icon, color, glow, trend, trendDirection, trendPercentage, sparkline }) => (
           <Card
             key={label}
             className={cn(
@@ -159,15 +305,40 @@ export default function Dashboard() {
                 >
                   <Icon className="h-4 w-4" style={{ color }} />
                 </div>
-                {trend && (
-                  <span className="rounded bg-[var(--color-paper-3)]/50 px-1.5 py-0.5 font-mono text-[9px] text-[var(--color-ink-faint)] border border-[var(--color-paper-3)]/30">
-                    {trend}
-                  </span>
+                <div className="flex items-center gap-1.5">
+                  {/* Trend arrow + percentage (F8) */}
+                  {trendDirection && (
+                    <span className="flex items-center gap-1 rounded bg-[var(--color-paper-3)]/50 px-1.5 py-0.5 font-mono text-[9px] border border-[var(--color-paper-3)]/30">
+                      <TrendIcon direction={trendDirection} />
+                      {trendPercentage !== undefined && (
+                        <span
+                          className={cn(
+                            trendDirection === "up" && "text-[var(--color-danger)]",
+                            trendDirection === "down" && "text-[var(--color-success)]",
+                            trendDirection === "stable" && "text-[var(--color-ink-faint)]",
+                          )}
+                        >
+                          {trendPercentage}%
+                        </span>
+                      )}
+                    </span>
+                  )}
+                  {trend && !trendDirection && (
+                    <span className="rounded bg-[var(--color-paper-3)]/50 px-1.5 py-0.5 font-mono text-[9px] text-[var(--color-ink-faint)] border border-[var(--color-paper-3)]/30">
+                      {trend}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-end justify-between">
+                <p className="mt-2 font-mono text-xl font-bold tabular-nums tracking-tight text-[var(--color-ink)]">
+                  {value}
+                </p>
+                {/* Sparkline (F8) */}
+                {sparkline && sparkline.length > 1 && (
+                  <Sparkline data={sparkline} color={color} className="mb-1" />
                 )}
               </div>
-              <p className="mt-2 font-mono text-xl font-bold tabular-nums tracking-tight text-[var(--color-ink)]">
-                {value}
-              </p>
               <p className="mt-0.5 text-[10px] tracking-wider text-[var(--color-ink-faint)] uppercase">
                 {label}
               </p>
@@ -197,6 +368,7 @@ export default function Dashboard() {
                   const color = VIOLATION_COLORS[vType] ?? "var(--color-accent)";
                   const label = VIOLATION_LABELS[vType] ?? type;
                   const pct = totalViolations > 0 ? (count / totalViolations) * 100 : 0;
+                  const tf = trendMap[type];
                   return (
                     <div key={type} className="group flex items-center gap-2.5">
                       <span
@@ -224,6 +396,20 @@ export default function Dashboard() {
                       <span className="w-10 shrink-0 text-right font-mono text-[10px] tabular-nums text-[var(--color-ink-faint)]">
                         {pct.toFixed(0)}%
                       </span>
+                      {/* Trend arrow per type (F8) */}
+                      {tf && (
+                        <span className="w-8 shrink-0 flex items-center justify-end gap-0.5">
+                          <TrendIcon direction={tf.trend_direction} />
+                          <span className={cn(
+                            "font-mono text-[9px] tabular-nums",
+                            tf.trend_direction === "up" && "text-[var(--color-danger)]",
+                            tf.trend_direction === "down" && "text-[var(--color-success)]",
+                            tf.trend_direction === "stable" && "text-[var(--color-ink-faint)]",
+                          )}>
+                            {tf.trend_percentage.toFixed(0)}%
+                          </span>
+                        </span>
+                      )}
                     </div>
                   );
                 })
@@ -289,8 +475,8 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Bottom: Top cameras + status breakdown */}
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+      {/* Bottom: Top cameras + Camera health + Status breakdown */}
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* Top cameras */}
         <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
           <CardContent className="p-4">
@@ -301,6 +487,7 @@ export default function Dashboard() {
             <div className="space-y-2">
               {(analytics?.top_cameras ?? []).slice(0, 6).map((cam, i) => {
                 const topCount = analytics?.top_cameras[0]?.count ?? 1;
+                const camHealth = cameras.find((c) => c.camera_id === cam.camera_id);
                 return (
                   <div key={cam.camera_id} className="flex items-center gap-2.5">
                     <span className="w-4 text-right font-mono text-[10px] tabular-nums text-[var(--color-ink-faint)]">
@@ -320,9 +507,63 @@ export default function Dashboard() {
                     <span className="w-8 text-right font-mono text-[11px] tabular-nums font-medium text-[var(--color-ink)]">
                       {cam.count}
                     </span>
+                    {camHealth && <CameraStatusBadge status={camHealth.status} />}
                   </div>
                 );
               })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Camera health panel (F9) */}
+        <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
+          <CardContent className="p-4">
+            <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold text-[var(--color-ink)]">
+              <Wifi className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+              Camera Health
+            </h2>
+            {/* Summary row */}
+            <div className="mb-3 flex items-center gap-3">
+              <span className="flex items-center gap-1 text-[10px] text-[var(--color-success)]">
+                <Wifi className="h-3 w-3" />
+                <span className="font-mono font-semibold">{activeCams}</span>
+                <span className="text-[var(--color-ink-faint)]">active</span>
+              </span>
+              <span className="flex items-center gap-1 text-[10px] text-[var(--color-warning)]">
+                <Clock className="h-3 w-3" />
+                <span className="font-mono font-semibold">{idleCams}</span>
+                <span className="text-[var(--color-ink-faint)]">idle</span>
+              </span>
+              <span className="flex items-center gap-1 text-[10px] text-[var(--color-danger)]">
+                <WifiOff className="h-3 w-3" />
+                <span className="font-mono font-semibold">{offlineCams}</span>
+                <span className="text-[var(--color-ink-faint)]">offline</span>
+              </span>
+            </div>
+            {/* Camera list */}
+            <div className="space-y-1.5 max-h-48 overflow-y-auto">
+              {cameras.length > 0 ? (
+                cameras.map((cam) => (
+                  <div key={cam.camera_id} className="flex items-center gap-2 py-0.5">
+                    <CameraStatusBadge status={cam.status} />
+                    <span className="flex-1 truncate font-mono text-[10px] text-[var(--color-ink-muted)]">
+                      {cam.junction_name}
+                    </span>
+                    <span className="font-mono text-[9px] tabular-nums text-[var(--color-ink-faint)]">
+                      {cam.violation_count_24h}v/24h
+                    </span>
+                    {cam.avg_latency_ms != null && (
+                      <span className="font-mono text-[8px] tabular-nums text-[var(--color-ink-faint)]">
+                        {cam.avg_latency_ms}ms
+                      </span>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="py-4 text-center text-xs text-[var(--color-ink-faint)]">
+                  No camera data
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -341,7 +582,9 @@ export default function Dashboard() {
                       const pct = ((count / total) * 100).toFixed(0);
                       const colorMap: Record<string, string> = {
                         pending: "var(--color-accent)",
+                        under_review: "#3b82f6",
                         approved: "var(--color-phosphor)",
+                        issued: "#06b6d4",
                         rejected: "var(--color-danger)",
                       };
                       const color = colorMap[status] ?? "var(--color-accent)";
@@ -353,7 +596,7 @@ export default function Dashboard() {
                                 className="h-2 w-2 rounded-full"
                                 style={{ backgroundColor: color }}
                               />
-                              {status}
+                              {status.replace("_", " ")}
                             </span>
                             <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink)]">
                               {count}
