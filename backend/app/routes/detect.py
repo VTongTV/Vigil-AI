@@ -23,7 +23,12 @@ from backend.app.core.evidence import (
 )
 from backend.app.core.ocr import process_plates
 from backend.app.core.preprocessing import preprocess_image
-from backend.app.core.violations import compute_danger_score, detect_all_violations, generate_ai_explanation
+from backend.app.core.violations import (
+    compute_danger_score,
+    detect_all_violations,
+    extract_windshield_crops,
+    generate_ai_explanation,
+)
 from backend.app.db.database import SessionLocal
 from backend.app.db.models import (
     FINE_SCHEDULE,
@@ -107,7 +112,29 @@ async def detect_violations(
     helmet_dets = mm.detect_helmet(preprocessed)
     detect_helmet_ms = int((time.time() - t0) * 1000)
 
-    # Step 4: Violation logic
+    # Step 3b: Seatbelt classification (on-demand, only if cars present)
+    # NOTE: Seatbelt timing is folded into violation_logic_ms below
+    seatbelt_classifications: list[dict] = []
+    car_dets = [d for d in coco_dets if d.get("class_id") == 2]  # COCO car class
+    if car_dets:
+        windshield_crops = extract_windshield_crops(
+            car_dets, preprocessed, img_w, img_h,
+        )
+        if windshield_crops:
+            raw_classifications = mm.classify_seatbelt_on_demand(
+                [c["crop"] for c in windshield_crops],
+            )
+            for crop_info, cls_result in zip(windshield_crops, raw_classifications):
+                seatbelt_classifications.append({
+                    "class_name": cls_result["class_name"],
+                    "confidence": cls_result["confidence"],
+                    "car_bbox": crop_info["car_bbox"],
+                    "crop_bbox": crop_info["crop_bbox"],
+                    "crop_index": crop_info["crop_index"],
+                    "car_confidence": crop_info["car_confidence"],
+                })
+
+    # Step 4: Violation logic (includes seatbelt classification timing)
     t0 = time.time()
     # Get configured polygons from violation configs
     wrong_side_cfg = get_violation_config("wrong_side")
@@ -115,15 +142,22 @@ async def detect_violations(
     stop_line_cfg = get_violation_config("stop_line")
     red_light_cfg = get_violation_config("red_light")
 
+    camera_id_str = camera_id or "unknown"
+
+    # Filter polygons by camera_id (if specified in config, otherwise apply globally)
+    def filter_polygons(polygons: list) -> list:
+        return [p for p in polygons if p.get("camera_id", camera_id_str) == camera_id_str]
+
     violations = detect_all_violations(
         coco_detections=coco_dets,
         helmet_detections=helmet_dets,
         img_w=img_w,
         img_h=img_h,
-        lane_polygons=wrong_side_cfg.get("lane_polygons", []),
-        no_parking_zones=parking_cfg.get("zone_polygons", []),
-        stop_line_zones=stop_line_cfg.get("stop_line_zones", []),
+        lane_polygons=filter_polygons(wrong_side_cfg.get("lane_polygons", [])),
+        no_parking_zones=filter_polygons(parking_cfg.get("zone_polygons", [])),
+        stop_line_zones=filter_polygons(stop_line_cfg.get("stop_line_zones", [])),
         signal_state=red_light_cfg.get("signal_state", "unknown"),
+        seatbelt_detections=seatbelt_classifications,
     )
     violation_logic_ms = int((time.time() - t0) * 1000)
 

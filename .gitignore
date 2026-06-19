@@ -17,6 +17,8 @@ backend/weights/*.pt
 backend/weights/*.onnx
 backend/weights/*.pth
 !backend/weights/.gitkeep
+*.pt
+!backend/weights/.gitkeep
 
 # Outputs (generated at runtime)
 outputs/
@@ -48,3 +50,6 @@ data/sample_videos/*.mp4
 
 # Agents
 .agents/
+
+# Temp scripts
+tune_demo.py

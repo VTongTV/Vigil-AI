@@ -527,16 +527,27 @@ def test_ocr_accuracy() -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-def compute_violation_metrics_placeholder() -> dict[str, Any]:
+def compute_violation_metrics(
+    predictions: Optional[list[dict[str, Any]]] = None,
+    ground_truths: Optional[list[dict[str, Any]]] = None,
+    iou_threshold: float = 0.5,
+) -> dict[str, Any]:
     """Compute per-violation-type precision, recall, and F1-score.
 
-    When a labeled test set is available, this function should:
-        1. Run the full pipeline on each test image
-        2. Compare predictions to ground-truth annotations
-        3. Compute TP, FP, FN per violation type
-        4. Derive precision, recall, F1
+    When ``predictions`` and ``ground_truths`` are provided, computes real
+    TP/FP/FN by matching predicted violation bboxes to ground-truth bboxes
+    using IoU >= ``iou_threshold``.  When omitted, returns the placeholder
+    structure with ``None`` values and a methodology note.
 
-    Currently returns placeholder structure with methodology notes.
+    Each element in ``predictions`` and ``ground_truths`` must be a dict
+    with at least:
+        - ``type`` (str): violation type label
+        - ``bbox`` (list[float]): normalised [x1, y1, x2, y2]
+
+    Args:
+        predictions: List of predicted violation dicts (or None).
+        ground_truths: List of ground-truth violation dicts (or None).
+        iou_threshold: Minimum IoU to consider a prediction a true positive.
 
     Returns:
         Dict mapping violation types to precision/recall/F1 with methodology note.
@@ -552,31 +563,156 @@ def compute_violation_metrics_placeholder() -> dict[str, Any]:
         "license_plate_mismatch",
     ]
 
-    metrics: dict[str, dict[str, Any]] = {}
-    for v_type in violation_types:
-        metrics[v_type] = {
-            "precision": None,
-            "recall": None,
-            "f1_score": None,
-            "tp": None,
-            "fp": None,
-            "fn": None,
-            "note": GROUND_TRUTH_NOTE,
+    # If no real data provided, return placeholder
+    if predictions is None or ground_truths is None:
+        metrics: dict[str, dict[str, Any]] = {}
+        for v_type in violation_types:
+            metrics[v_type] = {
+                "precision": None,
+                "recall": None,
+                "f1_score": None,
+                "tp": None,
+                "fp": None,
+                "fn": None,
+                "note": GROUND_TRUTH_NOTE,
+            }
+        return {
+            "per_violation_metrics": metrics,
+            "accuracy": None,
+            "accuracy_note": GROUND_TRUTH_NOTE,
+            "methodology": (
+                "Metrics require a labeled test set of 50+ images with ground-truth "
+                "bounding boxes and violation type labels. For each image, run the "
+                "full pipeline, match predictions to ground truth using IoU >= 0.5, "
+                "then compute TP, FP, FN per violation type. "
+                "Precision = TP/(TP+FP), Recall = TP/(TP+FN), "
+                "F1 = 2*P*R/(P+R), Accuracy = correct/total."
+            ),
         }
 
+    # Group predictions and ground-truths by violation type
+    pred_by_type: dict[str, list[dict]] = {vt: [] for vt in violation_types}
+    gt_by_type: dict[str, list[dict]] = {vt: [] for vt in violation_types}
+
+    for p in predictions:
+        v_type = p.get("type", "")
+        if v_type in pred_by_type:
+            pred_by_type[v_type].append(p)
+
+    for g in ground_truths:
+        v_type = g.get("type", "")
+        if v_type in gt_by_type:
+            gt_by_type[v_type].append(g)
+
+    per_type_metrics: dict[str, dict[str, Any]] = {}
+    total_tp = 0
+    total_fp = 0
+    total_fn = 0
+
+    for v_type in violation_types:
+        preds = pred_by_type[v_type]
+        gts = gt_by_type[v_type]
+
+        tp, fp, fn = _match_predictions_to_gt(preds, gts, iou_threshold)
+        total_tp += tp
+        total_fp += fp
+        total_fn += fn
+
+        precision = tp / (tp + fp) if (tp + fp) > 0 else None
+        recall = tp / (tp + fn) if (tp + fn) > 0 else None
+        f1 = (
+            2 * precision * recall / (precision + recall)
+            if precision is not None and recall is not None and (precision + recall) > 0
+            else None
+        )
+
+        per_type_metrics[v_type] = {
+            "precision": round(precision, 4) if precision is not None else None,
+            "recall": round(recall, 4) if recall is not None else None,
+            "f1_score": round(f1, 4) if f1 is not None else None,
+            "tp": tp,
+            "fp": fp,
+            "fn": fn,
+            "note": "Computed from labeled test set" if (preds or gts) else GROUND_TRUTH_NOTE,
+        }
+
+    total_correct = total_tp
+    total_samples = total_tp + total_fp + total_fn
+    accuracy = total_correct / total_samples if total_samples > 0 else None
+
     return {
-        "per_violation_metrics": metrics,
-        "accuracy": None,
-        "accuracy_note": GROUND_TRUTH_NOTE,
+        "per_violation_metrics": per_type_metrics,
+        "accuracy": round(accuracy, 4) if accuracy is not None else None,
+        "accuracy_note": (
+            f"Computed from {len(predictions)} predictions and "
+            f"{len(ground_truths)} ground truths"
+            if accuracy is not None
+            else GROUND_TRUTH_NOTE
+        ),
         "methodology": (
-            "Metrics require a labeled test set of 50+ images with ground-truth "
-            "bounding boxes and violation type labels. For each image, run the "
-            "full pipeline, match predictions to ground truth using IoU >= 0.5, "
-            "then compute TP, FP, FN per violation type. "
-            "Precision = TP/(TP+FP), Recall = TP/(TP+FN), "
-            "F1 = 2*P*R/(P+R), Accuracy = correct/total."
+            f"IoU threshold: {iou_threshold}. For each violation type, predictions "
+            f"matched to ground-truths by IoU >= {iou_threshold}. Greedy matching: "
+            f"each GT matched at most once. "
+            f"TP = matched predictions, FP = unmatched predictions, "
+            f"FN = unmatched ground truths. "
+            f"Precision = TP/(TP+FP), Recall = TP/(TP+FN), "
+            f"F1 = 2*P*R/(P+R), Accuracy = TP/(TP+FP+FN)."
         ),
     }
+
+
+def _match_predictions_to_gt(
+    predictions: list[dict],
+    ground_truths: list[dict],
+    iou_threshold: float,
+) -> tuple[int, int, int]:
+    """Match predictions to ground truths greedily by IoU.
+
+    For each prediction, finds the highest-IoU unmatched ground truth
+    of the same type. If IoU >= threshold, it's a true positive.
+
+    Args:
+        predictions: List of predicted violation dicts with 'bbox' key.
+        ground_truths: List of ground-truth violation dicts with 'bbox' key.
+        iou_threshold: Minimum IoU for a true positive match.
+
+    Returns:
+        Tuple of (true_positives, false_positives, false_negatives).
+    """
+    matched_gt: set[int] = set()
+    tp = 0
+
+    for pred in predictions:
+        pred_bbox = pred.get("bbox", [])
+        if len(pred_bbox) != 4:
+            continue
+
+        best_iou = 0.0
+        best_gt_idx = -1
+
+        for gt_idx, gt in enumerate(ground_truths):
+            if gt_idx in matched_gt:
+                continue
+            gt_bbox = gt.get("bbox", [])
+            if len(gt_bbox) != 4:
+                continue
+
+            # Import compute_iou from violations module
+            from backend.app.core.violations import compute_iou
+            iou_val = compute_iou(pred_bbox, gt_bbox)
+
+            if iou_val > best_iou:
+                best_iou = iou_val
+                best_gt_idx = gt_idx
+
+        if best_iou >= iou_threshold and best_gt_idx >= 0:
+            tp += 1
+            matched_gt.add(best_gt_idx)
+
+    fp = len(predictions) - tp
+    fn = len(ground_truths) - len(matched_gt)
+
+    return tp, fp, fn
 
 
 # ---------------------------------------------------------------------------
@@ -794,7 +930,7 @@ def main() -> None:
 
     # Step 5: Per-violation metrics (requires labeled test set)
     logger.info("Computing per-violation metrics...")
-    violation_metrics = compute_violation_metrics_placeholder()
+    violation_metrics = compute_violation_metrics()
 
     # Step 6: Final VRAM
     vram_info = get_vram_info()

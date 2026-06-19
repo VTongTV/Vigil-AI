@@ -26,7 +26,7 @@ from scripts.eval_metrics import (
     SYNTHETIC_IMAGE_HEIGHT,
     SYNTHETIC_IMAGE_WIDTH,
     build_eval_results_json,
-    compute_violation_metrics_placeholder,
+    compute_violation_metrics,
     format_report,
     generate_synthetic_plate_image,
     generate_synthetic_test_images,
@@ -128,7 +128,7 @@ class TestFormatReport:
         sample_vram_info: dict,
     ) -> None:
         """format_report should return a non-empty string."""
-        vm = compute_violation_metrics_placeholder()
+        vm = compute_violation_metrics()
         report = format_report(
             sample_benchmark, sample_coco_val, sample_ocr_metrics, vm, sample_vram_info
         )
@@ -142,7 +142,7 @@ class TestFormatReport:
         sample_vram_info: dict,
     ) -> None:
         """Report should contain all required metric sections."""
-        vm = compute_violation_metrics_placeholder()
+        vm = compute_violation_metrics()
         report = format_report(
             sample_benchmark, None, sample_ocr_metrics, vm, sample_vram_info
         )
@@ -161,7 +161,7 @@ class TestFormatReport:
         sample_vram_info: dict,
     ) -> None:
         """Report should display the FPS value from benchmark data."""
-        vm = compute_violation_metrics_placeholder()
+        vm = compute_violation_metrics()
         report = format_report(
             sample_benchmark, None, sample_ocr_metrics, vm, sample_vram_info
         )
@@ -175,7 +175,7 @@ class TestFormatReport:
         sample_vram_info: dict,
     ) -> None:
         """When COCO validation data exists, report shows mAP values."""
-        vm = compute_violation_metrics_placeholder()
+        vm = compute_violation_metrics()
         report = format_report(
             sample_benchmark, sample_coco_val, sample_ocr_metrics, vm, sample_vram_info
         )
@@ -188,7 +188,7 @@ class TestFormatReport:
         sample_vram_info: dict,
     ) -> None:
         """When COCO validation is None, report shows unavailable status."""
-        vm = compute_violation_metrics_placeholder()
+        vm = compute_violation_metrics()
         report = format_report(
             sample_benchmark, None, sample_ocr_metrics, vm, sample_vram_info
         )
@@ -201,7 +201,7 @@ class TestFormatReport:
         sample_vram_info: dict,
     ) -> None:
         """Report should list all 8 violation types."""
-        vm = compute_violation_metrics_placeholder()
+        vm = compute_violation_metrics()
         report = format_report(
             sample_benchmark, None, sample_ocr_metrics, vm, sample_vram_info
         )
@@ -219,7 +219,7 @@ class TestFormatReport:
         sample_vram_info: dict,
     ) -> None:
         """Total in timing breakdown should equal sum of individual stages."""
-        vm = compute_violation_metrics_placeholder()
+        vm = compute_violation_metrics()
         report = format_report(
             sample_benchmark, None, sample_ocr_metrics, vm, sample_vram_info
         )
@@ -309,12 +309,12 @@ class TestSyntheticImages:
 # ---------------------------------------------------------------------------
 
 
-class TestViolationMetricsPlaceholder:
-    """Tests for the compute_violation_metrics_placeholder function."""
+class TestViolationMetrics:
+    """Tests for the compute_violation_metrics function."""
 
     def test_returns_all_violation_types(self) -> None:
         """Should include metrics for all 8 violation types."""
-        result = compute_violation_metrics_placeholder()
+        result = compute_violation_metrics()
         per_v = result["per_violation_metrics"]
         assert len(per_v) == 8
         for v_type in [
@@ -326,7 +326,7 @@ class TestViolationMetricsPlaceholder:
 
     def test_metrics_are_none_without_test_set(self) -> None:
         """All metric values should be None when no test set is available."""
-        result = compute_violation_metrics_placeholder()
+        result = compute_violation_metrics()
         for v_type, vals in result["per_violation_metrics"].items():
             assert vals["precision"] is None, f"{v_type} precision should be None"
             assert vals["recall"] is None, f"{v_type} recall should be None"
@@ -337,14 +337,14 @@ class TestViolationMetricsPlaceholder:
 
     def test_each_type_has_note(self) -> None:
         """Each violation type should have a note about requiring test set."""
-        result = compute_violation_metrics_placeholder()
+        result = compute_violation_metrics()
         for v_type, vals in result["per_violation_metrics"].items():
             assert "note" in vals
             assert len(vals["note"]) > 0
 
     def test_accuracy_is_none_without_test_set(self) -> None:
         """Overall accuracy should be None without test set."""
-        result = compute_violation_metrics_placeholder()
+        result = compute_violation_metrics()
         assert result["accuracy"] is None
         assert "accuracy_note" in result
 
@@ -364,7 +364,7 @@ class TestBuildEvalResultsJson:
         sample_vram_info: dict,
     ) -> None:
         """Result dict should be JSON-serializable."""
-        vm = compute_violation_metrics_placeholder()
+        vm = compute_violation_metrics()
         result = build_eval_results_json(
             sample_benchmark, None, sample_ocr_metrics, vm, sample_vram_info
         )
@@ -379,7 +379,7 @@ class TestBuildEvalResultsJson:
         sample_vram_info: dict,
     ) -> None:
         """Result dict should have all required top-level keys."""
-        vm = compute_violation_metrics_placeholder()
+        vm = compute_violation_metrics()
         result = build_eval_results_json(
             sample_benchmark, None, sample_ocr_metrics, vm, sample_vram_info
         )
@@ -400,7 +400,7 @@ class TestBuildEvalResultsJson:
         sample_vram_info: dict,
     ) -> None:
         """Metadata should include a generated_at timestamp."""
-        vm = compute_violation_metrics_placeholder()
+        vm = compute_violation_metrics()
         result = build_eval_results_json(
             sample_benchmark, None, sample_ocr_metrics, vm, sample_vram_info
         )
@@ -553,3 +553,83 @@ class TestSlowIntegration:
         for key in result:
             assert isinstance(result[key], float)
             assert result[key] >= 0.0
+
+
+# ---------------------------------------------------------------------------
+# Real violation metrics computation tests
+# ---------------------------------------------------------------------------
+
+
+class TestViolationMetricsRealComputation:
+    """Tests for compute_violation_metrics with real predictions and ground truths."""
+
+    def test_perfect_match(self) -> None:
+        """Perfect predictions should yield precision=recall=f1=1."""
+        predictions = [
+            {"type": "no_helmet", "bbox": [0.1, 0.2, 0.3, 0.4]},
+        ]
+        ground_truths = [
+            {"type": "no_helmet", "bbox": [0.1, 0.2, 0.3, 0.4]},
+        ]
+        result = compute_violation_metrics(predictions, ground_truths)
+        per = result["per_violation_metrics"]["no_helmet"]
+        assert per["precision"] == 1.0
+        assert per["recall"] == 1.0
+        assert per["f1_score"] == 1.0
+        assert per["tp"] == 1
+        assert per["fp"] == 0
+        assert per["fn"] == 0
+
+    def test_false_positive(self) -> None:
+        """Prediction with no matching ground truth is a false positive."""
+        predictions = [
+            {"type": "no_helmet", "bbox": [0.1, 0.2, 0.3, 0.4]},
+        ]
+        ground_truths: list[dict] = []
+        result = compute_violation_metrics(predictions, ground_truths)
+        per = result["per_violation_metrics"]["no_helmet"]
+        assert per["tp"] == 0
+        assert per["fp"] == 1
+        assert per["fn"] == 0
+        assert per["precision"] == 0.0
+
+    def test_false_negative(self) -> None:
+        """Ground truth with no matching prediction is a false negative."""
+        predictions: list[dict] = []
+        ground_truths = [
+            {"type": "no_helmet", "bbox": [0.1, 0.2, 0.3, 0.4]},
+        ]
+        result = compute_violation_metrics(predictions, ground_truths)
+        per = result["per_violation_metrics"]["no_helmet"]
+        assert per["tp"] == 0
+        assert per["fp"] == 0
+        assert per["fn"] == 1
+        assert per["recall"] == 0.0
+
+    def test_iou_threshold_filtering(self) -> None:
+        """Low-IoU predictions should not match ground truths."""
+        predictions = [
+            {"type": "no_helmet", "bbox": [0.7, 0.7, 0.9, 0.9]},
+        ]
+        ground_truths = [
+            {"type": "no_helmet", "bbox": [0.1, 0.1, 0.3, 0.3]},
+        ]
+        result = compute_violation_metrics(predictions, ground_truths, iou_threshold=0.5)
+        per = result["per_violation_metrics"]["no_helmet"]
+        assert per["tp"] == 0
+        assert per["fp"] == 1
+        assert per["fn"] == 1
+
+    def test_accuracy_computation(self) -> None:
+        """Accuracy should be TP / (TP + FP + FN)."""
+        predictions = [
+            {"type": "no_helmet", "bbox": [0.1, 0.2, 0.3, 0.4]},  # TP
+            {"type": "triple_riding", "bbox": [0.5, 0.5, 0.7, 0.7]},  # FP
+        ]
+        ground_truths = [
+            {"type": "no_helmet", "bbox": [0.1, 0.2, 0.3, 0.4]},  # matched
+            {"type": "illegal_parking", "bbox": [0.1, 0.6, 0.3, 0.8]},  # FN
+        ]
+        result = compute_violation_metrics(predictions, ground_truths)
+        # TP=1, FP=1, FN=1 → accuracy = 1/3
+        assert result["accuracy"] == round(1 / 3, 4)

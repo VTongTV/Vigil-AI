@@ -415,22 +415,33 @@ no_parking_zones:
 
 **Fine**: ₹1,000 (first offense) under Section 194B
 
-### Detection Algorithm: Windshield Crop + Seatbelt Classifier
+### Detection Algorithm: Windshield Crop + YOLOv11s Seatbelt Classifier
 
 #### Overview
 
-Seatbelt detection from CCTV is inherently challenging — overhead angles obscure the driver's torso, and windshield glare reduces visibility. Our approach:
+Seatbelt detection from CCTV is inherently challenging — overhead angles obscure the driver's torso, and windshield glare reduces visibility. Our approach uses a real YOLOv11s classification model (`RISEF/yolov11s-seatbelt`, 10.5 MB) for best-effort detection:
 
 1. Detect cars using COCO model
 2. Crop the upper portion of the car bbox (windshield/driver region)
-3. Run a seatbelt detection model on the crop
+3. Run the seatbelt classifier on the crop (on-demand CUDA load/infer/unload)
 4. Apply confidence discount (0.7×) for overhead angle unreliability
 5. Flag as "review recommended" in the UI
+
+#### Model Details
+
+| Property | Value |
+|----------|-------|
+| Model | `RISEF/yolov11s-seatbelt` (HuggingFace Hub) |
+| Architecture | YOLOv11s Classification |
+| Size | 10.5 MB |
+| Classes | `no_seatbelt` (index 0), `seat_belt` (index 1) |
+| Loading | On-demand (load → infer → unload → gc.collect → empty_cache) |
+| Local path | `backend/weights/seatbelt.pt` |
 
 #### Step-by-Step Algorithm
 
 ```
-Input: car_boxes[], seatbelt_model
+Input: car_boxes[], seatbelt_classifier
 Output: list of seatbelt violations
 
 FOR each car in car_boxes:
@@ -438,27 +449,31 @@ FOR each car in car_boxes:
        - Windshield is roughly the top 40% of the car bbox
        - crop = car_bbox[top 40%]
 
-    2. RUN seatbelt detection:
-       - Run seatbelt model on the crop
-       - Look for "with_seatbelt" / "without_seatbelt" classes
+    2. CLASSIFY seatbelt:
+       - Run YOLOv11s classifier on the crop
+       - Model returns: probs.top1 = class index, probs.top1conf = confidence
+       - Class 0 = "no_seatbelt" → potential violation
+       - Class 1 = "seat_belt" → no violation
 
     3. DETERMINE violation:
-       - If "without_seatbelt" detected in crop → VIOLATION
+       - If class is in _NEGATIVE_LABELS {"no_seatbelt", "without_seatbelt", "no_belt", "nobelt"}:
+           → VIOLATION candidate
        - Apply confidence discount: confidence *= 0.7
-       - If confidence < 0.3 → SKIP (too unreliable)
+       - If confidence < min_confidence → SKIP (too unreliable)
        - If confidence 0.3-0.5 → flag as "review recommended"
 
     4. CREATE violation with:
-       - vehicle_bbox = car.bbox
+       - vehicle_bbox = car.bbox (vehicle-level challan)
        - confidence = discounted confidence
-       - metadata = { "crop_type": "windshield", "detection_method": "best_effort" }
+       - metadata = { "crop_type": "windshield", "crop_bbox": [x1,y1,x2,y2], "detection_method": "classifier", "model": "RISEF/yolov11s-seatbelt" }
 ```
 
 #### Parameters
 
 | Parameter | Value | Rationale |
 |-----------|-------|-----------|
-| `windshield_crop_ratio` | 0.40 | Top 40% of car bbox covers windshield area |
+| `windshield_crop_ratio_top` | 0.40 | Top 40% of car bbox covers windshield area |
+| `windshield_crop_ratio_side` | 0.70 | Central 70% of car width covers driver area |
 | `confidence_discount` | 0.70 | 30% discount for overhead angle unreliability |
 | `min_confidence` | 0.30 | Below 30% confidence is too unreliable to report |
 | `review_threshold` | 0.50 | Below 50% flagged for manual review |
@@ -473,15 +488,22 @@ FOR each car in car_boxes:
 #### Confidence Adjustment
 
 ```python
-def adjust_seatbelt_confidence(raw_confidence: float) -> tuple[float, str]:
+def adjust_seatbelt_confidence(raw_confidence: float, class_label: str) -> tuple[float, str]:
     """Apply confidence discount and determine review status.
 
+    The classifier returns class labels 'no_seatbelt' or 'seat_belt'.
+    Only 'no_seatbelt' (and variants in _NEGATIVE_LABELS) can produce violations.
+
     Args:
-        raw_confidence: Raw detection confidence from model.
+        raw_confidence: Raw classification confidence from model (probs.top1conf).
+        class_label: Predicted class label from model (probs.top1).
 
     Returns:
         Tuple of (adjusted_confidence, review_status).
     """
+    if class_label not in {"no_seatbelt", "without_seatbelt", "no_belt", "nobelt"}:
+        return raw_confidence, "no_violation"  # seat_belt → no violation
+
     adjusted = raw_confidence * 0.70  # Overhead angle discount
 
     if adjusted < 0.30:

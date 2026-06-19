@@ -11,6 +11,7 @@ from backend.app.core.violations import (
     detect_triple_riding,
     detect_wrong_side,
     detect_illegal_parking,
+    extract_windshield_crops,
     detect_seatbelt_violations,
     detect_stop_line_violations,
     detect_red_light_violations,
@@ -186,22 +187,227 @@ class TestDetectIllegalParking:
         assert len(violations) == 0
 
 
-class TestDetectSeatbeltViolations:
-    """Tests for seatbelt non-compliance (best-effort)."""
+class TestExtractWindshieldCrops:
+    """Tests for windshield crop extraction from car detections."""
 
-    def test_no_seatbelt_detection(self) -> None:
-        det = {"bbox": [100, 50, 200, 150], "confidence": 0.7, "class_name": "no_seatbelt"}
+    def _make_image(self, h: int = 400, w: int = 400) -> np.ndarray:
+        """Create a dummy BGR image for crop extraction tests."""
+        return np.random.randint(0, 255, (h, w, 3), dtype=np.uint8)
+
+    def test_basic_crop_extraction(self) -> None:
+        """Car in the middle of the image produces a valid crop."""
+        img = self._make_image(400, 400)
+        car = {"bbox": [100, 100, 300, 300], "confidence": 0.9, "class_id": 2}
+
+        crops = extract_windshield_crops([car], img, 400, 400)
+        assert len(crops) == 1
+        c = crops[0]
+        assert c["car_bbox"] == [100.0, 100.0, 300.0, 300.0]
+        assert c["crop_index"] == 0
+        assert c["car_confidence"] == 0.9
+        assert c["crop"].ndim == 3  # BGR image
+
+    def test_crop_shape_reflects_config(self) -> None:
+        """Crop dimensions match windshield_crop_ratio_top and _side config."""
+        img = self._make_image(400, 400)
+        # Full-width car, 200px tall → crop top 40% = 80px tall
+        car = {"bbox": [0, 100, 400, 300], "confidence": 0.85, "class_id": 2}
+
+        crops = extract_windshield_crops([car], img, 400, 400)
+        assert len(crops) == 1
+        cb = crops[0]["crop_bbox"]
+        crop_h = cb[3] - cb[1]
+        crop_w = cb[2] - cb[0]
+        # crop_h should be ~80 (200 * 0.4)
+        assert crop_h == pytest.approx(80, abs=2)
+        # crop_w should be narrower due to side inset (0.7 ratio → 280px)
+        assert crop_w == pytest.approx(280, abs=2)
+
+    def test_tiny_car_skipped(self) -> None:
+        """Car smaller than min_crop_size produces no crops."""
+        img = self._make_image(400, 400)
+        car = {"bbox": [200, 200, 210, 210], "confidence": 0.5, "class_id": 2}
+
+        crops = extract_windshield_crops([car], img, 400, 400)
+        assert len(crops) == 0
+
+    def test_crop_clamped_to_image_bounds(self) -> None:
+        """Crop at image edge is clamped to image dimensions."""
+        img = self._make_image(300, 300)
+        # Large enough car so crop isn't skipped, but positioned at edge
+        car = {"bbox": [100, 100, 300, 300], "confidence": 0.7, "class_id": 2}
+
+        crops = extract_windshield_crops([car], img, 300, 300)
+        assert len(crops) >= 1
+        cb = crops[0]["crop_bbox"]
+        # All values should be within image bounds
+        assert cb[0] >= 0
+        assert cb[1] >= 0
+        assert cb[2] <= 300
+        assert cb[3] <= 300
+
+    def test_multiple_cars(self) -> None:
+        """Multiple cars produce multiple crops."""
+        img = self._make_image(400, 600)
+        cars = [
+            {"bbox": [50, 50, 200, 200], "confidence": 0.8, "class_id": 2},
+            {"bbox": [300, 100, 500, 300], "confidence": 0.9, "class_id": 2},
+        ]
+
+        crops = extract_windshield_crops(cars, img, 600, 400)
+        assert len(crops) == 2
+        assert crops[0]["crop_index"] == 0
+        assert crops[1]["crop_index"] == 1
+
+    def test_empty_car_list(self) -> None:
+        """Empty car list returns empty crops."""
+        img = self._make_image()
+        crops = extract_windshield_crops([], img, 400, 400)
+        assert crops == []
+
+    def test_zero_area_car_skipped(self) -> None:
+        """Car with zero width/height is skipped."""
+        img = self._make_image(400, 400)
+        car = {"bbox": [100, 100, 100, 200], "confidence": 0.6, "class_id": 2}
+
+        crops = extract_windshield_crops([car], img, 400, 400)
+        assert len(crops) == 0
+
+
+class TestDetectSeatbeltViolations:
+    """Tests for seatbelt non-compliance (classifier-based)."""
+
+    def test_no_seatbelt_emits_violation(self) -> None:
+        """Classifier says no_seatbelt → violation emitted."""
+        det = {
+            "class_name": "no_seatbelt",
+            "confidence": 0.85,
+            "car_bbox": [100.0, 50.0, 250.0, 200.0],
+            "crop_bbox": [120.0, 50.0, 230.0, 110.0],
+            "crop_index": 0,
+            "car_confidence": 0.9,
+        }
+
+        violations = detect_seatbelt_violations([], [det], 400, 400)
+        assert len(violations) == 1
+        v = violations[0]
+        assert v["type"] == "no_seatbelt"
+        assert v["metadata"]["detection_method"] == "seatbelt_classifier"
+        assert v["metadata"]["raw_confidence"] == 0.85
+        assert v["metadata"]["car_confidence"] == 0.9
+        assert "crop_bbox" in v["metadata"]
+        # bbox should be car_bbox normalised
+        assert v["bbox"][0] == pytest.approx(100.0 / 400)
+        assert v["bbox"][2] == pytest.approx(250.0 / 400)
+
+    def test_with_seatbelt_no_violation(self) -> None:
+        """Classifier says with_seatbelt → no violation emitted."""
+        det = {
+            "class_name": "with_seatbelt",
+            "confidence": 0.9,
+            "car_bbox": [100.0, 50.0, 250.0, 200.0],
+            "crop_bbox": [120.0, 50.0, 230.0, 110.0],
+            "crop_index": 0,
+            "car_confidence": 0.85,
+        }
+
+        violations = detect_seatbelt_violations([], [det], 400, 400)
+        assert len(violations) == 0
+
+    def test_seat_belt_label_no_violation(self) -> None:
+        """Classifier says seat_belt → no violation emitted (positive label)."""
+        det = {
+            "class_name": "seat_belt",
+            "confidence": 0.88,
+            "car_bbox": [100.0, 50.0, 250.0, 200.0],
+            "crop_bbox": [120.0, 50.0, 230.0, 110.0],
+            "crop_index": 0,
+            "car_confidence": 0.9,
+        }
+
+        violations = detect_seatbelt_violations([], [det], 400, 400)
+        assert len(violations) == 0
+
+    def test_low_confidence_filtered(self) -> None:
+        """Low confidence no_seatbelt → filtered out (below min_confidence)."""
+        det = {
+            "class_name": "no_seatbelt",
+            "confidence": 0.15,
+            "car_bbox": [100.0, 50.0, 250.0, 200.0],
+            "crop_bbox": [120.0, 50.0, 230.0, 110.0],
+            "crop_index": 0,
+            "car_confidence": 0.8,
+        }
+
+        violations = detect_seatbelt_violations([], [det], 400, 400)
+        assert len(violations) == 0
+
+    def test_confidence_discount_applied(self) -> None:
+        """Raw confidence is discounted by config factor."""
+        det = {
+            "class_name": "no_seatbelt",
+            "confidence": 0.6,
+            "car_bbox": [100.0, 50.0, 250.0, 200.0],
+            "crop_bbox": [120.0, 50.0, 230.0, 110.0],
+            "crop_index": 0,
+            "car_confidence": 0.9,
+        }
+
+        violations = detect_seatbelt_violations([], [det], 400, 400)
+        assert len(violations) == 1
+        # 0.6 * 0.7 = 0.42
+        assert violations[0]["confidence"] == pytest.approx(0.42)
+        assert violations[0]["metadata"]["adjusted_confidence"] == pytest.approx(0.42)
+
+    def test_unknown_label_no_violation(self) -> None:
+        """Unknown class label → no violation emitted."""
+        det = {
+            "class_name": "something_else",
+            "confidence": 0.95,
+            "car_bbox": [100.0, 50.0, 250.0, 200.0],
+            "crop_bbox": [120.0, 50.0, 230.0, 110.0],
+            "crop_index": 0,
+            "car_confidence": 0.9,
+        }
+
+        violations = detect_seatbelt_violations([], [det], 400, 400)
+        assert len(violations) == 0
+
+    def test_review_recommended_below_threshold(self) -> None:
+        """Adjusted confidence below review threshold flags review_recommended."""
+        det = {
+            "class_name": "no_seatbelt",
+            "confidence": 0.5,
+            "car_bbox": [100.0, 50.0, 250.0, 200.0],
+            "crop_bbox": [120.0, 50.0, 230.0, 110.0],
+            "crop_index": 0,
+            "car_confidence": 0.9,
+        }
+
+        violations = detect_seatbelt_violations([], [det], 400, 400)
+        assert len(violations) == 1
+        # 0.5 * 0.7 = 0.35 < review_threshold 0.5 → True
+        assert violations[0]["metadata"]["review_recommended"] is True
+
+    def test_without_seatbelt_label_emits(self) -> None:
+        """Label 'without_seatbelt' is treated as negative → violation."""
+        det = {
+            "class_name": "without_seatbelt",
+            "confidence": 0.75,
+            "car_bbox": [100.0, 50.0, 250.0, 200.0],
+            "crop_bbox": [120.0, 50.0, 230.0, 110.0],
+            "crop_index": 0,
+            "car_confidence": 0.88,
+        }
 
         violations = detect_seatbelt_violations([], [det], 400, 400)
         assert len(violations) == 1
         assert violations[0]["type"] == "no_seatbelt"
-        assert violations[0]["confidence"] == pytest.approx(0.7 * 0.7)
 
-    def test_low_confidence_filtered(self) -> None:
-        det = {"bbox": [100, 50, 200, 150], "confidence": 0.2, "class_name": "no_seatbelt"}
-
-        violations = detect_seatbelt_violations([], [det], 400, 400)
-        assert len(violations) == 0
+    def test_empty_classifications(self) -> None:
+        """No classifications → no violations."""
+        violations = detect_seatbelt_violations([], [], 400, 400)
+        assert violations == []
 
 
 class TestDetectStopLineViolations:

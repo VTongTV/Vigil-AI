@@ -170,7 +170,7 @@ Image Upload
 Seatbelt detection from overhead CCTV is inherently challenging — the windshield creates glare, and the camera angle often obscures the shoulder/torso area. Our approach:
 
 1. **Detect car interior via windshield crop** — Use COCO car bbox → crop the upper portion (windshield region)
-2. **Run seatbelt classifier on crop** — Small YOLOv8n model trained on seatbelt dataset (Roboflow has several)
+2. **Run seatbelt classifier on crop** — YOLOv11s classification model (`RISEF/yolov11s-seatbelt`, 10.5 MB, classes: `no_seatbelt`/`seat_belt`)
 3. **Confidence discount** — Apply 0.7× multiplier because overhead angle reduces reliability
 4. **Auto-flag as "review recommended"** — UI shows seatbelt violations with a review badge
 5. **Improvement path** — Side-angle cameras yield dramatically better results; overhead accuracy improves with better image resolution
@@ -817,7 +817,7 @@ interface AuditEvent {
 }
 ```
 
-**Important**: `violation_type` uses `"no_helmet"` | `"triple_riding"` | `"wrong_side_driving"` | `"illegal_parking"` | `"license_plate_mismatch"`. These cover 4 of 7 violation types listed in the problem statement (seatbelt, red-light, and stop-line are cut because they require temporal/video reasoning).
+**Important**: `violation_type` uses `"no_helmet"` | `"triple_riding"` | `"wrong_side_driving"` | `"illegal_parking"` | `"no_seatbelt"` | `"stop_line_violation"` | `"red_light_violation"` | `"license_plate_mismatch"`. All 8 violation types are supported. Seatbelt uses a real YOLOv11s classifier (best-effort); red-light and stop-line are heuristic-based.
 
 ---
 

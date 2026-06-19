@@ -476,28 +476,114 @@ def detect_illegal_parking(
     return violations
 
 
-# --- Seatbelt Non-Compliance (Best-Effort) ---
+# --- Seatbelt Non-Compliance (Classifier-Based) ---
 
 
-def detect_seatbelt_violations(
+def extract_windshield_crops(
     car_boxes: list[dict],
-    seatbelt_detections: list[dict],
+    image: np.ndarray,
     img_w: int,
     img_h: int,
 ) -> list[dict]:
-    """Detect seatbelt non-compliance from windshield crop analysis.
+    """Extract windshield/driver crops from car detections for seatbelt classification.
 
-    Best-effort detection: overhead cameras have limited visibility
-    of seatbelt area. Confidence is discounted by 0.7×.
+    For each car bbox, extracts the top portion (windshield area) by taking
+    the top ``windshield_crop_ratio_top`` fraction of the car height and
+    the central ``windshield_crop_ratio_side`` fraction of the car width.
+    Crops are clamped to image bounds and crops smaller than
+    ``min_crop_size`` in either dimension are skipped.
 
     Args:
-        car_boxes: COCO car detections.
-        seatbelt_detections: Seatbelt model detections (from windshield crops).
+        car_boxes: COCO car detections with 'bbox' [x1,y1,x2,y2] pixel coords
+            and 'confidence'.
+        image: BGR image (HWC, uint8) to crop from.
         img_w: Image width in pixels.
         img_h: Image height in pixels.
 
     Returns:
-        List of violation dicts.
+        List of dicts with keys: crop (np.ndarray BGR), car_bbox (pixel),
+        crop_bbox (pixel), crop_index, car_confidence.
+    """
+    cfg = get_violation_config("seatbelt")
+    crop_ratio_top = cfg.get("windshield_crop_ratio_top", 0.4)
+    crop_ratio_side = cfg.get("windshield_crop_ratio_side", 0.7)
+    min_crop_size = cfg.get("min_crop_size", 32)
+
+    crops: list[dict] = []
+
+    for idx, car in enumerate(car_boxes):
+        bbox = car["bbox"]  # [x1, y1, x2, y2] pixel coords
+        x1, y1, x2, y2 = bbox
+
+        car_w = x2 - x1
+        car_h = y2 - y1
+
+        if car_w <= 0 or car_h <= 0:
+            continue
+
+        # Windshield region: top portion of car bbox
+        crop_y1 = int(round(y1))
+        crop_y2 = int(round(y1 + car_h * crop_ratio_top))
+
+        # Center-width inset: keep the middle crop_ratio_side fraction
+        side_inset = car_w * (1.0 - crop_ratio_side) / 2.0
+        crop_x1 = int(round(x1 + side_inset))
+        crop_x2 = int(round(x2 - side_inset))
+
+        # Clamp to image bounds
+        crop_x1 = max(0, crop_x1)
+        crop_y1 = max(0, crop_y1)
+        crop_x2 = min(img_w, crop_x2)
+        crop_y2 = min(img_h, crop_y2)
+
+        crop_w = crop_x2 - crop_x1
+        crop_h = crop_y2 - crop_y1
+
+        if crop_w < min_crop_size or crop_h < min_crop_size:
+            logger.debug(
+                "Skipping tiny seatbelt crop %dx%d for car %d",
+                crop_w, crop_h, idx,
+            )
+            continue
+
+        crop_img = image[crop_y1:crop_y2, crop_x1:crop_x2].copy()
+
+        crops.append({
+            "crop": crop_img,
+            "car_bbox": [float(x1), float(y1), float(x2), float(y2)],
+            "crop_bbox": [float(crop_x1), float(crop_y1),
+                          float(crop_x2), float(crop_y2)],
+            "crop_index": idx,
+            "car_confidence": car["confidence"],
+        })
+
+    return crops
+
+
+def detect_seatbelt_violations(
+    car_boxes: list[dict],
+    seatbelt_classifications: list[dict],
+    img_w: int,
+    img_h: int,
+) -> list[dict]:
+    """Detect seatbelt non-compliance from classifier results.
+
+    Only emits ``no_seatbelt`` violations for real negative class labels
+    from the classifier (e.g. ``no_seatbelt``).  Positive labels such as
+    ``with_seatbelt`` or ``seat_belt`` are never emitted.  Low-confidence
+    results (after applying the configured discount) are also filtered out.
+
+    Args:
+        car_boxes: COCO car detections (used for context; car_bbox is
+            embedded in each classification dict).
+        seatbelt_classifications: Classification results – list of dicts
+            with keys: class_name, confidence, car_bbox, crop_bbox,
+            crop_index, car_confidence.
+        img_w: Image width in pixels.
+        img_h: Image height in pixels.
+
+    Returns:
+        List of violation dicts with type, bbox, confidence, metadata.
     """
     cfg = get_violation_config("seatbelt")
     if not cfg.get("enabled", True):
@@ -505,30 +591,55 @@ def detect_seatbelt_violations(
 
     confidence_discount = cfg.get("confidence_discount", 0.70)
     min_confidence = cfg.get("min_confidence", 0.30)
+    review_threshold = cfg.get("review_threshold", 0.50)
 
-    violations = []
+    # Known negative class labels (normalised: lowercase, underscores)
+    _NEGATIVE_LABELS = frozenset({
+        "no_seatbelt", "without_seatbelt", "no seatbelt", "without seatbelt",
+        "no_belt", "nobelt",
+    })
 
-    for det in seatbelt_detections:
-        class_name = det.get("class_name", "").lower()
-        raw_conf = det["confidence"]
+    violations: list[dict] = []
+
+    for det in seatbelt_classifications:
+        raw_class = det.get("class_name", "")
+        class_name_norm = raw_class.lower().replace("-", "_").replace(" ", "_")
+        raw_conf: float = det["confidence"]
         adjusted_conf = raw_conf * confidence_discount
 
+        # Filter: low confidence after discount
         if adjusted_conf < min_confidence:
             continue
 
-        if "without" in class_name or "no_seatbelt" in class_name:
-            bbox = det["bbox"]
-            violations.append({
-                "type": "no_seatbelt",
-                "bbox": [bbox[0] / img_w, bbox[1] / img_h,
-                         bbox[2] / img_w, bbox[3] / img_h],
-                "confidence": adjusted_conf,
-                "metadata": {
-                    "detection_method": "best_effort",
-                    "raw_confidence": raw_conf,
-                    "review_recommended": adjusted_conf < cfg.get("review_threshold", 0.50),
-                },
-            })
+        # Filter: only emit for real negative labels
+        if class_name_norm not in _NEGATIVE_LABELS:
+            continue
+
+        car_bbox = det["car_bbox"]
+        crop_bbox = det["crop_bbox"]
+        car_conf: float = det.get("car_confidence", 0.0)
+
+        violations.append({
+            "type": "no_seatbelt",
+            "bbox": [
+                car_bbox[0] / img_w, car_bbox[1] / img_h,
+                car_bbox[2] / img_w, car_bbox[3] / img_h,
+            ],
+            "confidence": adjusted_conf,
+            "metadata": {
+                "detection_method": "seatbelt_classifier",
+                "raw_confidence": raw_conf,
+                "adjusted_confidence": adjusted_conf,
+                "crop_bbox": [
+                    crop_bbox[0] / img_w, crop_bbox[1] / img_h,
+                    crop_bbox[2] / img_w, crop_bbox[3] / img_h,
+                ],
+                "car_confidence": car_conf,
+                "review_recommended": adjusted_conf < review_threshold,
+                "crop_index": det.get("crop_index", 0),
+                "class_name": raw_class,
+            },
+        })
 
     return violations
 

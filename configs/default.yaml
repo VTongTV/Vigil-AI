@@ -1,36 +1,47 @@
-# VigilAI — Default Configuration
-# All tunable parameters live here. No magic numbers in code.
-
 models:
   coco:
-    path: "weights/yolov8n.pt"
-    device: "cuda"
+    path: weights/yolov8n.pt
+    device: cuda
     conf_threshold: 0.25
     iou_threshold: 0.45
     resident: true
-    classes: [0, 1, 2, 3, 5]  # person, bicycle, car, motorcycle, bus
-
+    classes:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 5
   helmet:
-    path: "weights/helmet.pt"
-    device: "cuda"
+    path: weights/helmet.pt
+    device: cuda
     conf_threshold: 0.15
     iou_threshold: 0.45
     resident: true
-    classes: ["helmet", "no_helmet"]
-
+    classes:
+    - helmet
+    - no_helmet
   plate:
-    path: "weights/plate.pt"
-    device: "cuda"
+    path: weights/plate.pt
+    device: cuda
     conf_threshold: 0.25
     iou_threshold: 0.45
-    resident: false  # On-demand: load → infer → unload
-    classes: ["license_plate"]
-
+    resident: false
+    classes:
+    - license_plate
+  seatbelt:
+    path: weights/seatbelt.pt
+    device: cuda
+    resident: false
+    classes:
+    - no_seatbelt
+    - seat_belt
 preprocessing:
   clahe:
     enabled: true
     clip_limit: 2.0
-    tile_grid_size: [8, 8]
+    tile_grid_size:
+    - 8
+    - 8
   denoise:
     enabled: true
     h: 10
@@ -39,106 +50,197 @@ preprocessing:
   gamma:
     enabled: true
     value: 1.2
-
 violations:
   helmet:
-    head_fraction: 0.30
+    head_fraction: 0.3
     iou_threshold: 0.3
   triple_riding:
     max_riders: 2
     horizontal_center_threshold: 0.15
-    vertical_overlap_threshold: 0.30
+    vertical_overlap_threshold: 0.3
     person_iou_threshold: 0.15
   wrong_side:
     enabled: true
-    lane_polygons: []
-    direction: "left_to_right"
+    lane_polygons:
+    - id: ws_bannerghatta
+      camera_id: BANNERGHATTA-01
+      polygon:
+      - - 0.0
+        - 0.0
+      - - 1.0
+        - 0.0
+      - - 1.0
+        - 1.0
+      - - 0.0
+        - 1.0
+    - id: ws_electronic
+      camera_id: ELECTRONIC-01
+      polygon:
+      - - 0.0
+        - 0.0
+      - - 1.0
+        - 0.0
+      - - 1.0
+        - 1.0
+      - - 0.0
+        - 1.0
+    - id: ws_yelahanka
+      camera_id: YELAHANKA-01
+      polygon:
+      - - 0.0
+        - 0.0
+      - - 1.0
+        - 0.0
+      - - 1.0
+        - 1.0
+      - - 0.0
+        - 1.0
+    direction: left_to_right
   illegal_parking:
     enabled: true
-    zone_polygons: []
+    zone_polygons:
+    - id: park_kormangala
+      camera_id: KORMANGALA-01
+      name: No Parking
+      polygon:
+      - - 0.0
+        - 0.0
+      - - 1.0
+        - 0.0
+      - - 1.0
+        - 1.0
+      - - 0.0
+        - 1.0
+    - id: park_mgroad
+      camera_id: MGROAD-01
+      name: No Parking
+      polygon:
+      - - 0.0
+        - 0.0
+      - - 1.0
+        - 0.0
+      - - 1.0
+        - 1.0
+      - - 0.0
+        - 1.0
+    - id: park_silkboard
+      camera_id: SILKBOARD-01
+      name: No Parking
+      polygon:
+      - - 0.0
+        - 0.0
+      - - 1.0
+        - 0.0
+      - - 1.0
+        - 1.0
+      - - 0.0
+        - 1.0
     min_confidence: 0.5
   seatbelt:
     enabled: true
-    windshield_crop_ratio: 0.40
-    confidence_discount: 0.70
-    min_confidence: 0.30
-    review_threshold: 0.50
+    windshield_crop_ratio_top: 0.4
+    windshield_crop_ratio_side: 0.7
+    min_crop_size: 32
+    confidence_discount: 0.7
+    min_confidence: 0.3
+    review_threshold: 0.5
   stop_line:
     enabled: true
-    stop_line_zones: []
+    stop_line_zones:
+    - id: stop_electronic
+      camera_id: ELECTRONIC-01
+      polygon:
+      - - 0.0
+        - 0.0
+      - - 1.0
+        - 0.0
+      - - 1.0
+        - 1.0
+      - - 0.0
+        - 1.0
+    - id: stop_krpuram
+      camera_id: KRPURAM-01
+      polygon:
+      - - 0.0
+        - 0.0
+      - - 1.0
+        - 0.0
+      - - 1.0
+        - 1.0
+      - - 0.0
+        - 1.0
     min_confidence: 0.3
     confidence_discount: 0.75
   red_light:
     enabled: true
-    # Shares stop_line_zones with stop_line violations
-    signal_state: "unknown"  # "red" | "green" | "unknown" — set by operator
-    confidence_discount: 0.80
-
+    signal_state: unknown
+    confidence_discount: 0.8
 ocr:
-  engine: "rapidocr"
+  engine: rapidocr
   thread_count: 4
-  # Indian plate regex: KA01AB1234 or KA01AB123
-  plate_regex: "^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{3,4}$"
+  plate_regex: ^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{3,4}$
   min_confidence: 0.5
-
 evidence:
-  output_dir: "outputs/evidence"
-  bbox_color: [0, 0, 255]      # Red BGR
-  text_color: [255, 255, 255]  # White BGR
+  output_dir: outputs/evidence
+  bbox_color:
+  - 0
+  - 0
+  - 255
+  text_color:
+  - 255
+  - 255
+  - 255
   bbox_thickness: 2
   font_scale: 0.6
   include_hash: true
-
 api:
-  host: "0.0.0.0"
+  host: 0.0.0.0
   port: 8000
   max_image_size_mb: 10
-  cors_origins: ["http://localhost:5173"]
-
+  cors_origins:
+  - http://localhost:5173
 database:
-  path: "outputs/vigilai.db"
-
+  path: outputs/vigilai.db
 demo:
   mode: false
-  # Camera locations for demo data (Bengaluru junctions)
   cameras:
-    - id: "MGROAD-01"
-      name: "MG Road - Trinity Circle"
-      lat: 12.9758
-      lng: 77.6045
-    - id: "SILKBOARD-01"
-      name: "Silk Board Junction"
-      lat: 12.9177
-      lng: 77.6238
-    - id: "HEBBAL-01"
-      name: "Hebbal Flyover"
-      lat: 13.0358
-      lng: 77.5970
-    - id: "WHITEFIELD-01"
-      name: "Whitefield Main Road"
-      lat: 12.9698
-      lng: 77.7500
-    - id: "ELECTRONIC-01"
-      name: "Electronic City Phase 1"
-      lat: 12.8456
-      lng: 77.6603
-    - id: "MARATHAHALLI-01"
-      name: "Marathahalli Bridge"
-      lat: 12.9591
-      lng: 77.6974
-    - id: "KRPURAM-01"
-      name: "KR Puram Railway Junction"
-      lat: 12.9970
-      lng: 77.6844
-    - id: "YELAHANKA-01"
-      name: "Yelahanka New Town"
-      lat: 13.1007
-      lng: 77.5963
-    - id: "BANNERGHATTA-01"
-      name: "Bannerghatta Road - Jayadeva"
-      lat: 12.9135
-      lng: 77.5985
-    - id: "KORMANGALA-01"
-      name: "Koramangala 100ft Road"
-      lat: 12.9352
-      lng: 77.6245
+  - id: MGROAD-01
+    name: MG Road - Trinity Circle
+    lat: 12.9758
+    lng: 77.6045
+  - id: SILKBOARD-01
+    name: Silk Board Junction
+    lat: 12.9177
+    lng: 77.6238
+  - id: HEBBAL-01
+    name: Hebbal Flyover
+    lat: 13.0358
+    lng: 77.597
+  - id: WHITEFIELD-01
+    name: Whitefield Main Road
+    lat: 12.9698
+    lng: 77.75
+  - id: ELECTRONIC-01
+    name: Electronic City Phase 1
+    lat: 12.8456
+    lng: 77.6603
+  - id: MARATHAHALLI-01
+    name: Marathahalli Bridge
+    lat: 12.9591
+    lng: 77.6974
+  - id: KRPURAM-01
+    name: KR Puram Railway Junction
+    lat: 12.997
+    lng: 77.6844
+  - id: YELAHANKA-01
+    name: Yelahanka New Town
+    lat: 13.1007
+    lng: 77.5963
+  - id: BANNERGHATTA-01
+    name: Bannerghatta Road - Jayadeva
+    lat: 12.9135
+    lng: 77.5985
+  - id: KORMANGALA-01
+    name: Koramangala 100ft Road
+    lat: 12.9352
+    lng: 77.6245

@@ -4,9 +4,11 @@ Manages three YOLOv8n models:
     - COCO model: always resident on GPU
     - Helmet model: always resident on GPU
     - Plate model: on-demand load → infer → unload
+    - Seatbelt classifier: on-demand load → classify → unload
 
 VRAM budget: COCO + Helmet resident (~1.5 GB with context),
-plate on-demand (~300 MB peak), leaving ~2.2 GB headroom.
+plate on-demand (~300 MB peak), seatbelt on-demand (~200 MB peak),
+leaving ~1.7 GB headroom.
 """
 
 import gc
@@ -262,6 +264,67 @@ class ModelManager:
             plate_model.unload()
 
         return detections
+
+    def classify_seatbelt_on_demand(
+        self,
+        crops: list[np.ndarray],
+    ) -> list[dict]:
+        """Run seatbelt classification on windshield crops. On-demand load/unload.
+
+        Loads the seatbelt classifier, runs classification on each crop,
+        then unloads to free VRAM. Uses Ultralytics classification output
+        probabilities (probs.top1, probs.top1conf).
+
+        Args:
+            crops: List of cropped windshield images (BGR, uint8).
+
+        Returns:
+            List of classification dicts with keys:
+                class_name: Predicted class label.
+                confidence: Top-1 classification probability.
+        """
+        if not crops:
+            return []
+
+        cfg = get_model_config("seatbelt")
+        seatbelt_path = settings.weights_dir / Path(cfg["path"]).name
+
+        seatbelt_model = DetectionModel(
+            seatbelt_path, device=cfg.get("device", "cuda")
+        )
+        seatbelt_model.load()
+
+        try:
+            results: list[dict] = []
+            for crop_img in crops:
+                predict_results = seatbelt_model.model.predict(
+                    crop_img, verbose=False, device=seatbelt_model.device,
+                )
+                if predict_results and len(predict_results) > 0:
+                    pred = predict_results[0]
+                    probs = pred.probs
+                    if probs is not None:
+                        class_id = int(probs.top1)
+                        class_name = pred.names.get(class_id, f"class_{class_id}")
+                        confidence = float(probs.top1conf)
+                        results.append({
+                            "class_name": class_name,
+                            "confidence": confidence,
+                        })
+                    else:
+                        results.append({
+                            "class_name": "unknown",
+                            "confidence": 0.0,
+                        })
+                else:
+                    results.append({
+                        "class_name": "unknown",
+                        "confidence": 0.0,
+                    })
+        finally:
+            seatbelt_model.unload()
+
+        return results
 
     def is_ready(self) -> bool:
         """Check if resident models are loaded and ready."""
