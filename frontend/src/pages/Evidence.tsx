@@ -10,6 +10,8 @@
  * - FIR PDF download button
  * - Print button triggers browser dialog
  * - Clean metadata grid with labeled rows
+ * - Framer Motion: page entrance, animated selection indicator via layoutId,
+ *   staggered violation list, AnimatePresence on evidence panel
  */
 
 import { useState } from "react";
@@ -24,6 +26,7 @@ import {
   AlertCircle,
   Loader2,
 } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion, type Variants } from "framer-motion";
 import { useAppStore } from "@/lib/store";
 import type { ViolationRecord } from "@/types/violation";
 import {
@@ -46,6 +49,7 @@ export default function Evidence() {
   const [copiedHash, setCopiedHash] = useState(false);
   const [firLoading, setFirLoading] = useState(false);
   const [firError, setFirError] = useState<string | null>(null);
+  const prefersReduced = useReducedMotion();
 
   const violations = lastDetection ?? [];
 
@@ -90,8 +94,31 @@ export default function Evidence() {
   /** Determine integrity status from evidence hash. */
   const hashPresent = !!selectedViolation?.evidence_hash;
 
+  /** Stagger variants for violation list. */
+  const listContainer: Variants = {
+    hidden: {},
+    visible: prefersReduced
+      ? {}
+      : { transition: { staggerChildren: 0.06 } },
+  };
+  const listItem: Variants = {
+    hidden: prefersReduced ? {} : { opacity: 0, x: -8 },
+    visible: prefersReduced
+      ? {}
+      : {
+          opacity: 1,
+          x: 0,
+          transition: { type: "spring", stiffness: 300, damping: 26 },
+        },
+  };
+
   return (
-    <div className="p-5">
+    <motion.div
+      className="p-5"
+      initial={prefersReduced ? {} : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+    >
       <header className="mb-5">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent-soft)] ring-1 ring-[var(--color-accent)]/15">
@@ -127,225 +154,300 @@ export default function Evidence() {
               </CardContent>
             </Card>
           ) : (
-            violations.map((v) => (
-              <button
-                key={v.id}
-                onClick={() => {
-                  setSelectedViolation(v);
-                  setViewingId(v.id);
-                }}
-                className={cn(
-                  "w-full rounded-md border p-2.5 text-left transition-all duration-200",
-                  viewingId === v.id
-                    ? "border-[var(--color-accent)]/30 bg-[var(--color-accent-soft)] ring-1 ring-[var(--color-accent)]/20"
-                    : "border-[var(--rule-color)] bg-[var(--color-paper-1)] hover:bg-[var(--color-paper-2)]",
-                )}
-              >
-                <ViolationSummary violation={v} />
-              </button>
-            ))
+            <motion.div
+              className="space-y-2"
+              variants={listContainer}
+              initial="hidden"
+              animate="visible"
+            >
+              {violations.map((v) => (
+                <motion.div key={v.id} variants={listItem}>
+                  <button
+                    onClick={() => {
+                      setSelectedViolation(v);
+                      setViewingId(v.id);
+                    }}
+                    className={cn(
+                      "relative w-full rounded-md border p-2.5 text-left transition-colors duration-150",
+                      viewingId === v.id
+                        ? "border-[var(--color-accent)]/30 text-[var(--color-ink)]"
+                        : "border-[var(--rule-color)] bg-[var(--color-paper-1)] hover:bg-[var(--color-paper-2)]",
+                    )}
+                  >
+                    {/* Animated selection background — slides via layoutId */}
+                    {viewingId === v.id && (
+                      <motion.span
+                        layoutId="evidence-selection"
+                        className="absolute inset-0 rounded-md bg-[var(--color-accent-soft)] ring-1 ring-[var(--color-accent)]/20"
+                        transition={
+                          prefersReduced
+                            ? { duration: 0 }
+                            : { type: "spring", stiffness: 400, damping: 32 }
+                        }
+                      />
+                    )}
+                    <span className="relative z-10">
+                      <ViolationSummary violation={v} />
+                    </span>
+                  </button>
+                </motion.div>
+              ))}
+            </motion.div>
           )}
         </div>
 
         {/* Evidence image + metadata — 3 cols */}
         <div className="lg:col-span-3">
-          {selectedViolation?.evidence_url ? (
-            <div className="space-y-4">
-              {/* Annotated evidence image */}
-              <Card className="overflow-hidden border-[var(--rule-color)] bg-[var(--color-paper-1)]">
-                <CardContent className="p-2">
-                  <AnnotatedViewer
-                    imageUrl={`http://localhost:8000${selectedViolation.evidence_url}`}
-                    violations={[selectedViolation]}
-                    alt={`Evidence for ${selectedViolation.id}`}
-                  />
-                </CardContent>
-              </Card>
+          <AnimatePresence mode="wait">
+            {selectedViolation?.evidence_url ? (
+              <motion.div
+                key={selectedViolation.id}
+                initial={prefersReduced ? {} : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="space-y-4"
+              >
+                {/* Annotated evidence image */}
+                <Card className="overflow-hidden border-[var(--rule-color)] bg-[var(--color-paper-1)]">
+                  <CardContent className="p-2">
+                    <AnnotatedViewer
+                      imageUrl={`http://localhost:8000${selectedViolation.evidence_url}`}
+                      violations={[selectedViolation]}
+                      alt={`Evidence for ${selectedViolation.id}`}
+                    />
+                  </CardContent>
+                </Card>
 
-              {/* Chain of Custody metadata */}
-              <Card className="border-[var(--rule-color)] bg-[var(--color-paper-1)]">
-                <CardContent className="p-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    <h3 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                      <Shield className="h-3 w-3" />
-                      Chain of Custody
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      {/* FIR PDF Download Button (F2) */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className={cn(
-                          "h-6 border-[var(--color-accent)]/30 bg-[var(--color-accent)]/5 text-[11px] text-[var(--color-accent)] hover:bg-[var(--color-accent)]/15 hover:text-[var(--color-accent-bright)]",
-                          firLoading && "opacity-60 cursor-wait",
-                        )}
-                        onClick={handleFirDownload}
-                        disabled={firLoading}
-                      >
-                        {firLoading ? (
-                          <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />
-                        ) : (
-                          <FileDown className="mr-1.5 h-3 w-3" />
-                        )}
-                        {firLoading ? "Generating..." : "FIR PDF"}
-                      </Button>
-                      {/* Print Button */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-6 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50 text-[11px] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
-                        onClick={handlePrint}
-                      >
-                        <Printer className="mr-1.5 h-3 w-3" />
-                        Print Evidence
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* FIR error message */}
-                  {firError && (
-                    <div className="mb-3 flex items-center gap-2 rounded-md bg-[var(--color-danger)]/10 px-3 py-2">
-                      <AlertCircle className="h-3.5 w-3.5 shrink-0 text-[var(--color-danger)]" />
-                      <span className="text-[11px] text-[var(--color-danger)]">{firError}</span>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-2.5">
-                    {/* Integrity Badge (F1) — verified or missing */}
-                    <MetaRow
-                      label="Integrity"
-                      value={
-                        <div className="flex items-center gap-1.5">
-                          {hashPresent ? (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-success-soft)] px-2 py-0.5 ring-1 ring-[var(--color-success)]/20">
-                              <IntegrityShield className="h-3 w-3 text-[var(--color-success)]" />
-                              <span className="text-[11px] font-medium text-[var(--color-success)]">
-                                Verified
-                              </span>
-                            </span>
+                {/* Chain of Custody metadata */}
+                <Card className="border-[var(--rule-color)] bg-[var(--color-paper-1)]">
+                  <CardContent className="p-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <h3 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                        <Shield className="h-3 w-3" />
+                        Chain of Custody
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        {/* FIR PDF Download Button */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className={cn(
+                            "h-6 border-[var(--color-accent)]/30 bg-[var(--color-accent)]/5 text-[11px] text-[var(--color-accent)] hover:bg-[var(--color-accent)]/15 hover:text-[var(--color-accent-bright)]",
+                            firLoading && "opacity-60 cursor-wait",
+                          )}
+                          onClick={handleFirDownload}
+                          disabled={firLoading}
+                        >
+                          {firLoading ? (
+                            <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />
                           ) : (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-warning-soft)] px-2 py-0.5 ring-1 ring-[var(--color-warning)]/20">
-                              <AlertCircle className="h-3 w-3 text-[var(--color-warning)]" />
-                              <span className="text-[11px] font-medium text-[var(--color-warning)]">
-                                No Hash
-                              </span>
-                            </span>
+                            <FileDown className="mr-1.5 h-3 w-3" />
                           )}
-                        </div>
-                      }
-                    />
-                    <MetaRow
-                      label="Evidence Hash"
-                      value={
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-mono text-[11px] text-[var(--color-accent)]">
-                            {selectedViolation.evidence_hash
-                              ? `${selectedViolation.evidence_hash.slice(0, 16)}…`
-                              : "—"}
-                          </span>
-                          {selectedViolation.evidence_hash && (
-                            <button
-                              onClick={() => copyHash(selectedViolation.evidence_hash!)}
-                              className="text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] transition-colors"
-                              title="Copy full hash"
-                            >
-                              {copiedHash ? (
-                                <Check className="h-3 w-3 text-[var(--color-success)]" />
-                              ) : (
-                                <Copy className="h-3 w-3" />
-                              )}
-                            </button>
-                          )}
-                        </div>
-                      }
-                    />
-                    <MetaRow
-                      label="Violation ID"
-                      value={
-                        <span className="font-mono text-[11px] text-[var(--color-ink)]">
-                          {selectedViolation.id}
-                        </span>
-                      }
-                    />
-                    <MetaRow
-                      label="Timestamp"
-                      value={
-                        <span className="font-mono text-[11px] text-[var(--color-ink)]">
-                          {new Date(selectedViolation.timestamp).toLocaleString("en-IN")}
-                        </span>
-                      }
-                    />
-                    <MetaRow
-                      label="Camera"
-                      value={
-                        <span className="text-[11px] text-[var(--color-ink)]">
-                          {selectedViolation.camera_id ?? "N/A"}
-                        </span>
-                      }
-                    />
-                    <MetaRow
-                      label="Junction"
-                      value={
-                        <span className="text-[11px] text-[var(--color-ink)]">
-                          {selectedViolation.junction_name ?? "N/A"}
-                        </span>
-                      }
-                    />
-                    <MetaRow
-                      label="Danger Score"
-                      value={
-                        <span className={cn(
-                          "inline-flex items-center gap-1 font-mono text-[11px] font-semibold",
-                          selectedViolation.danger_score >= 80
-                            ? "text-[var(--color-danger)]"
-                            : selectedViolation.danger_score >= 40
-                              ? "text-[var(--color-warning)]"
-                              : "text-[var(--color-success)]",
-                        )}>
-                          <DangerGauge size={14} value={selectedViolation.danger_score} />
-                          {selectedViolation.danger_score}/100
-                        </span>
-                      }
-                    />
-                    <MetaRow
-                      label="Fine Amount"
-                      value={
-                        <span className="font-medium text-[var(--color-warning)]">
-                          ₹{selectedViolation.fine_amount.toLocaleString("en-IN")}
-                        </span>
-                      }
-                    />
-                  </div>
-
-                  {/* AI Explanation */}
-                  {selectedViolation.ai_explanation && (
-                    <div className="mt-3 rounded-md border border-[var(--color-accent)]/15 bg-[var(--color-accent-soft)] p-2.5">
-                      <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
-                        AI Explanation
-                      </p>
-                      <p className="text-[11px] leading-relaxed text-[var(--color-ink-muted)]">
-                        {selectedViolation.ai_explanation}
-                      </p>
+                          {firLoading ? "Generating..." : "FIR PDF"}
+                        </Button>
+                        {/* Print Button */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-6 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50 text-[11px] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
+                          onClick={handlePrint}
+                        >
+                          <Printer className="mr-1.5 h-3 w-3" />
+                          Print Evidence
+                        </Button>
+                      </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          ) : (
-            <Card className="flex h-80 items-center justify-center border-[var(--rule-color)] bg-[var(--color-paper-1)]">
-              <div className="text-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-paper-2)]">
-                  <ZoomIn className="h-5 w-5 text-[var(--color-ink-faint)]" />
-                </div>
-                <p className="text-sm text-[var(--color-ink-muted)]">
-                  Select a violation to view evidence
-                </p>
-              </div>
-            </Card>
-          )}
+
+                    {/* FIR error message */}
+                    <AnimatePresence>
+                      {firError && (
+                        <motion.div
+                          key="fir-error"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="mb-3 flex items-center gap-2 rounded-md bg-[var(--color-danger)]/10 px-3 py-2"
+                        >
+                          <AlertCircle className="h-3.5 w-3.5 shrink-0 text-[var(--color-danger)]" />
+                          <span className="text-[11px] text-[var(--color-danger)]">{firError}</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-2.5">
+                      {/* Integrity Badge — verified or missing */}
+                      <MetaRow
+                        label="Integrity"
+                        value={
+                          <div className="flex items-center gap-1.5">
+                            {hashPresent ? (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-success-soft)] px-2 py-0.5 ring-1 ring-[var(--color-success)]/20">
+                                <IntegrityShield className="h-3 w-3 text-[var(--color-success)]" />
+                                <span className="text-[11px] font-medium text-[var(--color-success)]">
+                                  Verified
+                                </span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-warning-soft)] px-2 py-0.5 ring-1 ring-[var(--color-warning)]/20">
+                                <AlertCircle className="h-3 w-3 text-[var(--color-warning)]" />
+                                <span className="text-[11px] font-medium text-[var(--color-warning)]">
+                                  No Hash
+                                </span>
+                              </span>
+                            )}
+                          </div>
+                        }
+                      />
+                      <MetaRow
+                        label="Evidence Hash"
+                        value={
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-[11px] text-[var(--color-accent)]">
+                              {selectedViolation.evidence_hash
+                                ? `${selectedViolation.evidence_hash.slice(0, 16)}…`
+                                : "—"}
+                            </span>
+                            {selectedViolation.evidence_hash && (
+                              <motion.button
+                                whileTap={prefersReduced ? {} : { scale: 0.85 }}
+                                onClick={() => copyHash(selectedViolation.evidence_hash!)}
+                                className="text-[var(--color-ink-faint)] hover:text-[var(--color-ink)] transition-colors"
+                                title="Copy full hash"
+                              >
+                                <AnimatePresence mode="wait">
+                                  {copiedHash ? (
+                                    <motion.span
+                                      key="check"
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
+                                      exit={{ scale: 0 }}
+                                      transition={{ duration: 0.15 }}
+                                    >
+                                      <Check className="h-3 w-3 text-[var(--color-success)]" />
+                                    </motion.span>
+                                  ) : (
+                                    <motion.span
+                                      key="copy"
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
+                                      exit={{ scale: 0 }}
+                                      transition={{ duration: 0.15 }}
+                                    >
+                                      <Copy className="h-3 w-3" />
+                                    </motion.span>
+                                  )}
+                                </AnimatePresence>
+                              </motion.button>
+                            )}
+                          </div>
+                        }
+                      />
+                      <MetaRow
+                        label="Violation ID"
+                        value={
+                          <span className="font-mono text-[11px] text-[var(--color-ink)]">
+                            {selectedViolation.id}
+                          </span>
+                        }
+                      />
+                      <MetaRow
+                        label="Timestamp"
+                        value={
+                          <span className="font-mono text-[11px] text-[var(--color-ink)]">
+                            {new Date(selectedViolation.timestamp).toLocaleString("en-IN")}
+                          </span>
+                        }
+                      />
+                      <MetaRow
+                        label="Camera"
+                        value={
+                          <span className="text-[11px] text-[var(--color-ink)]">
+                            {selectedViolation.camera_id ?? "N/A"}
+                          </span>
+                        }
+                      />
+                      <MetaRow
+                        label="Junction"
+                        value={
+                          <span className="text-[11px] text-[var(--color-ink)]">
+                            {selectedViolation.junction_name ?? "N/A"}
+                          </span>
+                        }
+                      />
+                      <MetaRow
+                        label="Danger Score"
+                        value={
+                          <span className={cn(
+                            "inline-flex items-center gap-1 font-mono text-[11px] font-semibold",
+                            selectedViolation.danger_score >= 80
+                              ? "text-[var(--color-danger)]"
+                              : selectedViolation.danger_score >= 40
+                                ? "text-[var(--color-warning)]"
+                                : "text-[var(--color-success)]",
+                          )}>
+                            <DangerGauge size={14} value={selectedViolation.danger_score} />
+                            {selectedViolation.danger_score}/100
+                          </span>
+                        }
+                      />
+                      <MetaRow
+                        label="Fine Amount"
+                        value={
+                          <span className="font-medium text-[var(--color-warning)]">
+                            ₹{selectedViolation.fine_amount.toLocaleString("en-IN")}
+                          </span>
+                        }
+                      />
+                    </div>
+
+                    {/* AI Explanation */}
+                    <AnimatePresence>
+                      {selectedViolation.ai_explanation && (
+                        <motion.div
+                          key="ai-explanation"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.25 }}
+                          className="mt-3 rounded-md border border-[var(--color-accent)]/15 bg-[var(--color-accent-soft)] p-2.5"
+                        >
+                          <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
+                            AI Explanation
+                          </p>
+                          <p className="text-[11px] leading-relaxed text-[var(--color-ink-muted)]">
+                            {selectedViolation.ai_explanation}
+                          </p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="empty-state"
+                initial={prefersReduced ? {} : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Card className="flex h-80 items-center justify-center border-[var(--rule-color)] bg-[var(--color-paper-1)]">
+                  <div className="text-center">
+                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-paper-2)]">
+                      <ZoomIn className="h-5 w-5 text-[var(--color-ink-faint)]" />
+                    </div>
+                    <p className="text-sm text-[var(--color-ink-muted)]">
+                      Select a violation to view evidence
+                    </p>
+                  </div>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

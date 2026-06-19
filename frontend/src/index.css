@@ -363,17 +363,31 @@ code, pre, .font-mono {
 /* ── Animated SVG icons ── */
 
 @keyframes vigil-logo-pulse {
-  0%, 100% { opacity: 0.15; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(1.05); }
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+@keyframes vigil-logo-ring-pulse {
+  0%, 100% { opacity: var(--ring-base-opacity, 0.4); transform: scale(1); }
+  50% { opacity: calc(var(--ring-base-opacity, 0.4) * 1.6); transform: scale(1.04); }
 }
 
 .vigil-logo-ring {
-  animation: vigil-logo-pulse 3s ease-in-out infinite;
+  animation: vigil-logo-ring-pulse 3s ease-in-out infinite;
   transform-origin: center;
 }
-.vigil-logo-ring:nth-child(2) { animation-delay: 0s; }
-.vigil-logo-ring:nth-child(3) { animation-delay: 0.4s; }
-.vigil-logo-ring:nth-child(4) { animation-delay: 0.8s; }
+.vigil-logo-ring:nth-child(3) { animation-delay: 0s; --ring-base-opacity: 0.2; }
+.vigil-logo-ring:nth-child(4) { animation-delay: 0.35s; --ring-base-opacity: 0.45; }
+.vigil-logo-ring:nth-child(5) { animation-delay: 0.7s; --ring-base-opacity: 0.8; }
+
+@keyframes vigil-logo-shield-pulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+.vigil-logo-shield {
+  animation: vigil-logo-shield-pulse 4s ease-in-out infinite;
+}
 
 @keyframes alert-bell-swing {
   0%, 100% { transform: rotate(0deg); }
@@ -470,3 +484,65 @@ code, pre, .font-mono {
 .upload-arrow-shaft {
   animation: upload-bob 1.8s ease-in-out infinite;
 }
+
+/* ── Leaflet zoom control — themed to match Signal Console ── */
+
+.leaflet-control-zoom {
+  border: 1px solid var(--rule-color) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+  margin-bottom: 20px !important;
+  margin-right: 12px !important;
+}
+
+.leaflet-control-zoom a {
+  background: var(--color-paper-1) !important;
+  color: var(--color-ink-muted) !important;
+  border-bottom: 1px solid var(--rule-color) !important;
+  width: 28px !important;
+  height: 28px !important;
+  line-height: 28px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  transition: background 0.15s, color 0.15s;
+}
+
+.leaflet-control-zoom a:last-child {
+  border-bottom: none !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--color-paper-3) !important;
+  color: var(--color-ink) !important;
+}
+
+/* ── Leaflet popup — themed to match Signal Console ── */
+
+.leaflet-popup-content-wrapper {
+  background: var(--color-paper-1) !important;
+  border: 1px solid var(--rule-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  color: var(--color-ink) !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--color-paper-1) !important;
+}
+
+.leaflet-popup-close-button {
+  color: var(--color-ink-faint) !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: var(--color-ink) !important;
+  background: transparent !important;
+}
+
+/* ── Sidebar clip prevention — collapse toggle must protrude ── */
+
+.sidebar-shell {
+  overflow: visible !important;
+}
+

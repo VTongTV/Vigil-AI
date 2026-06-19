@@ -7,10 +7,12 @@
  * - Web Audio API beep for critical alerts (danger_score >= 80)
  * - Auto-dismiss non-critical alerts after 10 seconds
  * - Compact feed with violation type, camera, danger score
+ * - AnimatePresence on panel open/close and individual alert cards
  */
 
 import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useAppStore } from "@/lib/store";
 import type { ASTraMAlert } from "@/types/violation";
 import { VIOLATION_LABELS, VIOLATION_COLORS } from "@/types/violation";
@@ -56,6 +58,7 @@ export default function ASTraMAlertFeed() {
   const clearAlerts = useAppStore((s) => s.clearAlerts);
   const alertPanelOpen = useAppStore((s) => s.alertPanelOpen);
   const setAlertPanelOpen = useAppStore((s) => s.setAlertPanelOpen);
+  const prefersReduced = useReducedMotion();
 
   /** Track which alerts have already been beeped to avoid re-beeps on re-render. */
   const beepedIds = useRef<Set<string>>(new Set());
@@ -115,11 +118,12 @@ export default function ASTraMAlertFeed() {
 
   return (
     <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
-      {/* Toggle button */}
-      <button
+      {/* Toggle button — fixed: added `relative` so the badge counter positions correctly */}
+      <motion.button
+        whileTap={prefersReduced ? {} : { scale: 0.88 }}
         onClick={() => setAlertPanelOpen(!alertPanelOpen)}
         className={cn(
-          "pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full shadow-lg transition-all duration-200",
+          "pointer-events-auto relative flex h-9 w-9 items-center justify-center rounded-full shadow-lg transition-colors duration-150",
           criticalCount > 0
             ? "bg-[var(--color-danger)] text-white hover:bg-[var(--color-danger-bright)]"
             : "bg-[var(--color-paper-1)] text-[var(--color-ink-muted)] border border-[var(--rule-color)] hover:text-[var(--color-ink)]",
@@ -129,54 +133,92 @@ export default function ASTraMAlertFeed() {
           className="h-4 w-4"
           critical={criticalCount > 0}
         />
-        {alerts.length > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-danger)] text-[11px] font-bold text-white">
-            {alerts.length > 9 ? "9+" : alerts.length}
-          </span>
+        <AnimatePresence>
+          {alerts.length > 0 && (
+            <motion.span
+              key="badge"
+              initial={prefersReduced ? {} : { scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-danger)] text-[11px] font-bold text-white"
+            >
+              {alerts.length > 9 ? "9+" : alerts.length}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </motion.button>
+
+      {/* Alert feed panel — AnimatePresence for open/close */}
+      <AnimatePresence>
+        {alertPanelOpen && (
+          <motion.div
+            key="alert-panel"
+            initial={prefersReduced ? {} : { opacity: 0, scale: 0.95, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 8 }}
+            transition={{ type: "spring", stiffness: 380, damping: 30 }}
+            className="pointer-events-auto"
+            style={{ transformOrigin: "bottom right" }}
+          >
+            <Card className="w-80 max-h-96 overflow-y-auto border-[var(--rule-color)] bg-[var(--color-paper-1)] shadow-2xl">
+              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--rule-color)] bg-[var(--color-paper-1)] px-3 py-2">
+                <div className="flex items-center gap-2">
+                  <AlertBell className="h-3.5 w-3.5 text-[var(--color-accent)]" critical={criticalCount > 0} />
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                    ASTraM Alerts
+                  </span>
+                  {criticalCount > 0 && (
+                    <span className="rounded-full bg-[var(--color-danger-soft)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--color-danger)] ring-1 ring-[var(--color-danger)]/20">
+                      {criticalCount} critical
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-1">
+                  {alerts.length > 0 && (
+                    <motion.button
+                      whileTap={prefersReduced ? {} : { scale: 0.9 }}
+                      onClick={clearAlerts}
+                      className="rounded p-1 text-[var(--color-ink-faint)] hover:bg-[var(--color-paper-3)]/30 hover:text-[var(--color-ink-muted)] transition-colors"
+                      title="Clear all alerts"
+                    >
+                      <X className="h-3 w-3" />
+                    </motion.button>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-2 space-y-1.5">
+                {alerts.length === 0 ? (
+                  <p className="py-4 text-center text-[11px] text-[var(--color-ink-faint)]">
+                    No active alerts
+                  </p>
+                ) : (
+                  <AnimatePresence initial={false}>
+                    {alerts.map((alert, i) => (
+                      <motion.div
+                        key={alert.id}
+                        layout
+                        initial={prefersReduced ? {} : { opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={prefersReduced ? {} : { opacity: 0, x: 20, transition: { duration: 0.15 } }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 320,
+                          damping: 28,
+                          delay: i * 0.04,
+                        }}
+                      >
+                        <AlertCard alert={alert} onDismiss={dismissAlert} />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                )}
+              </div>
+            </Card>
+          </motion.div>
         )}
-      </button>
-
-      {/* Alert feed panel */}
-      {alertPanelOpen && (
-        <Card className="pointer-events-auto w-80 max-h-96 overflow-y-auto border-[var(--rule-color)] bg-[var(--color-paper-1)] shadow-2xl">
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--rule-color)] bg-[var(--color-paper-1)] px-3 py-2">
-            <div className="flex items-center gap-2">
-              <AlertBell className="h-3.5 w-3.5 text-[var(--color-accent)]" critical={criticalCount > 0} />
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                ASTraM Alerts
-              </span>
-              {criticalCount > 0 && (
-                <span className="rounded-full bg-[var(--color-danger-soft)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--color-danger)] ring-1 ring-[var(--color-danger)]/20">
-                  {criticalCount} critical
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-1">
-              {alerts.length > 0 && (
-                <button
-                  onClick={clearAlerts}
-                  className="rounded p-1 text-[var(--color-ink-faint)] hover:bg-[var(--color-paper-3)]/30 hover:text-[var(--color-ink-muted)] transition-colors"
-                  title="Clear all alerts"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="p-2 space-y-1.5">
-            {alerts.length === 0 ? (
-              <p className="py-4 text-center text-[11px] text-[var(--color-ink-faint)]">
-                No active alerts
-              </p>
-            ) : (
-              alerts.map((alert) => (
-                <AlertCard key={alert.id} alert={alert} onDismiss={dismissAlert} />
-              ))
-            )}
-          </div>
-        </Card>
-      )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -192,13 +234,14 @@ function AlertCard({
   const isCritical = alert.danger_score >= CRITICAL_DANGER_THRESHOLD;
   const vColor = VIOLATION_COLORS[alert.violation_type] ?? "var(--color-accent)";
   const vLabel = VIOLATION_LABELS[alert.violation_type] ?? alert.violation_type;
+  const prefersReduced = useReducedMotion();
 
   const timeAgo = getTimeAgo(alert.timestamp);
 
   return (
     <div
       className={cn(
-        "group relative rounded-md border p-2 transition-all duration-200",
+        "group relative rounded-md border p-2 transition-colors duration-150",
         isCritical
           ? "border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)]"
           : "border-[var(--rule-color)] bg-[var(--color-paper-2)]",
@@ -247,12 +290,13 @@ function AlertCard({
         </div>
 
         {/* Dismiss button */}
-        <button
+        <motion.button
+          whileTap={prefersReduced ? {} : { scale: 0.85 }}
           onClick={() => onDismiss(alert.id)}
           className="shrink-0 rounded p-0.5 text-[var(--color-ink-faint)] opacity-0 transition-opacity group-hover:opacity-100 hover:text-[var(--color-ink-muted)]"
         >
           <X className="h-3 w-3" />
-        </button>
+        </motion.button>
       </div>
     </div>
   );

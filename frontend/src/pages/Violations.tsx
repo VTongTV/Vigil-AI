@@ -7,6 +7,7 @@
  * - Inline status badges and confidence tier indicators
  * - Filter dropdowns using shadcn Select
  * - Collapsible audit trail section
+ * - Framer Motion: page entrance, row stagger, whileTap on action buttons
  */
 
 import { useEffect, useState, useCallback } from "react";
@@ -19,6 +20,7 @@ import {
   History,
   AlertTriangle,
 } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { listViolations, actionViolation } from "@/lib/api";
 import type { ViolationRecord } from "@/types/violation";
 import {
@@ -84,6 +86,7 @@ export default function Violations() {
   const [detailViolation, setDetailViolation] = useState<ViolationRecord | null>(null);
   const setSelectedViolation = useAppStore((s) => s.setSelectedViolation);
   const demoMode = useAppStore((s) => s.demoMode);
+  const prefersReduced = useReducedMotion();
 
   const fetchViolations = useCallback(async () => {
     setLoading(true);
@@ -135,7 +138,12 @@ export default function Violations() {
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="p-5">
+    <motion.div
+      className="p-5"
+      initial={prefersReduced ? {} : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+    >
       <header className="mb-5">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent-soft)] ring-1 ring-[var(--color-accent)]/15">
@@ -221,34 +229,38 @@ export default function Violations() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-32 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="h-4 w-4 rounded-full border-2 border-t-transparent border-[var(--color-accent)] animate-spin" />
-                      <span className="text-xs text-[var(--color-ink-faint)]">Loading...</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : violations.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-32 text-center text-xs text-[var(--color-ink-faint)]">
-                    No violations found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                violations.map((v) => (
-                  <ViolationRow
-                    key={v.id}
-                    violation={v}
-                    onAction={handleAction}
-                    onSelect={() => {
-                      setSelectedViolation(v);
-                      setDetailViolation(v);
-                    }}
-                  />
-                ))
-              )}
+              <AnimatePresence mode="wait">
+                {loading ? (
+                  <TableRow key="loading">
+                    <TableCell colSpan={7} className="h-32 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="h-4 w-4 rounded-full border-2 border-t-transparent border-[var(--color-accent)] animate-spin" />
+                        <span className="text-xs text-[var(--color-ink-faint)]">Loading...</span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : violations.length === 0 ? (
+                  <TableRow key="empty">
+                    <TableCell colSpan={7} className="h-32 text-center text-xs text-[var(--color-ink-faint)]">
+                      No violations found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  violations.map((v, i) => (
+                    <ViolationRow
+                      key={v.id}
+                      violation={v}
+                      index={i}
+                      onAction={handleAction}
+                      onSelect={() => {
+                        setSelectedViolation(v);
+                        setDetailViolation(v);
+                      }}
+                      prefersReduced={prefersReduced ?? false}
+                    />
+                  ))
+                )}
+              </AnimatePresence>
             </TableBody>
           </Table>
         </ScrollArea>
@@ -261,68 +273,88 @@ export default function Violations() {
             Page {page} of {totalPages}
           </p>
           <div className="flex gap-1">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-6 w-6 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-            >
-              <ChevronLeft className="h-3 w-3" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-6 w-6 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-            >
-              <ChevronRight className="h-3 w-3" />
-            </Button>
+            <motion.div whileTap={prefersReduced ? {} : { scale: 0.9 }}>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-6 w-6 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+              >
+                <ChevronLeft className="h-3 w-3" />
+              </Button>
+            </motion.div>
+            <motion.div whileTap={prefersReduced ? {} : { scale: 0.9 }}>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-6 w-6 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+              >
+                <ChevronRight className="h-3 w-3" />
+              </Button>
+            </motion.div>
           </div>
         </div>
       )}
 
       {/* Audit trail */}
-      {auditLog.length > 0 && (
-        <Card className="mt-5 border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
-          <CardContent className="p-4">
-            <h2 className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-              <History className="h-3 w-3" />
-              Action Log
-            </h2>
-            <div className="space-y-1.5">
-              {auditLog.map((entry, i) => (
-                <div
-                  key={`${entry.violationId}-${entry.timestamp}-${i}`}
-                  className="flex items-center gap-3 text-[11px]"
-                >
-                  <Badge
-                    variant="outline"
-                    className={cn(
-                      "text-[11px] font-semibold",
-                      entry.action === "approve"
-                        ? "border-[var(--color-success)]/30 bg-[var(--color-success)]/10 text-[var(--color-success)]"
-                        : "border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 text-[var(--color-danger)]",
-                    )}
-                  >
-                    {entry.action.toUpperCase()}
-                  </Badge>
-                  <span className="font-mono text-[var(--color-ink-muted)]">
-                    {entry.violationId.slice(0, 8)}
-                  </span>
-                  <span className="text-[var(--color-ink-faint)]">
-                    by {entry.actor}
-                  </span>
-                  <span className="ml-auto font-mono text-[11px] text-[var(--color-ink-faint)]">
-                    {entry.timestamp}
-                  </span>
+      <AnimatePresence>
+        {auditLog.length > 0 && (
+          <motion.div
+            key="audit-log"
+            initial={prefersReduced ? {} : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.25 }}
+          >
+            <Card className="mt-5 border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
+              <CardContent className="p-4">
+                <h2 className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                  <History className="h-3 w-3" />
+                  Action Log
+                </h2>
+                <div className="space-y-1.5">
+                  <AnimatePresence initial={false}>
+                    {auditLog.map((entry, i) => (
+                      <motion.div
+                        key={`${entry.violationId}-${entry.timestamp}-${i}`}
+                        initial={prefersReduced ? {} : { opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 8 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 26 }}
+                        className="flex items-center gap-3 text-[11px]"
+                      >
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-[11px] font-semibold",
+                            entry.action === "approve"
+                              ? "border-[var(--color-success)]/30 bg-[var(--color-success)]/10 text-[var(--color-success)]"
+                              : "border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 text-[var(--color-danger)]",
+                          )}
+                        >
+                          {entry.action.toUpperCase()}
+                        </Badge>
+                        <span className="font-mono text-[var(--color-ink-muted)]">
+                          {entry.violationId.slice(0, 8)}
+                        </span>
+                        <span className="text-[var(--color-ink-faint)]">
+                          by {entry.actor}
+                        </span>
+                        <span className="ml-auto font-mono text-[11px] text-[var(--color-ink-faint)]">
+                          {entry.timestamp}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Detail sheet */}
       <SheetPrimitive open={!!detailViolation} onOpenChange={(open) => !open && setDetailViolation(null)}>
@@ -351,19 +383,23 @@ export default function Violations() {
           )}
         </SheetContent>
       </SheetPrimitive>
-    </div>
+    </motion.div>
   );
 }
 
-/** Single row in the violations table. */
+/** Single row in the violations table — animated entrance via Framer Motion. */
 function ViolationRow({
   violation: v,
+  index,
   onAction,
   onSelect,
+  prefersReduced,
 }: {
   violation: ViolationRecord;
+  index: number;
   onAction: (id: string, action: "approve" | "reject") => void;
   onSelect: () => void;
+  prefersReduced: boolean;
 }) {
   const vColor = VIOLATION_COLORS[v.violation_type] ?? "var(--color-accent)";
   const vLabel = VIOLATION_LABELS[v.violation_type] ?? v.violation_type;
@@ -383,8 +419,16 @@ function ViolationRow({
   }[v.confidence_tier] ?? "";
 
   return (
-    <TableRow
-      className="cursor-pointer border-b-[var(--color-paper-3)]/40 transition-colors hover:bg-[var(--color-paper-2)]/40"
+    <motion.tr
+      initial={prefersReduced ? {} : { opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{
+        duration: 0.25,
+        delay: Math.min(index * 0.025, 0.4),
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      className="cursor-pointer border-b border-b-[var(--color-paper-3)]/40 transition-colors hover:bg-[var(--color-paper-2)]/40"
       onClick={onSelect}
     >
       <TableCell className="py-2">
@@ -423,28 +467,32 @@ function ViolationRow({
       <TableCell className="py-2">
         {v.status === "pending" && (
           <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 text-[var(--color-success)] hover:bg-[var(--color-success)]/10"
-              onClick={() => onAction(v.id, "approve")}
-              title="Approve"
-            >
-              <CheckCircle2 className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10"
-              onClick={() => onAction(v.id, "reject")}
-              title="Reject"
-            >
-              <XCircle className="h-3.5 w-3.5" />
-            </Button>
+            <motion.div whileTap={prefersReduced ? {} : { scale: 0.85 }}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 text-[var(--color-success)] hover:bg-[var(--color-success)]/10"
+                onClick={() => onAction(v.id, "approve")}
+                title="Approve"
+              >
+                <CheckCircle2 className="h-3.5 w-3.5" />
+              </Button>
+            </motion.div>
+            <motion.div whileTap={prefersReduced ? {} : { scale: 0.85 }}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10"
+                onClick={() => onAction(v.id, "reject")}
+                title="Reject"
+              >
+                <XCircle className="h-3.5 w-3.5" />
+              </Button>
+            </motion.div>
           </div>
         )}
       </TableCell>
-    </TableRow>
+    </motion.tr>
   );
 }
 

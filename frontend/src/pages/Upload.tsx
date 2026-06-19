@@ -13,6 +13,7 @@
  */
 
 import { useState, useRef, useCallback } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Upload as UploadIcon,
   Camera,
@@ -288,7 +289,7 @@ export default function Upload() {
   const fileRef = useRef<HTMLInputElement>(null);
   const signalState = useAppStore((s) => s.signalState);
   const setLastDetection = useAppStore((s) => s.setLastDetection);
-  const demoMode = useAppStore((s) => s.demoMode);
+  const prefersReduced = useReducedMotion();
 
   /** Add files to the batch (respects MAX_BATCH_SIZE). */
   const addFiles = useCallback((files: FileList | File[]) => {
@@ -413,7 +414,12 @@ export default function Upload() {
     : 1;
 
   return (
-    <div className="p-5">
+    <motion.div
+      className="p-5"
+      initial={prefersReduced ? {} : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+    >
       <header className="mb-5">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent-soft)] ring-1 ring-[var(--color-accent)]/15">
@@ -434,7 +440,9 @@ export default function Upload() {
         {/* Left Side: 2x2 Symmetrical Grid for Inputs & Queues */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {/* Top Left: Drop zone */}
-          <div
+          <motion.div
+            animate={prefersReduced ? {} : dragOver ? { scale: 1.02 } : { scale: 1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 28 }}
             onDragOver={(e) => {
               e.preventDefault();
               setDragOver(true);
@@ -447,7 +455,7 @@ export default function Upload() {
             }}
             onClick={() => fileRef.current?.click()}
             className={cn(
-              "group relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-all duration-300 h-[280px]",
+              "group relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 h-[280px]",
               dragOver
                 ? "border-[var(--color-accent)] bg-[var(--color-accent)]/5"
                 : batchFiles.length > 0
@@ -490,7 +498,7 @@ export default function Upload() {
                 e.target.value = "";
               }}
             />
-          </div>
+          </motion.div>
 
           {/* Bottom Left: Controls */}
           <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 h-[280px] flex flex-col justify-between">
@@ -710,9 +718,16 @@ export default function Upload() {
 
         {/* Right Side: Results panel */}
         <div className="flex flex-col gap-4">
-
+          <AnimatePresence mode="wait">
           {activeFile?.result ? (
-            <div className="space-y-4">
+            <motion.div
+              key={`result-${activeIndex}`}
+              initial={prefersReduced ? {} : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="space-y-4"
+            >
               {/* Result summary */}
               <div className="flex items-center gap-3 rounded-lg bg-[var(--color-success)]/8 px-4 py-2.5 ring-1 ring-[var(--color-success)]/20">
                 <CheckCircle2 className="h-4 w-4 text-[var(--color-success)]" />
@@ -740,7 +755,7 @@ export default function Upload() {
                     </span>
                   </div>
                   <div className="space-y-1.5">
-                    {PIPELINE_STAGES.map((stage) => {
+                    {PIPELINE_STAGES.map((stage, si) => {
                       const ms =
                         (activeFile.result!.timing_breakdown as unknown as Record<string, number>)[
                           stage.key
@@ -752,10 +767,16 @@ export default function Upload() {
                             {stage.abbr}
                           </span>
                           <div className="flex-1 overflow-hidden rounded-sm bg-[var(--color-paper-3)]/30">
-                            <div
-                              className="h-4 rounded-sm transition-all duration-700"
+                            <motion.div
+                              className="h-4 rounded-sm"
+                              initial={prefersReduced ? { width: `${pct}%` } : { width: 0 }}
+                              animate={{ width: `${pct}%` }}
+                              transition={{
+                                duration: 0.5,
+                                delay: si * 0.06,
+                                ease: [0.22, 1, 0.36, 1],
+                              }}
                               style={{
-                                width: `${pct}%`,
                                 backgroundColor: stage.color,
                                 opacity: 0.7,
                               }}
@@ -784,30 +805,49 @@ export default function Upload() {
                 </Card>
               )}
 
-              {/* Violation result cards */}
-              <div className="space-y-2">
+              {/* Violation result cards — staggered entrance */}
+              <motion.div
+                className="space-y-2"
+                variants={prefersReduced ? {} : { hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
+                initial="hidden"
+                animate="visible"
+              >
                 {activeFile.result.violations.map((v: ViolationRecord) => (
-                  <ViolationResultCard key={v.id} violation={v} />
+                  <ViolationResultCard key={v.id} violation={v} prefersReduced={prefersReduced ?? false} />
                 ))}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           ) : activeFile?.error ? (
-            <Card className="flex h-80 items-center justify-center border-[var(--color-danger)]/30 bg-[var(--color-danger)]/5">
-              <div className="text-center">
-                <XCircle className="mx-auto mb-3 h-8 w-8 text-[var(--color-danger)]" />
-                <p className="text-sm font-medium text-[var(--color-danger)]">
-                  Detection Failed
-                </p>
-                <p className="mt-1 text-[11px] text-[var(--color-danger)]/70">
-                  {activeFile.error}
-                </p>
-                <p className="mt-0.5 text-[11px] text-[var(--color-ink-faint)]">
-                  — {activeFile.file.name}
-                </p>
-              </div>
-            </Card>
+            <motion.div
+              key="error-state"
+              initial={prefersReduced ? {} : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <Card className="flex h-80 items-center justify-center border-[var(--color-danger)]/30 bg-[var(--color-danger)]/5">
+                <div className="text-center">
+                  <XCircle className="mx-auto mb-3 h-8 w-8 text-[var(--color-danger)]" />
+                  <p className="text-sm font-medium text-[var(--color-danger)]">
+                    Detection Failed
+                  </p>
+                  <p className="mt-1 text-[11px] text-[var(--color-danger)]/70">
+                    {activeFile.error}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-[var(--color-ink-faint)]">
+                    — {activeFile.file.name}
+                  </p>
+                </div>
+              </Card>
+            </motion.div>
           ) : activeFile ? (
-            <div className="space-y-4">
+            <motion.div
+              key={`preview-${activeIndex}`}
+              initial={prefersReduced ? {} : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-4"
+            >
               <div className="flex items-center gap-3 rounded-lg bg-[var(--color-paper-3)]/30 px-4 py-2.5 ring-1 ring-[var(--color-paper-4)]/50">
                 <FileImage className="h-4 w-4 text-[var(--color-ink-faint)]" />
                 <span className="text-sm font-medium text-[var(--color-ink)]">
@@ -827,30 +867,38 @@ export default function Upload() {
                   />
                 )}
               </Card>
-            </div>
+            </motion.div>
           ) : (
-            <Card className="flex h-[584px] items-center justify-center border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/30">
-              <div className="text-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-paper-3)]/30">
-                  <AlertTriangle className="h-5 w-5 text-[var(--color-ink-faint)]" />
+            <motion.div
+              key="empty-state"
+              initial={prefersReduced ? {} : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <Card className="flex h-[584px] items-center justify-center border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/30">
+                <div className="text-center">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-paper-3)]/30">
+                    <AlertTriangle className="h-5 w-5 text-[var(--color-ink-faint)]" />
+                  </div>
+                  <p className="text-sm text-[var(--color-ink-muted)]">
+                    Upload images to see detection results
+                  </p>
+                  <p className="mt-1 text-[11px] text-[var(--color-ink-faint)]">
+                    Select up to {MAX_BATCH_SIZE} files for batch processing
+                  </p>
                 </div>
-                <p className="text-sm text-[var(--color-ink-muted)]">
-                  Upload images to see detection results
-                </p>
-                <p className="mt-1 text-[11px] text-[var(--color-ink-faint)]">
-                  Select up to {MAX_BATCH_SIZE} files for batch processing
-                </p>
-              </div>
-            </Card>
+              </Card>
+            </motion.div>
           )}
+          </AnimatePresence>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
-/** Compact result card for a single detected violation. */
-function ViolationResultCard({ violation: v }: { violation: ViolationRecord }) {
+/** Compact result card for a single detected violation — animated entrance via parent stagger variants. */
+function ViolationResultCard({ violation: v, prefersReduced }: { violation: ViolationRecord; prefersReduced: boolean }) {
   const vColor =
     VIOLATION_COLORS[v.violation_type] ?? "var(--color-accent)";
   const vLabel =
@@ -865,6 +913,12 @@ function ViolationResultCard({ violation: v }: { violation: ViolationRecord }) {
   }[v.confidence_tier] ?? "";
 
   return (
+    <motion.div
+      variants={prefersReduced ? {} : {
+        hidden: { opacity: 0, y: 10 },
+        visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 26 } },
+      }}
+    >
     <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 overflow-hidden">
       <div className="flex">
         {/* Left color accent strip */}
@@ -912,5 +966,6 @@ function ViolationResultCard({ violation: v }: { violation: ViolationRecord }) {
         </CardContent>
       </div>
     </Card>
+    </motion.div>
   );
 }

@@ -16,6 +16,11 @@ import {
   WifiOff,
   Clock,
 } from "lucide-react";
+import {
+  motion,
+  AnimatePresence,
+  useReducedMotion,
+} from "framer-motion";
 import { getAnalytics, listCameras } from "@/lib/api";
 import type {
   AnalyticsOverview,
@@ -128,12 +133,37 @@ function CameraStatusBadge({ status }: { status: CameraStatus }) {
   );
 }
 
+/** Framer Motion variants for staggered list children. */
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.07 } },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring" as const, stiffness: 300, damping: 26 },
+  },
+};
+
+const rowVariants = {
+  hidden: { opacity: 0, x: -8 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { type: "spring" as const, stiffness: 320, damping: 28 },
+  },
+};
+
 export default function Dashboard() {
   const [analytics, setAnalytics] = useState<AnalyticsOverview | null>(null);
   const [cameras, setCameras] = useState<CameraHealth[]>([]);
   const [loading, setLoading] = useState(true);
   const setCamerasStore = useAppStore((s) => s.setCameras);
   const demoMode = useAppStore((s) => s.demoMode);
+  const prefersReduced = useReducedMotion();
 
   useEffect(() => {
     Promise.all([
@@ -149,19 +179,69 @@ export default function Dashboard() {
       .finally(() => setLoading(false));
   }, [setCamerasStore, demoMode]);
 
-  if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="space-y-3 text-center">
-          <div className="mx-auto h-8 w-8 rounded-full border-2 border-t-transparent border-[var(--color-accent)] animate-spin" />
-          <p className="text-xs tracking-wider text-[var(--color-ink-faint)] uppercase">
-            Loading command data
-          </p>
-        </div>
-      </div>
-    );
-  }
+  return (
+    <AnimatePresence mode="wait">
+      {loading ? (
+        <motion.div
+          key="loading"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="flex h-full items-center justify-center"
+        >
+          <div className="space-y-3 text-center">
+            <div className="mx-auto h-8 w-8 rounded-full border-2 border-t-transparent border-[var(--color-accent)] animate-spin" />
+            <p className="text-xs tracking-wider text-[var(--color-ink-faint)] uppercase">
+              Loading command data
+            </p>
+          </div>
+        </motion.div>
+      ) : (
+        <motion.div
+          key="content"
+          initial={prefersReduced ? {} : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="min-h-full p-5 lg:p-6"
+        >
+          {/* Header */}
+          <header className="mb-5">
+            <div className="flex items-center gap-3">
+              <div className="relative flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent-soft)] border border-[var(--color-accent)]/20">
+                <ShieldAlert className="h-4 w-4 text-[var(--color-accent)]" />
+              </div>
+              <div>
+                <h1 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">
+                  Command Center
+                </h1>
+                <p className="text-[12px] text-[var(--color-ink-faint)]">
+                  Real-time traffic violation interception — Bengaluru Traffic Police
+                </p>
+              </div>
+            </div>
+          </header>
 
+          <DashboardContent
+            analytics={analytics}
+            cameras={cameras}
+            prefersReduced={prefersReduced ?? false}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/** Separated so stagger variants can run after loading resolves. */
+function DashboardContent({
+  analytics,
+  cameras,
+  prefersReduced,
+}: {
+  analytics: AnalyticsOverview | null;
+  cameras: CameraHealth[];
+  prefersReduced: boolean;
+}) {
   const totalViolations = analytics?.total_violations ?? 0;
   const totalFines = analytics?.total_fines ?? 0;
   const avgConf = (analytics?.avg_confidence ?? 0) * 100;
@@ -247,366 +327,410 @@ export default function Dashboard() {
   const idleCams = cameras.filter((c) => c.status === "idle").length;
   const offlineCams = cameras.filter((c) => c.status === "offline").length;
 
-  return (
-    <div className="min-h-full p-5 lg:p-6">
-      {/* Header */}
-      <header className="mb-5">
-        <div className="flex items-center gap-3">
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent-soft)] border border-[var(--color-accent)]/20">
-            <ShieldAlert className="h-4 w-4 text-[var(--color-accent)]" />
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">
-              Command Center
-            </h1>
-            <p className="text-[12px] text-[var(--color-ink-faint)]">
-              Real-time traffic violation interception — Bengaluru Traffic Police
-            </p>
-          </div>
-        </div>
-      </header>
+  const motionCardVariants = prefersReduced
+    ? { hidden: {}, visible: {} }
+    : cardVariants;
 
-      {/* Stat cards */}
-      <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+  const motionContainerVariants = prefersReduced
+    ? { hidden: {}, visible: {} }
+    : containerVariants;
+
+  const motionRowVariants = prefersReduced
+    ? { hidden: {}, visible: {} }
+    : rowVariants;
+
+  return (
+    <>
+      {/* Stat cards — staggered entrance */}
+      <motion.div
+        className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4"
+        variants={motionContainerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {stats.map(({ label, value, icon: Icon, color, glow, trend, trendDirection, trendPercentage, sparkline }) => (
-          <Card
-            key={label}
-            className={cn(
-              "group relative overflow-hidden border-[var(--rule-color)] bg-[var(--color-paper-1)] transition-all duration-300 hover:border-[var(--color-accent)]/25",
-              glow,
-            )}
-          >
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-accent)]/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-            <CardContent className="p-3.5">
-              <div className="flex items-start justify-between">
-                <div
-                  className="flex h-8 w-8 items-center justify-center rounded-md border"
-                  style={{
-                    backgroundColor: `color-mix(in oklch, ${color} 10%, transparent)`,
-                    borderColor: `color-mix(in oklch, ${color} 20%, transparent)`,
-                  }}
-                >
-                  <Icon className="h-4 w-4" style={{ color }} />
-                </div>
-                <div className="flex items-center gap-1.5">
-                  {/* Trend arrow + percentage (F8) */}
-                  {trendDirection && (
-                    <span className="flex items-center gap-1 rounded bg-[var(--color-paper-3)]/50 px-1.5 py-0.5 font-mono text-[11px] border border-[var(--color-paper-3)]/30">
-                      <TrendIcon direction={trendDirection} />
-                      {trendPercentage !== undefined && (
-                        <span
-                          className={cn(
-                            trendDirection === "up" && "text-[var(--color-danger)]",
-                            trendDirection === "down" && "text-[var(--color-success)]",
-                            trendDirection === "stable" && "text-[var(--color-ink-faint)]",
+          <motion.div key={label} variants={motionCardVariants}>
+            <motion.div
+              whileHover={prefersReduced ? {} : { y: -2, transition: { duration: 0.15 } }}
+            >
+              <Card
+                className={cn(
+                  "group relative overflow-hidden border-[var(--rule-color)] bg-[var(--color-paper-1)] hover:border-[var(--color-accent)]/25",
+                  glow,
+                )}
+              >
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-accent)]/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                <CardContent className="p-3.5">
+                  <div className="flex items-start justify-between">
+                    <div
+                      className="flex h-8 w-8 items-center justify-center rounded-md border"
+                      style={{
+                        backgroundColor: `color-mix(in oklch, ${color} 10%, transparent)`,
+                        borderColor: `color-mix(in oklch, ${color} 20%, transparent)`,
+                      }}
+                    >
+                      <Icon className="h-4 w-4" style={{ color }} />
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {/* Trend arrow + percentage */}
+                      {trendDirection && (
+                        <span className="flex items-center gap-1 rounded bg-[var(--color-paper-3)]/50 px-1.5 py-0.5 font-mono text-[11px] border border-[var(--color-paper-3)]/30">
+                          <TrendIcon direction={trendDirection} />
+                          {trendPercentage !== undefined && (
+                            <span
+                              className={cn(
+                                trendDirection === "up" && "text-[var(--color-danger)]",
+                                trendDirection === "down" && "text-[var(--color-success)]",
+                                trendDirection === "stable" && "text-[var(--color-ink-faint)]",
+                              )}
+                            >
+                              {trendPercentage}%
+                            </span>
                           )}
-                        >
-                          {trendPercentage}%
                         </span>
                       )}
-                    </span>
-                  )}
-                  {trend && !trendDirection && (
-                    <span className="rounded bg-[var(--color-paper-3)]/50 px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-ink-faint)] border border-[var(--color-paper-3)]/30">
-                      {trend}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-end justify-between">
-                <p className="mt-2 font-mono text-[22px] font-bold tabular-nums tracking-tight text-[var(--color-ink)]">
-                  {value}
-                </p>
-                {/* Sparkline (F8) */}
-                {sparkline && sparkline.length > 1 && (
-                  <Sparkline data={sparkline} color={color} className="mb-1" />
-                )}
-              </div>
-              <p className="mt-0.5 text-[11px] tracking-wider text-[var(--color-ink-faint)] uppercase">
-                {label}
-              </p>
-            </CardContent>
-          </Card>
+                      {trend && !trendDirection && (
+                        <span className="rounded bg-[var(--color-paper-3)]/50 px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-ink-faint)] border border-[var(--color-paper-3)]/30">
+                          {trend}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-end justify-between">
+                    <p className="mt-2 font-mono text-[22px] font-bold tabular-nums tracking-tight text-[var(--color-ink)]">
+                      {value}
+                    </p>
+                    {/* Sparkline */}
+                    {sparkline && sparkline.length > 1 && (
+                      <Sparkline data={sparkline} color={color} className="mb-1" />
+                    )}
+                  </div>
+                  <p className="mt-0.5 text-[11px] tracking-wider text-[var(--color-ink-faint)] uppercase">
+                    {label}
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Main content — 2-column */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
         {/* Left: Violations by type — 3 cols */}
-        <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80 lg:col-span-3">
-          <CardContent className="p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
-                <Activity className="h-3.5 w-3.5 text-[var(--color-accent)]" />
-                Violations by Type
-              </h2>
-              <span className="font-mono text-[11px] tabular-nums text-[var(--color-phosphor)]">
-                {totalViolations} total
-              </span>
-            </div>
-            <div className="space-y-2">
-              {typeEntries.length > 0 ? (
-                typeEntries.map(([type, count]) => {
-                  const vType = type as ViolationType;
-                  const color = VIOLATION_COLORS[vType] ?? "var(--color-accent)";
-                  const label = VIOLATION_LABELS[vType] ?? type;
-                  const pct = totalViolations > 0 ? (count / totalViolations) * 100 : 0;
-                  const tf = trendMap[type];
-                  return (
-                    <div key={type} className="group flex items-center gap-2.5">
-                      <span
-                        className="h-2 w-2 shrink-0 rounded-full transition-transform group-hover:scale-125"
-                        style={{ backgroundColor: color }}
-                      />
-                      <span className="w-24 shrink-0 truncate text-[11px] text-[var(--color-ink-muted)]">
-                        {label}
-                      </span>
-                      <div className="flex-1">
-                        <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/40">
-                          <div
-                            className="h-1.5 rounded-full transition-all duration-700"
-                            style={{
-                              width: `${Math.min(pct, 100)}%`,
-                              backgroundColor: color,
-                              opacity: 0.8,
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <span className="w-8 shrink-0 text-right font-mono text-[11px] tabular-nums font-medium text-[var(--color-ink)]">
-                        {count}
-                      </span>
-                      <span className="w-10 shrink-0 text-right font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
-                        {pct.toFixed(0)}%
-                      </span>
-                      {/* Trend arrow per type (F8) */}
-                      {tf && (
-                        <span className="w-8 shrink-0 flex items-center justify-end gap-0.5">
-                          <TrendIcon direction={tf.trend_direction} />
-                          <span className={cn(
-                            "font-mono text-[11px] tabular-nums",
-                            tf.trend_direction === "up" && "text-[var(--color-danger)]",
-                            tf.trend_direction === "down" && "text-[var(--color-success)]",
-                            tf.trend_direction === "stable" && "text-[var(--color-ink-faint)]",
-                          )}>
-                            {tf.trend_percentage.toFixed(0)}%
-                          </span>
-                        </span>
-                      )}
-                    </div>
-                  );
-                })
-              ) : (
-                <p className="py-4 text-center text-xs text-[var(--color-ink-faint)]">
-                  No data available
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Right: Daily trend — 2 cols */}
-        <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80 lg:col-span-2">
-          <CardContent className="p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
-                <TrendArrow direction="up" className="h-3.5 w-3.5 text-[var(--color-accent)]" />
-                Daily Trend
-              </h2>
-              <span className="font-mono text-[11px] text-[var(--color-phosphor)]">
-                21 days
-              </span>
-            </div>
-            {/* Mini bar chart — amber bars with phosphor hover */}
-            <div className="flex items-end gap-[3px]" style={{ height: 120 }}>
-              {recentDays.length > 0 ? (
-                recentDays.map(({ date, count }) => {
-                  const h = Math.max((count / maxDaily) * 100, 4);
-                  return (
-                    <div
-                      key={date}
-                      className="group relative flex-1 cursor-default"
-                      style={{ height: `${h}%` }}
-                    >
-                      <div className="absolute inset-0 rounded-sm bg-[var(--color-accent)]/40 transition-colors group-hover:bg-[var(--color-accent)]/70" />
-                      <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 rounded bg-[var(--color-paper-2)] px-1.5 py-0.5 font-mono text-[11px] tabular-nums text-[var(--color-accent)] opacity-0 shadow-lg ring-1 ring-[var(--color-paper-3)]/30 transition-opacity group-hover:opacity-100">
-                        {count}
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="flex h-full w-full items-center justify-center">
-                  <p className="text-xs text-[var(--color-ink-faint)]">No data</p>
-                </div>
-              )}
-            </div>
-            {/* Date labels */}
-            {recentDays.length > 0 && (
-              <div className="mt-1.5 flex gap-[3px]">
-                {recentDays.map(({ date }, i) => (
-                  <div
-                    key={date}
-                    className="flex-1 text-center font-mono text-[11px] text-[var(--color-ink-faint)]"
-                  >
-                    {i % 7 === 0 ? date.slice(8) : ""}
-                  </div>
-                ))}
+        <motion.div
+          className="lg:col-span-3"
+          initial={prefersReduced ? {} : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80 h-full">
+            <CardContent className="p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
+                  <Activity className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                  Violations by Type
+                </h2>
+                <span className="font-mono text-[11px] tabular-nums text-[var(--color-phosphor)]">
+                  {analytics?.total_violations ?? 0} total
+                </span>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Bottom: Top cameras + Camera health + Status breakdown */}
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-        {/* Top cameras */}
-        <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
-          <CardContent className="p-4">
-            <h2 className="mb-3 flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
-              <CameraPulse className="h-3.5 w-3.5 text-[var(--color-accent)]" />
-              Top Cameras
-            </h2>
-            <div className="space-y-2">
-              {(analytics?.top_cameras ?? []).slice(0, 6).map((cam, i) => {
-                const topCount = analytics?.top_cameras[0]?.count ?? 1;
-                const camHealth = cameras.find((c) => c.camera_id === cam.camera_id);
-                return (
-                  <div key={cam.camera_id} className="flex items-center gap-2.5">
-                    <span className="w-4 text-right font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
-                      {i + 1}
-                    </span>
-                    <span className="w-32 truncate font-mono text-[11px] text-[var(--color-phosphor)]">
-                      {cam.camera_id}
-                    </span>
-                    <div className="flex-1">
-                      <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/40">
-                        <div
-                          className="h-1.5 rounded-full bg-[var(--color-accent)]/50 transition-all duration-500"
-                          style={{ width: `${(cam.count / topCount) * 100}%` }}
+              <motion.div
+                className="space-y-2"
+                variants={motionContainerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                {typeEntries.length > 0 ? (
+                  typeEntries.map(([type, count]) => {
+                    const vType = type as ViolationType;
+                    const color = VIOLATION_COLORS[vType] ?? "var(--color-accent)";
+                    const label = VIOLATION_LABELS[vType] ?? type;
+                    const pct = (analytics?.total_violations ?? 0) > 0
+                      ? (count / (analytics?.total_violations ?? 1)) * 100
+                      : 0;
+                    const tf = trendMap[type];
+                    return (
+                      <motion.div key={type} variants={motionRowVariants} className="group flex items-center gap-2.5">
+                        <span
+                          className="h-2 w-2 shrink-0 rounded-full transition-transform group-hover:scale-125"
+                          style={{ backgroundColor: color }}
                         />
-                      </div>
-                    </div>
-                    <span className="w-8 text-right font-mono text-[11px] tabular-nums font-medium text-[var(--color-ink)]">
-                      {cam.count}
-                    </span>
-                    {camHealth && <CameraStatusBadge status={camHealth.status} />}
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Camera health panel (F9) */}
-        <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
-          <CardContent className="p-4">
-            <h2 className="mb-3 flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
-              <Wifi className="h-3.5 w-3.5 text-[var(--color-accent)]" />
-              Camera Health
-            </h2>
-            {/* Summary row */}
-            <div className="mb-3 flex items-center gap-3">
-              <span className="flex items-center gap-1 text-[11px] text-[var(--color-success)]">
-                <Wifi className="h-3 w-3" />
-                <span className="font-mono font-semibold">{activeCams}</span>
-                <span className="text-[var(--color-ink-faint)]">active</span>
-              </span>
-              <span className="flex items-center gap-1 text-[11px] text-[var(--color-warning)]">
-                <Clock className="h-3 w-3" />
-                <span className="font-mono font-semibold">{idleCams}</span>
-                <span className="text-[var(--color-ink-faint)]">idle</span>
-              </span>
-              <span className="flex items-center gap-1 text-[11px] text-[var(--color-danger)]">
-                <WifiOff className="h-3 w-3" />
-                <span className="font-mono font-semibold">{offlineCams}</span>
-                <span className="text-[var(--color-ink-faint)]">offline</span>
-              </span>
-            </div>
-            {/* Camera list */}
-            <div className="space-y-1.5 max-h-48 overflow-y-auto">
-              {cameras.length > 0 ? (
-                cameras.map((cam) => (
-                  <div key={cam.camera_id} className="flex items-center gap-2 py-0.5">
-                    <CameraStatusBadge status={cam.status} />
-                    <span className="flex-1 truncate font-mono text-[11px] text-[var(--color-ink-muted)]">
-                      {cam.junction_name}
-                    </span>
-                    <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
-                      {cam.violation_count_24h}v/24h
-                    </span>
-                    {cam.avg_latency_ms != null && (
-                      <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
-                        {cam.avg_latency_ms}ms
-                      </span>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <p className="py-4 text-center text-xs text-[var(--color-ink-faint)]">
-                  No camera data
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Status breakdown */}
-        <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
-          <CardContent className="p-4">
-            <h2 className="mb-3 text-[13px] font-semibold text-[var(--color-ink)]">
-              Review Status
-            </h2>
-            <div className="space-y-3">
-              {analytics
-                ? Object.entries(analytics.violations_by_status).map(
-                    ([status, count]) => {
-                      const total = totalViolations || 1;
-                      const pct = ((count / total) * 100).toFixed(0);
-                      const colorMap: Record<string, string> = {
-                        pending: "var(--color-accent)",
-                        under_review: "#3b82f6",
-                        approved: "var(--color-phosphor)",
-                        issued: "#06b6d4",
-                        rejected: "var(--color-danger)",
-                      };
-                      const color = colorMap[status] ?? "var(--color-accent)";
-                      return (
-                        <div key={status}>
-                          <div className="mb-1 flex items-center justify-between">
-                            <span className="flex items-center gap-2 text-[11px] capitalize text-[var(--color-ink-muted)]">
-                              <span
-                                className="h-2 w-2 rounded-full"
-                                style={{ backgroundColor: color }}
-                              />
-                              {status.replace("_", " ")}
-                            </span>
-                            <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink)]">
-                              {count}
-                              <span className="ml-1 text-[var(--color-ink-faint)]">
-                                ({pct}%)
-                              </span>
-                            </span>
-                          </div>
+                        <span className="w-24 shrink-0 truncate text-[11px] text-[var(--color-ink-muted)]">
+                          {label}
+                        </span>
+                        <div className="flex-1">
                           <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/40">
-                            <div
-                              className="h-1.5 rounded-full transition-all duration-700"
-                              style={{
-                                width: `${pct}%`,
-                                backgroundColor: color,
-                                opacity: 0.7,
-                              }}
+                            <motion.div
+                              className="h-1.5 rounded-full"
+                              initial={prefersReduced ? { width: `${Math.min(pct, 100)}%` } : { width: 0 }}
+                              animate={{ width: `${Math.min(pct, 100)}%` }}
+                              transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                              style={{ backgroundColor: color, opacity: 0.8 }}
                             />
                           </div>
                         </div>
-                      );
-                    },
-                  )
-                : null}
-            </div>
-          </CardContent>
-        </Card>
+                        <span className="w-8 shrink-0 text-right font-mono text-[11px] tabular-nums font-medium text-[var(--color-ink)]">
+                          {count}
+                        </span>
+                        <span className="w-10 shrink-0 text-right font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
+                          {pct.toFixed(0)}%
+                        </span>
+                        {/* Trend arrow per type */}
+                        {tf && (
+                          <span className="w-8 shrink-0 flex items-center justify-end gap-0.5">
+                            <TrendIcon direction={tf.trend_direction} />
+                            <span className={cn(
+                              "font-mono text-[11px] tabular-nums",
+                              tf.trend_direction === "up" && "text-[var(--color-danger)]",
+                              tf.trend_direction === "down" && "text-[var(--color-success)]",
+                              tf.trend_direction === "stable" && "text-[var(--color-ink-faint)]",
+                            )}>
+                              {tf.trend_percentage.toFixed(0)}%
+                            </span>
+                          </span>
+                        )}
+                      </motion.div>
+                    );
+                  })
+                ) : (
+                  <p className="py-4 text-center text-xs text-[var(--color-ink-faint)]">
+                    No data available
+                  </p>
+                )}
+              </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Right: Daily trend — 2 cols */}
+        <motion.div
+          className="lg:col-span-2"
+          initial={prefersReduced ? {} : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.32, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80 h-full">
+            <CardContent className="p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
+                  <TrendArrow direction="up" className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                  Daily Trend
+                </h2>
+                <span className="font-mono text-[11px] text-[var(--color-phosphor)]">
+                  21 days
+                </span>
+              </div>
+              {/* Mini bar chart */}
+              <div className="flex items-end gap-[3px]" style={{ height: 120 }}>
+                {recentDays.length > 0 ? (
+                  recentDays.map(({ date, count }, i) => {
+                    const h = Math.max((count / maxDaily) * 100, 4);
+                    return (
+                      <motion.div
+                        key={date}
+                        className="group relative flex-1 cursor-default"
+                        style={{ height: `${h}%` }}
+                        initial={prefersReduced ? {} : { scaleY: 0, originY: 1 }}
+                        animate={{ scaleY: 1 }}
+                        transition={{
+                          duration: 0.4,
+                          delay: i * 0.015,
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
+                      >
+                        <div className="absolute inset-0 rounded-sm bg-[var(--color-accent)]/40 transition-colors group-hover:bg-[var(--color-accent)]/70" />
+                        <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 rounded bg-[var(--color-paper-2)] px-1.5 py-0.5 font-mono text-[11px] tabular-nums text-[var(--color-accent)] opacity-0 shadow-lg ring-1 ring-[var(--color-paper-3)]/30 transition-opacity group-hover:opacity-100">
+                          {count}
+                        </div>
+                      </motion.div>
+                    );
+                  })
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <p className="text-xs text-[var(--color-ink-faint)]">No data</p>
+                  </div>
+                )}
+              </div>
+              {/* Date labels */}
+              {recentDays.length > 0 && (
+                <div className="mt-1.5 flex gap-[3px]">
+                  {recentDays.map(({ date }, i) => (
+                    <div
+                      key={date}
+                      className="flex-1 text-center font-mono text-[11px] text-[var(--color-ink-faint)]"
+                    >
+                      {i % 7 === 0 ? date.slice(8) : ""}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
-    </div>
+
+      {/* Bottom: Top cameras + Camera health + Status breakdown */}
+      <motion.div
+        className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3"
+        variants={motionContainerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* Top cameras */}
+        <motion.div variants={motionCardVariants}>
+          <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
+            <CardContent className="p-4">
+              <h2 className="mb-3 flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
+                <CameraPulse className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                Top Cameras
+              </h2>
+              <div className="space-y-2">
+                {(analytics?.top_cameras ?? []).slice(0, 6).map((cam, i) => {
+                  const topCount = analytics?.top_cameras[0]?.count ?? 1;
+                  const camHealth = cameras.find((c) => c.camera_id === cam.camera_id);
+                  return (
+                    <div key={cam.camera_id} className="flex items-center gap-2.5">
+                      <span className="w-4 text-right font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
+                        {i + 1}
+                      </span>
+                      <span className="w-32 truncate font-mono text-[11px] text-[var(--color-phosphor)]">
+                        {cam.camera_id}
+                      </span>
+                      <div className="flex-1">
+                        <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/40">
+                          <motion.div
+                            className="h-1.5 rounded-full bg-[var(--color-accent)]/50"
+                            initial={prefersReduced ? { width: `${(cam.count / topCount) * 100}%` } : { width: 0 }}
+                            animate={{ width: `${(cam.count / topCount) * 100}%` }}
+                            transition={{ duration: 0.6, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                          />
+                        </div>
+                      </div>
+                      <span className="w-8 text-right font-mono text-[11px] tabular-nums font-medium text-[var(--color-ink)]">
+                        {cam.count}
+                      </span>
+                      {camHealth && <CameraStatusBadge status={camHealth.status} />}
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Camera health panel */}
+        <motion.div variants={motionCardVariants}>
+          <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
+            <CardContent className="p-4">
+              <h2 className="mb-3 flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
+                <Wifi className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                Camera Health
+              </h2>
+              {/* Summary row */}
+              <div className="mb-3 flex items-center gap-3">
+                <span className="flex items-center gap-1 text-[11px] text-[var(--color-success)]">
+                  <Wifi className="h-3 w-3" />
+                  <span className="font-mono font-semibold">{activeCams}</span>
+                  <span className="text-[var(--color-ink-faint)]">active</span>
+                </span>
+                <span className="flex items-center gap-1 text-[11px] text-[var(--color-warning)]">
+                  <Clock className="h-3 w-3" />
+                  <span className="font-mono font-semibold">{idleCams}</span>
+                  <span className="text-[var(--color-ink-faint)]">idle</span>
+                </span>
+                <span className="flex items-center gap-1 text-[11px] text-[var(--color-danger)]">
+                  <WifiOff className="h-3 w-3" />
+                  <span className="font-mono font-semibold">{offlineCams}</span>
+                  <span className="text-[var(--color-ink-faint)]">offline</span>
+                </span>
+              </div>
+              {/* Camera list */}
+              <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                {cameras.length > 0 ? (
+                  cameras.map((cam) => (
+                    <div key={cam.camera_id} className="flex items-center gap-2 py-0.5">
+                      <CameraStatusBadge status={cam.status} />
+                      <span className="flex-1 truncate font-mono text-[11px] text-[var(--color-ink-muted)]">
+                        {cam.junction_name}
+                      </span>
+                      <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
+                        {cam.violation_count_24h}v/24h
+                      </span>
+                      {cam.avg_latency_ms != null && (
+                        <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
+                          {cam.avg_latency_ms}ms
+                        </span>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="py-4 text-center text-xs text-[var(--color-ink-faint)]">
+                    No camera data
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Status breakdown */}
+        <motion.div variants={motionCardVariants}>
+          <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
+            <CardContent className="p-4">
+              <h2 className="mb-3 text-[13px] font-semibold text-[var(--color-ink)]">
+                Review Status
+              </h2>
+              <div className="space-y-3">
+                {analytics
+                  ? Object.entries(analytics.violations_by_status).map(
+                      ([status, count]) => {
+                        const total = analytics.total_violations || 1;
+                        const pct = ((count / total) * 100).toFixed(0);
+                        const colorMap: Record<string, string> = {
+                          pending: "var(--color-accent)",
+                          under_review: "#3b82f6",
+                          approved: "var(--color-phosphor)",
+                          issued: "#06b6d4",
+                          rejected: "var(--color-danger)",
+                        };
+                        const color = colorMap[status] ?? "var(--color-accent)";
+                        return (
+                          <div key={status}>
+                            <div className="mb-1 flex items-center justify-between">
+                              <span className="flex items-center gap-2 text-[11px] capitalize text-[var(--color-ink-muted)]">
+                                <span
+                                  className="h-2 w-2 rounded-full"
+                                  style={{ backgroundColor: color }}
+                                />
+                                {status.replace("_", " ")}
+                              </span>
+                              <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink)]">
+                                {count}
+                                <span className="ml-1 text-[var(--color-ink-faint)]">
+                                  ({pct}%)
+                                </span>
+                              </span>
+                            </div>
+                            <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/40">
+                              <motion.div
+                                className="h-1.5 rounded-full"
+                                initial={prefersReduced ? { width: `${pct}%` } : { width: 0 }}
+                                animate={{ width: `${pct}%` }}
+                                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                                style={{ backgroundColor: color, opacity: 0.7 }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      },
+                    )
+                  : null}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
+    </>
   );
 }

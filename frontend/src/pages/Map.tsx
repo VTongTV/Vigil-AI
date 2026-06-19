@@ -10,20 +10,20 @@
  * Design: "Tactical Map Overlay"
  * - Dark CartoDB tiles with violation markers / heatmap
  * - Floating filter/count panel in the corner
- * - Legend overlay
- * - Heatmap toggle button
+ * - Legend overlay with animated legend swap
+ * - Animated sliding pill for marker/heatmap toggle
  */
 
 import { useEffect, useState, useMemo } from "react";
-import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Popup, ZoomControl } from "react-leaflet";
 import { listViolations } from "@/lib/api";
 import type { ViolationRecord, ViolationType } from "@/types/violation";
 import { VIOLATION_LABELS, VIOLATION_COLORS } from "@/types/violation";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Flame, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import HeatmapLayer from "@/components/HeatmapLayer";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 /** Bengaluru city-centre coordinates. */
 const BENGALURU_CENTER: [number, number] = [12.9716, 77.5946];
@@ -37,6 +37,11 @@ const TILE_ATTRIBUTION =
 
 /** Map display mode — markers or heatmap. */
 type MapViewMode = "markers" | "heatmap";
+
+const MAP_MODES: { id: MapViewMode; label: string; icon: React.ElementType }[] = [
+  { id: "markers", label: "Markers", icon: MapPin },
+  { id: "heatmap", label: "Heatmap", icon: Flame },
+];
 
 /**
  * Resolve a CSS variable colour to a concrete hex/rgb value for Leaflet.
@@ -60,6 +65,7 @@ export default function Map() {
   const [violations, setViolations] = useState<ViolationRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<MapViewMode>("markers");
+  const prefersReduced = useReducedMotion();
 
   useEffect(() => {
     listViolations({ page_size: 500, hide_duplicates: false })
@@ -99,25 +105,36 @@ export default function Map() {
 
   return (
     <div className="relative h-full w-full">
-      {loading && (
-        <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-[var(--color-paper)]/80 backdrop-blur-sm">
-          <div className="space-y-3 text-center">
-            <div className="mx-auto h-8 w-8 rounded-full border-2 border-t-transparent border-[var(--color-accent)] animate-spin" />
-            <p className="text-xs tracking-wider text-[var(--color-ink-faint)] uppercase">
-              Loading violations...
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Loading overlay — AnimatePresence so it fades out smoothly */}
+      <AnimatePresence>
+        {loading && (
+          <motion.div
+            key="loading-overlay"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="absolute inset-0 z-[1000] flex items-center justify-center bg-[var(--color-paper)]/80 backdrop-blur-sm"
+          >
+            <div className="space-y-3 text-center">
+              <div className="mx-auto h-8 w-8 rounded-full border-2 border-t-transparent border-[var(--color-accent)] animate-spin" />
+              <p className="text-xs tracking-wider text-[var(--color-ink-faint)] uppercase">
+                Loading violations...
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <MapContainer
         center={BENGALURU_CENTER}
         zoom={12}
         className="h-full w-full"
         scrollWheelZoom={true}
+        zoomControl={false}
         style={{ background: "var(--color-paper)" }}
       >
         <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
+        <ZoomControl position="bottomright" />
 
         {/* F5: Heatmap layer — shown when viewMode === "heatmap" */}
         {viewMode === "heatmap" && (
@@ -190,37 +207,48 @@ export default function Map() {
           })}
       </MapContainer>
 
-      {/* F5: Heatmap toggle button — top-left */}
+      {/* F5: View mode toggle — sliding pill indicator */}
       <div className="absolute left-4 top-4 z-[1000]">
-        <div className="flex gap-1.5">
-          <Button
-            size="sm"
-            onClick={() => setViewMode("markers")}
-            className={cn(
-              "h-7 gap-1.5 text-[11px] font-semibold",
-              viewMode === "markers"
-                ? "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-bright)]"
-                : "border-[var(--rule-color)] bg-[var(--color-paper-1)]/90 text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-2)]",
-            )}
-            variant={viewMode === "markers" ? "default" : "outline"}
-          >
-            <MapPin className="h-3 w-3" />
-            Markers
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => setViewMode("heatmap")}
-            className={cn(
-              "h-7 gap-1.5 text-[11px] font-semibold",
-              viewMode === "heatmap"
-                ? "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-bright)]"
-                : "border-[var(--rule-color)] bg-[var(--color-paper-1)]/90 text-[var(--color-ink-muted)] hover:bg-[var(--color-paper-2)]",
-            )}
-            variant={viewMode === "heatmap" ? "default" : "outline"}
-          >
-            <Flame className="h-3 w-3" />
-            Heatmap
-          </Button>
+        <div className="relative flex gap-0 rounded-lg border border-[var(--rule-color)] bg-[var(--color-paper-1)]/90 p-1 backdrop-blur-md shadow-lg">
+          {/* Sliding pill background */}
+          {MAP_MODES.map((mode) => (
+            mode.id === viewMode && (
+              <motion.div
+                key="pill"
+                layoutId="map-mode-pill"
+                className="absolute inset-y-1 rounded-md bg-[var(--color-accent)]"
+                style={{
+                  width: `calc(50% - 2px)`,
+                  left: viewMode === "markers" ? "4px" : "calc(50% + 2px)",
+                }}
+                transition={
+                  prefersReduced
+                    ? { duration: 0 }
+                    : { type: "spring", stiffness: 400, damping: 32 }
+                }
+              />
+            )
+          ))}
+          {MAP_MODES.map((mode) => {
+            const Icon = mode.icon;
+            const isActive = viewMode === mode.id;
+            return (
+              <motion.button
+                key={mode.id}
+                whileTap={prefersReduced ? {} : { scale: 0.94 }}
+                onClick={() => setViewMode(mode.id)}
+                className={cn(
+                  "relative z-10 flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-semibold transition-colors duration-150",
+                  isActive
+                    ? "text-white"
+                    : "text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]",
+                )}
+              >
+                <Icon className="h-3 w-3" />
+                {mode.label}
+              </motion.button>
+            );
+          })}
         </div>
       </div>
 
@@ -243,50 +271,66 @@ export default function Map() {
         </Card>
       </div>
 
-      {/* Top-right: legend */}
+      {/* Top-right: legend — AnimatePresence swaps content */}
       <div className="absolute right-4 top-4 z-[1000]">
         <Card className="border-[var(--rule-color)] bg-[var(--color-paper-1)]/90 backdrop-blur-md">
           <CardContent className="p-3">
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
               {viewMode === "heatmap" ? "Intensity" : "Legend"}
             </p>
-            {viewMode === "heatmap" ? (
-              <div className="space-y-1.5">
-                {/* Heatmap intensity gradient legend */}
-                <div className="h-2.5 w-full rounded-sm" style={{
-                  background: "linear-gradient(to right, #3b82f6, #06b6d4, #10b981, #84cc16, #f59e0b, #f97316, #ef4444, #f43f5e)",
-                }} />
-                <div className="flex justify-between text-[11px] text-[var(--color-ink-faint)]">
-                  <span>Low</span>
-                  <span>High</span>
-                </div>
-                <p className="pt-1 text-[11px] text-[var(--color-ink-faint)]">
-                  Intensity based on danger score
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-1.5">
-                {legendEntries.map(([type, count]) => {
-                  const vType = type as ViolationType;
-                  const color = VIOLATION_COLORS[vType] ?? "var(--color-accent)";
-                  const label = VIOLATION_LABELS[vType] ?? type;
-                  return (
-                    <div key={type} className="flex items-center gap-2">
-                      <span
-                        className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: color }}
-                      />
-                      <span className="text-[11px] text-[var(--color-ink-muted)]">
-                        {label}
-                      </span>
-                      <span className="ml-auto font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
-                        {count}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            <AnimatePresence mode="wait">
+              {viewMode === "heatmap" ? (
+                <motion.div
+                  key="heatmap-legend"
+                  initial={prefersReduced ? {} : { opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.18 }}
+                  className="space-y-1.5"
+                >
+                  {/* Heatmap intensity gradient legend */}
+                  <div className="h-2.5 w-full rounded-sm" style={{
+                    background: "linear-gradient(to right, #3b82f6, #06b6d4, #10b981, #84cc16, #f59e0b, #f97316, #ef4444, #f43f5e)",
+                  }} />
+                  <div className="flex justify-between text-[11px] text-[var(--color-ink-faint)]">
+                    <span>Low</span>
+                    <span>High</span>
+                  </div>
+                  <p className="pt-1 text-[11px] text-[var(--color-ink-faint)]">
+                    Intensity based on danger score
+                  </p>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="marker-legend"
+                  initial={prefersReduced ? {} : { opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.18 }}
+                  className="space-y-1.5"
+                >
+                  {legendEntries.map(([type, count]) => {
+                    const vType = type as ViolationType;
+                    const color = VIOLATION_COLORS[vType] ?? "var(--color-accent)";
+                    const label = VIOLATION_LABELS[vType] ?? type;
+                    return (
+                      <div key={type} className="flex items-center gap-2">
+                        <span
+                          className="h-2 w-2 rounded-full"
+                          style={{ backgroundColor: color }}
+                        />
+                        <span className="text-[11px] text-[var(--color-ink-muted)]">
+                          {label}
+                        </span>
+                        <span className="ml-auto font-mono text-[11px] tabular-nums text-[var(--color-ink-faint)]">
+                          {count}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </CardContent>
         </Card>
       </div>
