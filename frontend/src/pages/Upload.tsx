@@ -465,8 +465,10 @@ export default function Upload() {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-        {/* Left Side: 2x2 Symmetrical Grid for Inputs & Queues */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        {/* Left Side: inputs grid + violation result cards below */}
+        <div className="flex flex-col gap-5">
+          {/* 2x2 Symmetrical Grid for Inputs & Queues */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {/* Top Left: Drop zone */}
           <motion.div
             animate={prefersReduced ? {} : dragOver ? { scale: 1.02 } : { scale: 1 }}
@@ -738,7 +740,26 @@ export default function Upload() {
               )}
             </CardContent>
           </Card>
-        </div>
+          </div>{/* end 2x2 grid */}
+
+          {/* Violation result cards — below Demo Quick-Select & Batch Queue */}
+          <AnimatePresence mode="wait">
+            {activeFile?.result && activeFile.result.violations.length > 0 && (
+              <motion.div
+                key={`viol-cards-${activeIndex}`}
+                className="space-y-2"
+                variants={prefersReduced ? {} : { hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
+                initial="hidden"
+                animate="visible"
+                exit={{ opacity: 0 }}
+              >
+                {activeFile.result.violations.map((v: ViolationRecord) => (
+                  <ViolationResultCard key={v.id} violation={v} prefersReduced={prefersReduced ?? false} />
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>{/* end left column */}
 
         {/* Right Side: Results panel */}
         <div className="flex flex-col gap-4">
@@ -834,17 +855,6 @@ export default function Upload() {
                   </Card>
                 )}
 
-                {/* Violation result cards — staggered entrance */}
-                <motion.div
-                  className="space-y-2"
-                  variants={prefersReduced ? {} : { hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
-                  initial="hidden"
-                  animate="visible"
-                >
-                  {activeFile.result.violations.map((v: ViolationRecord) => (
-                    <ViolationResultCard key={v.id} violation={v} prefersReduced={prefersReduced ?? false} />
-                  ))}
-                </motion.div>
               </motion.div>
             ) : activeFile?.error ? (
               <motion.div
