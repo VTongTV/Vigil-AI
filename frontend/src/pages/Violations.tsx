@@ -26,6 +26,16 @@ import {
   ChevronRight,
   History,
   AlertTriangle,
+  ShieldAlert,
+  IndianRupee,
+  Camera,
+  MapPin,
+  Clock,
+  Hash,
+  Activity,
+  Car,
+  FileText,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { listViolations, actionViolation } from "@/lib/api";
@@ -394,47 +404,88 @@ export default function Violations() {
 
       {/* ── Detail sheet ── */}
       <SheetPrimitive open={!!detailViolation} onOpenChange={(open) => !open && setDetailViolation(null)}>
-        <SheetContent className="border-[var(--color-paper-3)] bg-[var(--color-paper-1)]">
-          <SheetHeader className="mb-4">
-            <SheetTitle className="text-[15px] font-semibold text-[var(--color-ink)]">
-              Violation Detail
-            </SheetTitle>
-            {/* L5: ID — auxiliary */}
-            <SheetDescription className="font-mono text-[10px] text-[var(--color-ink-faint)]">
-              {detailViolation?.id}
-            </SheetDescription>
-          </SheetHeader>
-          {detailViolation && (
-            <div className="space-y-5">
-              {/* Primary group — type, fine, status (highest visibility) */}
+        <SheetContent
+          side="right"
+          showCloseButton={false}
+          className="flex w-[400px] max-w-[95vw] flex-col gap-0 border-l border-[var(--rule-color)] bg-[var(--color-paper-1)] p-0 sm:w-[420px]"
+        >
+          {/* ── Sheet header ── */}
+          <div className="flex items-start justify-between border-b border-[var(--rule-color)] px-5 py-4">
+            <div className="flex items-center gap-3">
+              <div
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                style={{
+                  backgroundColor: detailViolation
+                    ? `color-mix(in oklch, ${VIOLATION_COLORS[detailViolation.violation_type] ?? "var(--color-accent)"} 12%, transparent)`
+                    : "var(--color-accent-soft)",
+                  border: `1px solid color-mix(in oklch, ${detailViolation ? (VIOLATION_COLORS[detailViolation.violation_type] ?? "var(--color-accent)") : "var(--color-accent)"} 25%, transparent)`,
+                }}
+              >
+                <ShieldAlert
+                  className="h-4 w-4"
+                  style={{ color: detailViolation ? (VIOLATION_COLORS[detailViolation.violation_type] ?? "var(--color-accent)") : "var(--color-accent)" }}
+                />
+              </div>
               <div>
-                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                  Violation
-                </p>
-                <div className="space-y-2">
-                  <DetailRow
-                    label="Type"
-                    value={
-                      <span className="text-[13px] font-semibold text-[var(--color-ink)]">
-                        {VIOLATION_LABELS[detailViolation.violation_type] ?? detailViolation.violation_type}
-                      </span>
-                    }
-                  />
-                  <DetailRow
-                    label="Fine"
-                    value={
-                      <span className="font-mono text-[16px] font-bold text-[var(--color-warning)]">
+                <SheetTitle className="text-[14px] font-semibold text-[var(--color-ink)]">
+                  Violation Detail
+                </SheetTitle>
+                <SheetDescription className="mt-0.5 font-mono text-[10px] text-[var(--color-ink-faint)]">
+                  {detailViolation?.id.slice(0, 16)}…
+                </SheetDescription>
+              </div>
+            </div>
+            <button
+              onClick={() => setDetailViolation(null)}
+              className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--color-ink-faint)] transition-colors hover:bg-[var(--color-paper-3)]/50 hover:text-[var(--color-ink)]"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* ── Scrollable body ── */}
+          <ScrollArea className="flex-1 overflow-y-auto">
+            {detailViolation && (
+              <div className="space-y-0 divide-y divide-[var(--rule-color)]">
+
+                {/* Section 1: Violation identity */}
+                <div className="px-5 py-4">
+                  <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-ink-faint)]">
+                    <ShieldAlert className="h-3 w-3" />
+                    Violation
+                  </p>
+                  <div
+                    className="mb-3 flex items-center gap-2.5 rounded-lg p-3"
+                    style={{
+                      backgroundColor: `color-mix(in oklch, ${VIOLATION_COLORS[detailViolation.violation_type] ?? "var(--color-accent)"} 8%, transparent)`,
+                      border: `1px solid color-mix(in oklch, ${VIOLATION_COLORS[detailViolation.violation_type] ?? "var(--color-accent)"} 20%, transparent)`,
+                    }}
+                  >
+                    <span
+                      className="h-3 w-3 shrink-0 rounded-full"
+                      style={{ backgroundColor: VIOLATION_COLORS[detailViolation.violation_type] ?? "var(--color-accent)" }}
+                    />
+                    <span className="text-[13px] font-semibold text-[var(--color-ink)]">
+                      {VIOLATION_LABELS[detailViolation.violation_type] ?? detailViolation.violation_type}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="rounded-md bg-[var(--color-paper-2)]/60 p-2.5">
+                      <p className="mb-0.5 flex items-center gap-1 text-[10px] text-[var(--color-ink-faint)]">
+                        <IndianRupee className="h-2.5 w-2.5" /> Fine
+                      </p>
+                      <p className="font-mono text-[16px] font-bold text-[var(--color-warning)]">
                         ₹{detailViolation.fine_amount.toLocaleString("en-IN")}
-                      </span>
-                    }
-                  />
-                  <DetailRow
-                    label="Status"
-                    value={
+                      </p>
+                    </div>
+                    <div className="rounded-md bg-[var(--color-paper-2)]/60 p-2.5">
+                      <p className="mb-0.5 flex items-center gap-1 text-[10px] text-[var(--color-ink-faint)]">
+                        <Activity className="h-2.5 w-2.5" /> Status
+                      </p>
                       <Badge
                         variant="outline"
                         className={cn(
-                          "text-[11px]",
+                          "mt-0.5 text-[11px] font-semibold",
                           {
                             pending: "border-[var(--color-warning)]/30 bg-[var(--color-warning)]/10 text-[var(--color-warning)]",
                             under_review: "border-blue-400/30 bg-blue-400/10 text-blue-400",
@@ -446,36 +497,120 @@ export default function Violations() {
                       >
                         {detailViolation.status}
                       </Badge>
-                    }
-                  />
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              {/* Secondary group — enforcement details */}
-              <div>
-                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                  Enforcement
-                </p>
-                <div className="space-y-2">
-                  <DetailRow label="MV Act" value={<span className="text-[12px] text-[var(--color-ink)]">{detailViolation.mv_act_section}</span>} />
-                  <DetailRow label="Confidence" value={<span className="font-mono text-[12px] text-[var(--color-ink-muted)]">{(detailViolation.confidence * 100).toFixed(1)}%</span>} />
-                  <DetailRow label="Plate" value={<span className="font-mono text-[12px] text-[var(--color-accent)]">{detailViolation.license_plate?.text ?? "—"}</span>} />
+                {/* Section 2: Enforcement */}
+                <div className="px-5 py-4">
+                  <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-ink-faint)]">
+                    <FileText className="h-3 w-3" />
+                    Enforcement
+                  </p>
+                  <div className="space-y-2.5">
+                    <SheetDetailRow icon={Hash} label="MV Act" value={detailViolation.mv_act_section} />
+                    <SheetDetailRow
+                      icon={Activity}
+                      label="Confidence"
+                      value={
+                        <span className="flex items-center gap-2">
+                          <span className="font-mono text-[12px] font-medium text-[var(--color-ink)]">
+                            {(detailViolation.confidence * 100).toFixed(1)}%
+                          </span>
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              "text-[10px]",
+                              {
+                                high: "border-[var(--color-success)]/30 bg-[var(--color-success)]/10 text-[var(--color-success)]",
+                                medium: "border-[var(--color-warning)]/30 bg-[var(--color-warning)]/10 text-[var(--color-warning)]",
+                                low: "border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 text-[var(--color-danger)]",
+                              }[detailViolation.confidence_tier] ?? ""
+                            )}
+                          >
+                            {detailViolation.confidence_tier}
+                          </Badge>
+                        </span>
+                      }
+                    />
+                    <SheetDetailRow
+                      icon={Car}
+                      label="Plate"
+                      value={
+                        <span className="font-mono text-[12px] font-semibold text-[var(--color-accent)]">
+                          {detailViolation.license_plate?.text ?? "—"}
+                        </span>
+                      }
+                    />
+                    {detailViolation.danger_score !== undefined && (
+                      <SheetDetailRow
+                        icon={AlertTriangle}
+                        label="Danger Score"
+                        value={
+                          <span className="font-mono text-[12px] font-medium text-[var(--color-danger)]">
+                            {detailViolation.danger_score}
+                          </span>
+                        }
+                      />
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              {/* Tertiary group — location and audit metadata */}
-              <div>
-                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                  Location & Audit
-                </p>
-                <div className="space-y-2">
-                  <DetailRow label="Camera" value={<span className="font-mono text-[11px] text-[var(--color-ink-muted)]">{detailViolation.camera_id ?? "—"}</span>} />
-                  <DetailRow label="Junction" value={<span className="text-[11px] text-[var(--color-ink-muted)]">{detailViolation.junction_name ?? "—"}</span>} />
-                  <DetailRow label="Timestamp" value={<span className="font-mono text-[10px] text-[var(--color-ink-faint)]">{new Date(detailViolation.timestamp).toLocaleString("en-IN")}</span>} />
+                {/* Section 3: Location & metadata */}
+                <div className="px-5 py-4">
+                  <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-ink-faint)]">
+                    <MapPin className="h-3 w-3" />
+                    Location & Metadata
+                  </p>
+                  <div className="space-y-2.5">
+                    <SheetDetailRow icon={Camera} label="Camera" value={
+                      <span className="font-mono text-[11px] text-[var(--color-ink-muted)]">{detailViolation.camera_id ?? "—"}</span>
+                    } />
+                    <SheetDetailRow icon={MapPin} label="Junction" value={
+                      <span className="text-[11px] text-[var(--color-ink-muted)]">{detailViolation.junction_name ?? "—"}</span>
+                    } />
+                    <SheetDetailRow icon={Clock} label="Timestamp" value={
+                      <span className="font-mono text-[10px] text-[var(--color-ink-faint)]">
+                        {new Date(detailViolation.timestamp).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
+                      </span>
+                    } />
+                    <SheetDetailRow icon={Hash} label="ID" value={
+                      <span className="font-mono text-[10px] text-[var(--color-ink-faint)] break-all">{detailViolation.id}</span>
+                    } />
+                  </div>
                 </div>
+
+                {/* Section 4: Actions (only if pending) */}
+                {detailViolation.status === "pending" && (
+                  <div className="px-5 py-4">
+                    <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-ink-faint)]">
+                      <Activity className="h-3 w-3" />
+                      Actions
+                    </p>
+                    <div className="flex gap-2">
+                      <motion.button
+                        whileTap={prefersReduced ? {} : { scale: 0.96 }}
+                        onClick={() => { handleAction(detailViolation.id, "approve"); setDetailViolation(null); }}
+                        className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[var(--color-success)]/10 py-2.5 text-[12px] font-semibold text-[var(--color-success)] ring-1 ring-[var(--color-success)]/25 transition-colors hover:bg-[var(--color-success)]/20"
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                        Approve
+                      </motion.button>
+                      <motion.button
+                        whileTap={prefersReduced ? {} : { scale: 0.96 }}
+                        onClick={() => { handleAction(detailViolation.id, "reject"); setDetailViolation(null); }}
+                        className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[var(--color-paper-2)] py-2.5 text-[12px] font-semibold text-[var(--color-danger)] ring-1 ring-[var(--color-paper-3)]/50 transition-colors hover:bg-[var(--color-danger)]/10"
+                      >
+                        <XCircle className="h-4 w-4" />
+                        Reject
+                      </motion.button>
+                    </div>
+                  </div>
+                )}
+
               </div>
-            </div>
-          )}
+            )}
+          </ScrollArea>
         </SheetContent>
       </SheetPrimitive>
     </motion.div>
@@ -606,6 +741,33 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
         ? <span className="text-[12px] font-medium text-[var(--color-ink)]">{value}</span>
         : value
       }</span>
+    </div>
+  );
+}
+
+/** Icon + label key-value row used in the restyled detail sheet. */
+function SheetDetailRow({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-3">
+      <span className="flex shrink-0 items-center gap-1.5 text-[11px] text-[var(--color-ink-faint)]">
+        <Icon className="h-3 w-3 shrink-0" />
+        {label}
+      </span>
+      <span className="text-right">
+        {typeof value === "string" ? (
+          <span className="text-[12px] font-medium text-[var(--color-ink)]">{value}</span>
+        ) : (
+          value
+        )}
+      </span>
     </div>
   );
 }
