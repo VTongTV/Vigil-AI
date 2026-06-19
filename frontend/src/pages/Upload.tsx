@@ -10,6 +10,13 @@
  * - Rich violation result cards with shadcn components
  * - AnnotatedViewer with bbox overlays
  * - Batch progress bar with per-file status tracking
+ *
+ * Hierarchy (mirrors Dashboard reference):
+ *   L1 Hero     → font-mono text-[18px]+ font-bold  (fine amount, total time)
+ *   L2 Title    → text-[13px] font-semibold text-ink (card/section titles)
+ *   L3 Body     → text-[14px] font-semibold / text-[12px] font-medium (violation type, labels)
+ *   L4 Label    → text-[11px] uppercase tracking-wider text-faint (category stamps)
+ *   L5 Aux      → text-[10px] tabular-nums text-faint (camera IDs, timing abbrevs)
  */
 
 import { useState, useRef, useCallback } from "react";
@@ -415,24 +422,45 @@ export default function Upload() {
 
   return (
     <motion.div
-      className="p-5"
+      className="p-5 lg:p-6"
       initial={prefersReduced ? {} : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
     >
+      {/* ── Header ── */}
       <header className="mb-5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent-soft)] ring-1 ring-[var(--color-accent)]/15">
-            <UploadArrow className="h-4 w-4 text-[var(--color-accent)]" />
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent-soft)] ring-1 ring-[var(--color-accent)]/15">
+              <UploadArrow className="h-4 w-4 text-[var(--color-accent)]" />
+            </div>
+            <div>
+              {/* L1: page title */}
+              <h1 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">
+                Detect Violations
+              </h1>
+              {/* L4: subtitle */}
+              <p className="text-[11px] text-[var(--color-ink-faint)]">
+                Upload up to {MAX_BATCH_SIZE} traffic camera images for batch violation detection
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">
-              Detect Violations
-            </h1>
-            <p className="text-[12px] text-[var(--color-ink-faint)]">
-              Upload up to {MAX_BATCH_SIZE} traffic camera images for batch violation detection
-            </p>
-          </div>
+          {/* Batch aggregate hero pills — visible at a glance */}
+          {batchStats.done > 0 && !batchRunning && (
+            <div className="flex items-center gap-2">
+              <span className="rounded-md bg-[var(--color-success)]/10 px-2.5 py-1 font-mono text-[13px] font-bold tabular-nums text-[var(--color-success)] ring-1 ring-[var(--color-success)]/20">
+                {batchStats.totalViolations} violations
+              </span>
+              <span className="rounded-md bg-[var(--color-paper-2)] px-2.5 py-1 font-mono text-[12px] tabular-nums text-[var(--color-ink-muted)] ring-1 ring-[var(--color-paper-3)]/50">
+                {batchStats.totalTime}ms
+              </span>
+              {batchStats.errors > 0 && (
+                <span className="rounded-md bg-[var(--color-danger)]/10 px-2.5 py-1 font-mono text-[12px] tabular-nums text-[var(--color-danger)] ring-1 ring-[var(--color-danger)]/20">
+                  {batchStats.errors} error{batchStats.errors > 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </header>
 
@@ -502,20 +530,26 @@ export default function Upload() {
 
           {/* Bottom Left: Controls */}
           <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 h-[280px] flex flex-col justify-between">
-            <CardContent className="space-y-3 p-3.5">
+            <CardContent className="space-y-3 p-4">
+              {/* L2: section label */}
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                Detection Controls
+              </p>
+
               {/* Camera select */}
               <div>
-                <label className="mb-1.5 block text-[11px] font-medium tracking-wider text-[var(--color-ink-faint)] uppercase">
+                {/* L4: field label */}
+                <label className="mb-1.5 block text-[11px] font-semibold tracking-wider text-[var(--color-ink-faint)] uppercase">
                   Camera ID
                 </label>
                 <Select value={cameraId} onValueChange={(val) => { if (val !== null) setCameraId(val); }}>
-                  <SelectTrigger className="h-8 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50 text-xs">
+                  <SelectTrigger className="h-8 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50 text-[12px]">
                     <SelectValue placeholder="Select camera (optional)" />
                   </SelectTrigger>
                   <SelectContent>
                     {DEMO_CAMERAS.map((c) => (
                       <SelectItem key={c.id} value={c.id}>
-                        <span className="text-xs">{c.name}</span>
+                        <span className="text-[12px]">{c.name}</span>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -525,13 +559,13 @@ export default function Upload() {
               {/* Signal state */}
               <div className="flex items-center gap-2 rounded-md bg-[var(--color-paper-2)]/50 px-3 py-1.5">
                 <Camera className="h-3.5 w-3.5 text-[var(--color-ink-faint)]" />
-                <span className="text-[11px] text-[var(--color-ink-faint)] uppercase tracking-wider">
+                <span className="text-[11px] font-semibold text-[var(--color-ink-faint)] uppercase tracking-wider">
                   Signal:
                 </span>
                 <Badge
                   variant="outline"
                   className={cn(
-                    "text-[11px] font-mono",
+                    "text-[11px] font-mono font-semibold",
                     signalState === "red"
                       ? "border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 text-[var(--color-danger)]"
                       : signalState === "green"
@@ -543,12 +577,12 @@ export default function Upload() {
                 </Badge>
               </div>
 
-              {/* Batch submit button */}
+              {/* PRIMARY CTA: Run Detection — unmistakably dominant */}
               <Button
                 onClick={runBatch}
                 disabled={batchFiles.length === 0 || batchRunning}
                 className={cn(
-                  "w-full text-xs font-semibold",
+                  "w-full h-9 text-[13px] font-semibold",
                   batchFiles.length > 0 && !batchRunning
                     ? "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-bright)]"
                     : "bg-[var(--color-paper-3)] text-[var(--color-ink-faint)]",
@@ -556,29 +590,16 @@ export default function Upload() {
               >
                 {batchRunning ? (
                   <span className="flex items-center gap-2">
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     Processing ({batchStats.done}/{batchStats.total})…
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
-                    <Zap className="h-3.5 w-3.5" />
+                    <Zap className="h-4 w-4" />
                     Run Detection{batchFiles.length > 1 ? ` (${batchFiles.length} files)` : ""}
                   </span>
                 )}
               </Button>
-
-              {/* Batch aggregate summary */}
-              {batchStats.done > 0 && !batchRunning && (
-                <div className="rounded-md bg-[var(--color-success)]/8 px-3 py-2 ring-1 ring-[var(--color-success)]/20">
-                  <p className="text-[11px] font-medium text-[var(--color-success)]">
-                    Batch complete: {batchStats.totalViolations} violation(s) across {batchStats.done} image(s)
-                  </p>
-                  <p className="text-[11px] text-[var(--color-success)]/70">
-                    Total processing time: {batchStats.totalTime}ms
-                    {batchStats.errors > 0 && ` · ${batchStats.errors} error(s)`}
-                  </p>
-                </div>
-              )}
             </CardContent>
           </Card>
 
@@ -596,7 +617,7 @@ export default function Upload() {
                   Click an example to load a demo image with matching camera
                 </p>
               </div>
-              <div className="grid grid-cols-1 gap-1.5 overflow-y-auto pr-1 flex-1 min-h-0">
+              <div className="grid grid-cols-1 gap-1 overflow-y-auto pr-1 flex-1 min-h-0">
                 {DEMO_IMAGES.map((demo) => {
                   const vColor =
                     VIOLATION_COLORS[demo.type as keyof typeof VIOLATION_COLORS] ?? "var(--color-accent)";
@@ -606,24 +627,27 @@ export default function Upload() {
                       onClick={() => loadDemoImage(demo)}
                       disabled={batchRunning}
                       className={cn(
-                        "group flex flex-col items-start gap-0.5 rounded-md border px-2.5 py-2 text-left transition-all duration-200",
+                        "group flex items-start gap-2.5 rounded-md border px-2.5 py-2 text-left transition-all duration-200",
                         "border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70",
                         "hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent)]/5",
                         "disabled:opacity-50 disabled:cursor-not-allowed",
                       )}
                     >
-                      <div className="flex items-center gap-1.5">
-                        <span
-                          className="h-2 w-2 shrink-0 rounded-full"
-                          style={{ backgroundColor: vColor }}
-                        />
-                        <span className="text-[11px] font-medium text-[var(--color-ink)] truncate">
+                      {/* Violation type color dot */}
+                      <span
+                        className="mt-1 h-2 w-2 shrink-0 rounded-full"
+                        style={{ backgroundColor: vColor }}
+                      />
+                      <div className="min-w-0">
+                        {/* L3: demo label — primary, readable font-medium */}
+                        <span className="block text-[12px] font-medium text-[var(--color-ink)] truncate">
                           {demo.label}
                         </span>
+                        {/* L5: camera ID — auxiliary, faintest */}
+                        <span className="block font-mono text-[10px] text-[var(--color-ink-faint)]">
+                          {demo.cameraId}
+                        </span>
                       </div>
-                      <span className="text-[11px] text-[var(--color-ink-faint)] pl-3.5">
-                        {demo.cameraId}
-                      </span>
                     </button>
                   );
                 })}
@@ -747,11 +771,14 @@ export default function Upload() {
               <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
                 <CardContent className="p-4">
                   <div className="mb-3 flex items-center justify-between">
-                    <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                    {/* L2: section title — promoted from L4 */}
+                    <h3 className="text-[13px] font-semibold text-[var(--color-ink)]">
                       Pipeline Timing
                     </h3>
-                    <span className="font-mono text-[11px] tabular-nums text-[var(--color-accent)]">
-                      {activeFile.result.processing_time_ms}ms total
+                    {/* L1: total time — hero metric for this panel */}
+                    <span className="font-mono text-[18px] font-bold tabular-nums text-[var(--color-accent)]">
+                      {activeFile.result.processing_time_ms}
+                      <span className="ml-1 text-[12px] font-medium text-[var(--color-ink-faint)]">ms</span>
                     </span>
                   </div>
                   <div className="space-y-1.5">
@@ -763,7 +790,8 @@ export default function Upload() {
                       const pct = Math.max((ms / maxMs) * 100, 3);
                       return (
                         <div key={stage.key} className="flex items-center gap-2">
-                          <span className="w-12 shrink-0 text-right font-mono text-[11px] font-medium text-[var(--color-ink-faint)]">
+                          {/* L5: stage abbreviation — auxiliary */}
+                          <span className="w-14 shrink-0 text-right font-mono text-[10px] font-medium text-[var(--color-ink-faint)]">
                             {stage.abbr}
                           </span>
                           <div className="flex-1 overflow-hidden rounded-sm bg-[var(--color-paper-3)]/30">
@@ -782,7 +810,8 @@ export default function Upload() {
                               }}
                             />
                           </div>
-                          <span className="w-14 shrink-0 text-right font-mono text-[11px] tabular-nums text-[var(--color-ink-muted)]">
+                          {/* L3: ms value — body content */}
+                          <span className="w-14 shrink-0 text-right font-mono text-[12px] tabular-nums font-medium text-[var(--color-ink-muted)]">
                             {ms}ms
                           </span>
                         </div>
@@ -923,10 +952,12 @@ function ViolationResultCard({ violation: v, prefersReduced }: { violation: Viol
       <div className="flex">
         {/* Left color accent strip */}
         <div className="w-1 shrink-0" style={{ backgroundColor: vColor }} />
-        <CardContent className="flex-1 p-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-[var(--color-ink)]">
+        <CardContent className="flex-1 p-3.5">
+          {/* Top row: type (L3) + badges + plate */}
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              {/* L3: violation type — primary card content */}
+              <span className="text-[14px] font-semibold text-[var(--color-ink)]">
                 {vLabel}
               </span>
               <Badge variant="outline" className={cn("text-[11px]", tierColor)}>
@@ -938,31 +969,34 @@ function ViolationResultCard({ violation: v, prefersReduced }: { violation: Viol
                 </Badge>
               )}
             </div>
-            <div className="flex items-center gap-3">
-              {v.license_plate && (
-                <span className="rounded bg-[var(--color-accent)]/10 px-2 py-0.5 font-mono text-[11px] font-semibold text-[var(--color-accent)]">
-                  {v.license_plate.text}
-                </span>
-              )}
-              <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink-muted)]">
-                {(v.confidence * 100).toFixed(0)}%
-              </span>
-              <span className="font-mono text-[11px] text-[var(--color-ink-faint)]">
-                {vSection}
-              </span>
-            </div>
-          </div>
-          <div className="mt-1 flex items-center gap-4 text-[11px] text-[var(--color-ink-faint)]">
-            <span>
-              Fine: <span className="font-medium text-[var(--color-warning)]">₹{v.fine_amount.toLocaleString("en-IN")}</span>
-            </span>
-            {v.camera_id && <span>Camera: {v.camera_id}</span>}
-            {v.ai_explanation && (
-              <span className="truncate max-w-xs" title={v.ai_explanation}>
-                {v.ai_explanation.slice(0, 80)}{v.ai_explanation.length > 80 ? "…" : ""}
+            {/* License plate — distinctive accent mono */}
+            {v.license_plate && (
+              <span className="shrink-0 rounded bg-[var(--color-accent)]/10 px-2 py-0.5 font-mono text-[12px] font-semibold text-[var(--color-accent)]">
+                {v.license_plate.text}
               </span>
             )}
           </div>
+
+          {/* Bottom row: fine (L1 hero) + supporting meta */}
+          <div className="mt-2 flex items-end justify-between gap-2">
+            {/* L1: fine amount — dominant metric on this card */}
+            <span className="font-mono text-[18px] font-bold tabular-nums text-[var(--color-warning)]">
+              ₹{v.fine_amount.toLocaleString("en-IN")}
+            </span>
+            {/* L5: aux metadata — confidence, section, camera */}
+            <div className="flex items-center gap-3 text-[10px] text-[var(--color-ink-faint)]">
+              <span className="font-mono">{(v.confidence * 100).toFixed(0)}% conf</span>
+              <span className="font-mono">{vSection}</span>
+              {v.camera_id && <span>{v.camera_id}</span>}
+            </div>
+          </div>
+
+          {/* AI explanation — tertiary, only if present */}
+          {v.ai_explanation && (
+            <p className="mt-2 truncate text-[11px] text-[var(--color-ink-faint)]" title={v.ai_explanation}>
+              {v.ai_explanation.slice(0, 100)}{v.ai_explanation.length > 100 ? "…" : ""}
+            </p>
+          )}
         </CardContent>
       </div>
     </Card>

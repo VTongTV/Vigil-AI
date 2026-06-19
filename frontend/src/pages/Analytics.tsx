@@ -8,6 +8,13 @@
  * - ROI table with accent color coding
  * - Period selector with shadcn Select
  * - Framer Motion staggered card entrances
+ *
+ * Hierarchy (mirrors Dashboard reference):
+ *   L1 Hero     → font-mono text-[22px] font-bold tabular-nums  (primary metric)
+ *   L2 Title    → text-[13px] font-semibold text-ink            (section labels)
+ *   L3 Body     → text-[12px] font-medium text-ink-muted        (row content)
+ *   L4 Label    → text-[11px] tracking-wider uppercase text-faint (category stamps)
+ *   L5 Aux      → text-[10px] tabular-nums text-faint           (timestamps, IDs)
  */
 
 import { useEffect, useState } from "react";
@@ -18,6 +25,7 @@ import {
   AlertTriangle,
   IndianRupee,
   PieChart as PieIcon,
+  Activity,
 } from "lucide-react";
 import {
   BarChart,
@@ -186,44 +194,54 @@ export default function Analytics() {
 
   return (
     <motion.div
-      className="p-5"
+      className="p-5 lg:p-6"
       initial={prefersReduced ? {} : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
     >
-      <header className="mb-5">
+      {/* ── Header ── */}
+      <header className="mb-6">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-accent-soft)] ring-1 ring-[var(--color-accent)]/15">
               <BarChart3 className="h-4 w-4 text-[var(--color-accent)]" />
             </div>
             <div>
+              {/* L1: page title — largest text on page */}
               <h1 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">
                 Analytics
               </h1>
+              {/* L4: subtitle — subdued category stamp */}
               <p className="text-[11px] text-[var(--color-ink-faint)]">
                 Violation trends and enforcement statistics
               </p>
             </div>
           </div>
-          <div className="relative z-50 flex-shrink-0">
-            <Select value={String(days)} onValueChange={(v) => setDays(Number(v))}>
-              <SelectTrigger className="h-7 w-36 border-[var(--rule-color)] bg-[var(--color-paper-2)] text-[11px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent side="bottom" align="end">
-                <SelectItem value="7">Last 7 days</SelectItem>
-                <SelectItem value="30">Last 30 days</SelectItem>
-                <SelectItem value="90">Last 90 days</SelectItem>
-              </SelectContent>
-            </Select>
+
+          {/* Period selector — explicit label prevents ambiguity */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
+              Period
+            </span>
+            <div className="relative z-50">
+              <Select value={String(days)} onValueChange={(v) => setDays(Number(v))}>
+                <SelectTrigger className="h-7 w-36 border-[var(--rule-color)] bg-[var(--color-paper-2)] text-[11px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent side="bottom" align="end">
+                  <SelectItem value="7">Last 7 days</SelectItem>
+                  <SelectItem value="30">Last 30 days</SelectItem>
+                  <SelectItem value="90">Last 90 days</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Summary stats — staggered */}
+      {/* ── L1 Hero stat row — staggered entrance ── */}
       <motion.div
-        className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3"
+        className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3"
         variants={motionContainer}
         initial="hidden"
         animate="visible"
@@ -232,7 +250,7 @@ export default function Analytics() {
           <StatBox
             icon={AlertTriangle}
             label="Total Violations"
-            value={totalViolations}
+            value={totalViolations.toLocaleString("en-IN")}
             color="var(--color-accent)"
           />
         </motion.div>
@@ -254,7 +272,7 @@ export default function Analytics() {
         </motion.div>
       </motion.div>
 
-      {/* Charts */}
+      {/* ── Charts grid ── */}
       <AnimatePresence mode="wait">
         <motion.div
           key={days}
@@ -267,10 +285,17 @@ export default function Analytics() {
           {/* Violation type bar chart */}
           <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
             <CardContent className="p-4">
-              <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold text-[var(--color-ink)]">
-                <BarChart3 className="h-3.5 w-3.5 text-[var(--color-accent)]" />
-                Violations by Type
-              </h2>
+              {/* L2: card title with icon anchor */}
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
+                  <BarChart3 className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                  Violations by Type
+                </h2>
+                {/* L4: count stamp — subdued, supporting */}
+                <span className="font-mono text-[11px] tabular-nums text-[var(--color-phosphor)]">
+                  {totalViolations} total
+                </span>
+              </div>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={typeData}>
@@ -304,10 +329,15 @@ export default function Analytics() {
           {/* Status pie chart */}
           <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
             <CardContent className="p-4">
-              <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold text-[var(--color-ink)]">
-                <PieIcon className="h-3.5 w-3.5 text-[var(--color-accent)]" />
-                Review Status
-              </h2>
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
+                  <PieIcon className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                  Review Status
+                </h2>
+                <span className="font-mono text-[11px] tabular-nums text-[var(--color-phosphor)]">
+                  {statusData.reduce((s, d) => s + d.value, 0)} records
+                </span>
+              </div>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -334,12 +364,18 @@ export default function Analytics() {
             </CardContent>
           </Card>
 
-          {/* Daily trend */}
+          {/* Daily trend — full width */}
           <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 lg:col-span-2">
             <CardContent className="p-4">
-              <h2 className="mb-3 text-xs font-semibold text-[var(--color-ink)]">
-                Daily Violation Trend
-              </h2>
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
+                  <Activity className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                  Daily Violation Trend
+                </h2>
+                <span className="font-mono text-[11px] tabular-nums text-[var(--color-phosphor)]">
+                  {days}d window
+                </span>
+              </div>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={dailyData}>
@@ -364,7 +400,7 @@ export default function Analytics() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Top cameras */}
+      {/* ── Top cameras ── */}
       {analytics && analytics.top_cameras.length > 0 && (
         <motion.div
           initial={prefersReduced ? {} : { opacity: 0, y: 10 }}
@@ -373,18 +409,28 @@ export default function Analytics() {
         >
           <Card className="mt-4 border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
             <CardContent className="p-4">
-              <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold text-[var(--color-ink)]">
-                <Camera className="h-3.5 w-3.5 text-[var(--color-accent)]" />
-                Top Cameras by Violation Count
-              </h2>
-              <div className="space-y-2">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
+                  <Camera className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                  Top Cameras by Violation Count
+                </h2>
+                <span className="font-mono text-[11px] tabular-nums text-[var(--color-phosphor)]">
+                  {analytics.top_cameras.length} cameras
+                </span>
+              </div>
+              <div className="space-y-2.5">
                 {analytics.top_cameras.map((cam, i) => (
-                  <div key={cam.camera_id} className="flex items-center gap-2.5">
-                    <Camera className="h-3 w-3 text-[var(--color-ink-faint)]" />
-                    <span className="flex-1 text-[11px] text-[var(--color-ink-muted)]">
+                  <div key={cam.camera_id} className="flex items-center gap-3">
+                    {/* L5: rank — faintest, auxiliary */}
+                    <span className="w-4 text-right font-mono text-[10px] tabular-nums text-[var(--color-ink-faint)]">
+                      {i + 1}
+                    </span>
+                    <Camera className="h-3 w-3 text-[var(--color-ink-faint)] shrink-0" />
+                    {/* L3: camera ID — body content */}
+                    <span className="w-36 shrink-0 truncate font-mono text-[12px] text-[var(--color-phosphor)]">
                       {cam.camera_id}
                     </span>
-                    <div className="w-32">
+                    <div className="flex-1">
                       <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/50">
                         <motion.div
                           className="h-1.5 rounded-full bg-[var(--color-accent)]/60"
@@ -396,7 +442,8 @@ export default function Analytics() {
                         />
                       </div>
                     </div>
-                    <span className="w-8 text-right font-mono text-[11px] tabular-nums text-[var(--color-ink-muted)]">
+                    {/* L3: count value — readable, medium weight */}
+                    <span className="w-10 text-right font-mono text-[12px] font-semibold tabular-nums text-[var(--color-ink)]">
                       {cam.count}
                     </span>
                   </div>
@@ -407,7 +454,7 @@ export default function Analytics() {
         </motion.div>
       )}
 
-      {/* ROI Calculator */}
+      {/* ── ROI Calculator ── */}
       <motion.div
         initial={prefersReduced ? {} : { opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -415,37 +462,45 @@ export default function Analytics() {
       >
         <Card className="mt-4 border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
           <CardContent className="p-4">
-            <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold text-[var(--color-ink)]">
+            {/* L2: section title */}
+            <h2 className="mb-1 flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
               <IndianRupee className="h-3.5 w-3.5 text-[var(--color-warning)]" />
               ROI Calculator
             </h2>
+            {/* L4: contextual subtitle — subdued */}
             <p className="mb-4 text-[11px] text-[var(--color-ink-faint)]">
               Projected financial impact — Bengaluru-wide deployment across 500 junctions
             </p>
             <Table>
               <TableHeader>
-                <TableRow className="border-b-[var(--color-paper-3)]/60 hover:bg-transparent">
-                  <TableHead className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
+                <TableRow className="border-b border-[var(--color-paper-3)]/60 hover:bg-transparent">
+                  {/* L4: column headers — uppercase, tracking, faint */}
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
                     Metric
                   </TableHead>
-                  <TableHead className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-accent)]">
+                  {/* Conservative — accent-blue emphasis */}
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
                     Conservative
                   </TableHead>
-                  <TableHead className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-success)]">
+                  {/* Aggressive — success-green emphasis (higher value = better) */}
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-success)]">
                     Aggressive
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {ROI_DATA.map((row) => (
-                  <TableRow key={row.metric} className="border-b-[var(--color-paper-3)]/30">
-                    <TableCell className="py-2 text-[11px] font-medium text-[var(--color-ink)]">
+                  <TableRow key={row.metric} className="border-b border-[var(--color-paper-3)]/30">
+                    {/* L3: metric name */}
+                    <TableCell className="py-2.5 text-[12px] font-medium text-[var(--color-ink)]">
                       {row.metric}
                     </TableCell>
-                    <TableCell className="py-2 font-mono text-[11px] tabular-nums text-[var(--color-ink-muted)]">
+                    {/* L3: conservative value — muted */}
+                    <TableCell className="py-2.5 font-mono text-[12px] tabular-nums text-[var(--color-ink-muted)]">
                       {row.conservative}
                     </TableCell>
-                    <TableCell className="py-2 font-mono text-[11px] tabular-nums font-medium text-[var(--color-ink)]">
+                    {/* L3: aggressive value — primary (more prominent than conservative) */}
+                    <TableCell className="py-2.5 font-mono text-[12px] font-semibold tabular-nums text-[var(--color-ink)]">
                       {row.aggressive}
                     </TableCell>
                   </TableRow>
@@ -459,7 +514,13 @@ export default function Analytics() {
   );
 }
 
-/** Stat card used in the summary row. */
+/**
+ * Stat hero card used in the summary row.
+ *
+ * Upgraded to match Dashboard stat card visual weight:
+ * - L1 hero: font-mono text-[22px] font-bold tabular-nums
+ * - L4 label: text-[11px] uppercase tracking-wider text-faint
+ */
 function StatBox({
   icon: Icon,
   label,
@@ -472,24 +533,30 @@ function StatBox({
   color: string;
 }) {
   return (
-    <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 transition-colors duration-200 hover:border-[var(--color-paper-4)]">
-      <CardContent className="p-3.5">
-        <div className="flex items-center gap-3">
+    <Card className="group relative overflow-hidden border-[var(--rule-color)] bg-[var(--color-paper-1)] hover:border-[var(--color-accent)]/25 transition-colors duration-200">
+      {/* Accent top line on hover */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-accent)]/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between">
+          {/* Icon badge — same pattern as Dashboard */}
           <div
-            className="flex h-8 w-8 items-center justify-center rounded-md"
-            style={{ backgroundColor: `color-mix(in oklch, ${color} 15%, transparent)` }}
+            className="flex h-8 w-8 items-center justify-center rounded-md border"
+            style={{
+              backgroundColor: `color-mix(in oklch, ${color} 10%, transparent)`,
+              borderColor: `color-mix(in oklch, ${color} 20%, transparent)`,
+            }}
           >
             <Icon className="h-4 w-4" style={{ color }} />
           </div>
-          <div>
-            <p className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
-              {label}
-            </p>
-            <p className="font-mono text-lg font-bold tabular-nums tracking-tight text-[var(--color-ink)]">
-              {value}
-            </p>
-          </div>
         </div>
+        {/* L1: hero value — largest element on this card */}
+        <p className="mt-3 font-mono text-[22px] font-bold tabular-nums tracking-tight text-[var(--color-ink)]">
+          {value}
+        </p>
+        {/* L4: label — smallest, most subdued */}
+        <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
+          {label}
+        </p>
       </CardContent>
     </Card>
   );
