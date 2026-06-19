@@ -223,9 +223,13 @@ export default function Violations() {
       </div>
 
       {/* ── Table ── */}
-      <Card className="overflow-hidden border-[var(--rule-color)] bg-[var(--color-paper-1)]">
-        <ScrollArea className="w-full">
-          <Table>
+      <motion.div
+        whileHover={prefersReduced ? {} : { y: -2, transition: { duration: 0.15 } }}
+      >
+        <Card className="group relative overflow-hidden border-[var(--rule-color)] bg-[var(--color-paper-1)] hover:border-[var(--color-accent)]/25 glow-accent">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-accent)]/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+          <ScrollArea className="w-full relative z-10">
+            <Table>
             <TableHeader>
               {/* Header row — visually separated from data by stronger border */}
               <TableRow className="border-b-2 border-b-[var(--color-paper-3)]/70 hover:bg-transparent">
@@ -290,6 +294,7 @@ export default function Violations() {
           </Table>
         </ScrollArea>
       </Card>
+      </motion.div>
 
       {/* ── Pagination ── */}
       {totalPages > 1 && (

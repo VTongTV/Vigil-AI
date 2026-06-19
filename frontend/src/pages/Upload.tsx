@@ -78,175 +78,175 @@ const DEMO_IMAGES: {
   cameraId: string;
   placeholderText: string;
 }[] = [
-  {
-    type: "no_helmet",
-    label: "No Helmet — Trinity Circle",
-    description: "Rider without helmet near Trinity Circle signal on MG Road",
-    cameraId: "MGROAD-01",
-    placeholderText: "No helmet\\nTrinity Circle rider\\nMG Road",
-  },
-  {
-    type: "no_helmet",
-    label: "No Helmet — Silk Board Pillion",
-    description: "Pillion rider without helmet at Silk Board junction during peak traffic",
-    cameraId: "SILKBOARD-01",
-    placeholderText: "No helmet\\nSilk Board pillion\\nPeak hour",
-  },
-  {
-    type: "no_helmet",
-    label: "No Helmet — Hebbal Ramp",
-    description: "Delivery rider without helmet on Hebbal flyover approach",
-    cameraId: "HEBBAL-01",
-    placeholderText: "No helmet\\nDelivery rider\\nHebbal ramp",
-  },
-  {
-    type: "triple_riding",
-    label: "Triple Riding — ITPL Road",
-    description: "Three adults on one bike near Whitefield ITPL corridor",
-    cameraId: "WHITEFIELD-01",
-    placeholderText: "Triple riding\\n3 adults on bike\\nWhitefield",
-  },
-  {
-    type: "triple_riding",
-    label: "Triple Riding — ORR Merge",
-    description: "School-age passengers triple riding near Marathahalli ORR merge",
-    cameraId: "MARATHAHALLI-01",
-    placeholderText: "Triple riding\\nORR merge\\nMarathahalli",
-  },
-  {
-    type: "triple_riding",
-    label: "Triple Riding — Station Road",
-    description: "Three-up two-wheeler crossing KR Puram junction",
-    cameraId: "KRPURAM-01",
-    placeholderText: "Triple riding\\nKR Puram junction\\nStation road",
-  },
-  {
-    type: "wrong_side_driving",
-    label: "Wrong Side — Hosur Flyover",
-    description: "Auto-rickshaw on wrong side of Hosur Road flyover approach",
-    cameraId: "ELECTRONIC-01",
-    placeholderText: "Wrong side\\nAuto-rickshaw\\nHosur flyover",
-  },
-  {
-    type: "wrong_side_driving",
-    label: "Wrong Side — Service Lane",
-    description: "Bike entering Yelahanka main carriageway from the wrong service lane",
-    cameraId: "YELAHANKA-01",
-    placeholderText: "Wrong side\\nService lane entry\\nYelahanka",
-  },
-  {
-    type: "wrong_side_driving",
-    label: "Wrong Side — Temple Exit",
-    description: "Scooter cutting against traffic near Bannerghatta Jayadeva stretch",
-    cameraId: "BANNERGHATTA-01",
-    placeholderText: "Wrong side\\nAgainst traffic\\nBannerghatta",
-  },
-  {
-    type: "illegal_parking",
-    label: "Illegal Parking — Brigade Road",
-    description: "Sedan parked in a no-parking bay off Brigade Road near MG Road",
-    cameraId: "KORMANGALA-01",
-    placeholderText: "Illegal parking\\nNo-parking bay\\nBrigade zone",
-  },
-  {
-    type: "illegal_parking",
-    label: "Illegal Parking — Metro Approach",
-    description: "SUV blocking curbside pickup lane near MG Road metro approach",
-    cameraId: "MGROAD-01",
-    placeholderText: "Illegal parking\\nMetro approach\\nMG Road",
-  },
-  {
-    type: "illegal_parking",
-    label: "Illegal Parking — Slip Road",
-    description: "Hatchback parked in the no-stopping slip road at Silk Board",
-    cameraId: "SILKBOARD-01",
-    placeholderText: "Illegal parking\\nSlip road block\\nSilk Board",
-  },
-  {
-    type: "no_seatbelt",
-    label: "No Seatbelt — ORR Sedan",
-    description: "Driver without seatbelt in slow-moving traffic near Marathahalli bridge",
-    cameraId: "MARATHAHALLI-01",
-    placeholderText: "No seatbelt\\nSedan driver\\nMarathahalli",
-  },
-  {
-    type: "no_seatbelt",
-    label: "No Seatbelt — Airport Route",
-    description: "Front-seat occupant unbelted on Hebbal airport corridor",
-    cameraId: "HEBBAL-01",
-    placeholderText: "No seatbelt\\nFront occupant\\nHebbal corridor",
-  },
-  {
-    type: "no_seatbelt",
-    label: "No Seatbelt — Tech Park Cab",
-    description: "Cab driver without seatbelt near Whitefield tech park exit",
-    cameraId: "WHITEFIELD-01",
-    placeholderText: "No seatbelt\\nCab driver\\nWhitefield",
-  },
-  {
-    type: "stop_line_violation",
-    label: "Stop Line — KR Puram Signal",
-    description: "Bike past the stop line at KR Puram junction before the green",
-    cameraId: "KRPURAM-01",
-    placeholderText: "Stop line\\nBike past line\\nKR Puram",
-  },
-  {
-    type: "stop_line_violation",
-    label: "Stop Line — Hosur Road",
-    description: "Car crossing the stop line early at Electronic City signal",
-    cameraId: "ELECTRONIC-01",
-    placeholderText: "Stop line\\nCar crossed early\\nE-City",
-  },
-  {
-    type: "stop_line_violation",
-    label: "Stop Line — Yelahanka Main",
-    description: "Auto-rickshaw nudged beyond stop line at Yelahanka main signal",
-    cameraId: "YELAHANKA-01",
-    placeholderText: "Stop line\\nAuto beyond line\\nYelahanka",
-  },
-  {
-    type: "red_light_violation",
-    label: "Red Light — Church Street Turn",
-    description: "Bike jumping the red at MG Road–Church Street turn pocket",
-    cameraId: "MGROAD-01",
-    placeholderText: "Red light jump\\nTurn pocket\\nMG Road",
-  },
-  {
-    type: "red_light_violation",
-    label: "Red Light — Silk Board Bus Lane",
-    description: "Two-wheeler crossing on red near Silk Board bus lane merge",
-    cameraId: "SILKBOARD-01",
-    placeholderText: "Red light jump\\nBus lane merge\\nSilk Board",
-  },
-  {
-    type: "red_light_violation",
-    label: "Red Light — Hebbal Loop",
-    description: "Car running the red near Hebbal loop ramp during signal cycle",
-    cameraId: "HEBBAL-01",
-    placeholderText: "Red light jump\\nLoop ramp\\nHebbal",
-  },
-  {
-    type: "license_plate_mismatch",
-    label: "Plate Mismatch — Obscured RE",
-    description: "Blurry or partially obscured Royal Enfield plate near Bannerghatta junction",
-    cameraId: "BANNERGHATTA-01",
-    placeholderText: "Plate mismatch\\nObscured RE plate\\nBannerghatta",
-  },
-  {
-    type: "license_plate_mismatch",
-    label: "Plate Mismatch — Folded Plate",
-    description: "Folded rear plate on scooter near Koramangala 100 Feet Road",
-    cameraId: "KORMANGALA-01",
-    placeholderText: "Plate mismatch\\nFolded rear plate\\nKoramangala",
-  },
-  {
-    type: "license_plate_mismatch",
-    label: "Plate Mismatch — Mud Smeared",
-    description: "Mud-smeared commercial plate near Marathahalli bridge camera zone",
-    cameraId: "MARATHAHALLI-01",
-    placeholderText: "Plate mismatch\\nMud-smeared plate\\nMarathahalli",
-  },
-];
+    {
+      type: "no_helmet",
+      label: "No Helmet — Trinity Circle",
+      description: "Rider without helmet near Trinity Circle signal on MG Road",
+      cameraId: "MGROAD-01",
+      placeholderText: "No helmet\\nTrinity Circle rider\\nMG Road",
+    },
+    {
+      type: "no_helmet",
+      label: "No Helmet — Silk Board Pillion",
+      description: "Pillion rider without helmet at Silk Board junction during peak traffic",
+      cameraId: "SILKBOARD-01",
+      placeholderText: "No helmet\\nSilk Board pillion\\nPeak hour",
+    },
+    {
+      type: "no_helmet",
+      label: "No Helmet — Hebbal Ramp",
+      description: "Delivery rider without helmet on Hebbal flyover approach",
+      cameraId: "HEBBAL-01",
+      placeholderText: "No helmet\\nDelivery rider\\nHebbal ramp",
+    },
+    {
+      type: "triple_riding",
+      label: "Triple Riding — ITPL Road",
+      description: "Three adults on one bike near Whitefield ITPL corridor",
+      cameraId: "WHITEFIELD-01",
+      placeholderText: "Triple riding\\n3 adults on bike\\nWhitefield",
+    },
+    {
+      type: "triple_riding",
+      label: "Triple Riding — ORR Merge",
+      description: "School-age passengers triple riding near Marathahalli ORR merge",
+      cameraId: "MARATHAHALLI-01",
+      placeholderText: "Triple riding\\nORR merge\\nMarathahalli",
+    },
+    {
+      type: "triple_riding",
+      label: "Triple Riding — Station Road",
+      description: "Three-up two-wheeler crossing KR Puram junction",
+      cameraId: "KRPURAM-01",
+      placeholderText: "Triple riding\\nKR Puram junction\\nStation road",
+    },
+    {
+      type: "wrong_side_driving",
+      label: "Wrong Side — Hosur Flyover",
+      description: "Auto-rickshaw on wrong side of Hosur Road flyover approach",
+      cameraId: "ELECTRONIC-01",
+      placeholderText: "Wrong side\\nAuto-rickshaw\\nHosur flyover",
+    },
+    {
+      type: "wrong_side_driving",
+      label: "Wrong Side — Service Lane",
+      description: "Bike entering Yelahanka main carriageway from the wrong service lane",
+      cameraId: "YELAHANKA-01",
+      placeholderText: "Wrong side\\nService lane entry\\nYelahanka",
+    },
+    {
+      type: "wrong_side_driving",
+      label: "Wrong Side — Temple Exit",
+      description: "Scooter cutting against traffic near Bannerghatta Jayadeva stretch",
+      cameraId: "BANNERGHATTA-01",
+      placeholderText: "Wrong side\\nAgainst traffic\\nBannerghatta",
+    },
+    {
+      type: "illegal_parking",
+      label: "Illegal Parking — Brigade Road",
+      description: "Sedan parked in a no-parking bay off Brigade Road near MG Road",
+      cameraId: "KORMANGALA-01",
+      placeholderText: "Illegal parking\\nNo-parking bay\\nBrigade zone",
+    },
+    {
+      type: "illegal_parking",
+      label: "Illegal Parking — Metro Approach",
+      description: "SUV blocking curbside pickup lane near MG Road metro approach",
+      cameraId: "MGROAD-01",
+      placeholderText: "Illegal parking\\nMetro approach\\nMG Road",
+    },
+    {
+      type: "illegal_parking",
+      label: "Illegal Parking — Slip Road",
+      description: "Hatchback parked in the no-stopping slip road at Silk Board",
+      cameraId: "SILKBOARD-01",
+      placeholderText: "Illegal parking\\nSlip road block\\nSilk Board",
+    },
+    {
+      type: "no_seatbelt",
+      label: "No Seatbelt — ORR Sedan",
+      description: "Driver without seatbelt in slow-moving traffic near Marathahalli bridge",
+      cameraId: "MARATHAHALLI-01",
+      placeholderText: "No seatbelt\\nSedan driver\\nMarathahalli",
+    },
+    {
+      type: "no_seatbelt",
+      label: "No Seatbelt — Airport Route",
+      description: "Front-seat occupant unbelted on Hebbal airport corridor",
+      cameraId: "HEBBAL-01",
+      placeholderText: "No seatbelt\\nFront occupant\\nHebbal corridor",
+    },
+    {
+      type: "no_seatbelt",
+      label: "No Seatbelt — Tech Park Cab",
+      description: "Cab driver without seatbelt near Whitefield tech park exit",
+      cameraId: "WHITEFIELD-01",
+      placeholderText: "No seatbelt\\nCab driver\\nWhitefield",
+    },
+    {
+      type: "stop_line_violation",
+      label: "Stop Line — KR Puram Signal",
+      description: "Bike past the stop line at KR Puram junction before the green",
+      cameraId: "KRPURAM-01",
+      placeholderText: "Stop line\\nBike past line\\nKR Puram",
+    },
+    {
+      type: "stop_line_violation",
+      label: "Stop Line — Hosur Road",
+      description: "Car crossing the stop line early at Electronic City signal",
+      cameraId: "ELECTRONIC-01",
+      placeholderText: "Stop line\\nCar crossed early\\nE-City",
+    },
+    {
+      type: "stop_line_violation",
+      label: "Stop Line — Yelahanka Main",
+      description: "Auto-rickshaw nudged beyond stop line at Yelahanka main signal",
+      cameraId: "YELAHANKA-01",
+      placeholderText: "Stop line\\nAuto beyond line\\nYelahanka",
+    },
+    {
+      type: "red_light_violation",
+      label: "Red Light — Church Street Turn",
+      description: "Bike jumping the red at MG Road–Church Street turn pocket",
+      cameraId: "MGROAD-01",
+      placeholderText: "Red light jump\\nTurn pocket\\nMG Road",
+    },
+    {
+      type: "red_light_violation",
+      label: "Red Light — Silk Board Bus Lane",
+      description: "Two-wheeler crossing on red near Silk Board bus lane merge",
+      cameraId: "SILKBOARD-01",
+      placeholderText: "Red light jump\\nBus lane merge\\nSilk Board",
+    },
+    {
+      type: "red_light_violation",
+      label: "Red Light — Hebbal Loop",
+      description: "Car running the red near Hebbal loop ramp during signal cycle",
+      cameraId: "HEBBAL-01",
+      placeholderText: "Red light jump\\nLoop ramp\\nHebbal",
+    },
+    {
+      type: "license_plate_mismatch",
+      label: "Plate Mismatch — Obscured RE",
+      description: "Blurry or partially obscured Royal Enfield plate near Bannerghatta junction",
+      cameraId: "BANNERGHATTA-01",
+      placeholderText: "Plate mismatch\\nObscured RE plate\\nBannerghatta",
+    },
+    {
+      type: "license_plate_mismatch",
+      label: "Plate Mismatch — Folded Plate",
+      description: "Folded rear plate on scooter near Koramangala 100 Feet Road",
+      cameraId: "KORMANGALA-01",
+      placeholderText: "Plate mismatch\\nFolded rear plate\\nKoramangala",
+    },
+    {
+      type: "license_plate_mismatch",
+      label: "Plate Mismatch — Mud Smeared",
+      description: "Mud-smeared commercial plate near Marathahalli bridge camera zone",
+      cameraId: "MARATHAHALLI-01",
+      placeholderText: "Plate mismatch\\nMud-smeared plate\\nMarathahalli",
+    },
+  ];
 
 /** Maximum number of files in a batch. */
 const MAX_BATCH_SIZE = 10;
@@ -415,9 +415,9 @@ export default function Upload() {
   /** Compute the max stage duration for scaling waterfall bars. */
   const maxMs = activeFile?.result
     ? Math.max(
-        ...Object.values(activeFile.result.timing_breakdown).map((v) => Number(v)),
-        1,
-      )
+      ...Object.values(activeFile.result.timing_breakdown).map((v) => Number(v)),
+      1,
+    )
     : 1;
 
   return (
@@ -743,182 +743,182 @@ export default function Upload() {
         {/* Right Side: Results panel */}
         <div className="flex flex-col gap-4">
           <AnimatePresence mode="wait">
-          {activeFile?.result ? (
-            <motion.div
-              key={`result-${activeIndex}`}
-              initial={prefersReduced ? {} : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="space-y-4"
-            >
-              {/* Result summary */}
-              <div className="flex items-center gap-3 rounded-lg bg-[var(--color-success)]/8 px-4 py-2.5 ring-1 ring-[var(--color-success)]/20">
-                <CheckCircle2 className="h-4 w-4 text-[var(--color-success)]" />
-                <span className="text-sm font-medium text-[var(--color-success)]">
-                  {activeFile.result.violations.length} violation(s) detected
-                </span>
-                <Separator orientation="vertical" className="h-4 bg-[var(--color-success)]/20" />
-                <span className="font-mono text-xs tabular-nums text-[var(--color-success)]/80">
-                  {activeFile.result.processing_time_ms}ms
-                </span>
-                <span className="text-[11px] text-[var(--color-success)]/60">
-                  — {activeFile.file.name}
-                </span>
-              </div>
+            {activeFile?.result ? (
+              <motion.div
+                key={`result-${activeIndex}`}
+                initial={prefersReduced ? {} : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="space-y-4"
+              >
+                {/* Result summary */}
+                <div className="flex items-center gap-3 rounded-lg bg-[var(--color-success)]/8 px-4 py-2.5 ring-1 ring-[var(--color-success)]/20">
+                  <CheckCircle2 className="h-4 w-4 text-[var(--color-success)]" />
+                  <span className="text-sm font-medium text-[var(--color-success)]">
+                    {activeFile.result.violations.length} violation(s) detected
+                  </span>
+                  <Separator orientation="vertical" className="h-4 bg-[var(--color-success)]/20" />
+                  <span className="font-mono text-xs tabular-nums text-[var(--color-success)]/80">
+                    {activeFile.result.processing_time_ms}ms
+                  </span>
+                  <span className="text-[11px] text-[var(--color-success)]/60">
+                    — {activeFile.file.name}
+                  </span>
+                </div>
 
-              {/* Pipeline waterfall chart */}
-              <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
-                <CardContent className="p-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    {/* L2: section title — promoted from L4 */}
-                    <h3 className="text-[13px] font-semibold text-[var(--color-ink)]">
-                      Pipeline Timing
-                    </h3>
-                    {/* L1: total time — hero metric for this panel */}
-                    <span className="font-mono text-[18px] font-bold tabular-nums text-[var(--color-accent)]">
-                      {activeFile.result.processing_time_ms}
-                      <span className="ml-1 text-[12px] font-medium text-[var(--color-ink-faint)]">ms</span>
-                    </span>
-                  </div>
-                  <div className="space-y-1.5">
-                    {PIPELINE_STAGES.map((stage, si) => {
-                      const ms =
-                        (activeFile.result!.timing_breakdown as unknown as Record<string, number>)[
+                {/* Pipeline waterfall chart */}
+                <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
+                  <CardContent className="p-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      {/* L2: section title — promoted from L4 */}
+                      <h3 className="text-[13px] font-semibold text-[var(--color-ink)]">
+                        Pipeline Timing
+                      </h3>
+                      {/* L1: total time — hero metric for this panel */}
+                      <span className="font-mono text-[18px] font-bold tabular-nums text-[var(--color-accent)]">
+                        {activeFile.result.processing_time_ms}
+                        <span className="ml-1 text-[12px] font-medium text-[var(--color-ink-faint)]">ms</span>
+                      </span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {PIPELINE_STAGES.map((stage, si) => {
+                        const ms =
+                          (activeFile.result!.timing_breakdown as unknown as Record<string, number>)[
                           stage.key
-                        ] ?? 0;
-                      const pct = Math.max((ms / maxMs) * 100, 3);
-                      return (
-                        <div key={stage.key} className="flex items-center gap-2">
-                          {/* L5: stage abbreviation — auxiliary */}
-                          <span className="w-14 shrink-0 text-right font-mono text-[10px] font-medium text-[var(--color-ink-faint)]">
-                            {stage.abbr}
-                          </span>
-                          <div className="flex-1 overflow-hidden rounded-sm bg-[var(--color-paper-3)]/30">
-                            <motion.div
-                              className="h-4 rounded-sm"
-                              initial={prefersReduced ? { width: `${pct}%` } : { width: 0 }}
-                              animate={{ width: `${pct}%` }}
-                              transition={{
-                                duration: 0.5,
-                                delay: si * 0.06,
-                                ease: [0.22, 1, 0.36, 1],
-                              }}
-                              style={{
-                                backgroundColor: stage.color,
-                                opacity: 0.7,
-                              }}
-                            />
+                          ] ?? 0;
+                        const pct = Math.max((ms / maxMs) * 100, 3);
+                        return (
+                          <div key={stage.key} className="flex items-center gap-2">
+                            {/* L5: stage abbreviation — auxiliary */}
+                            <span className="w-14 shrink-0 text-right font-mono text-[10px] font-medium text-[var(--color-ink-faint)]">
+                              {stage.abbr}
+                            </span>
+                            <div className="flex-1 overflow-hidden rounded-sm bg-[var(--color-paper-3)]/30">
+                              <motion.div
+                                className="h-4 rounded-sm"
+                                initial={prefersReduced ? { width: `${pct}%` } : { width: 0 }}
+                                animate={{ width: `${pct}%` }}
+                                transition={{
+                                  duration: 0.5,
+                                  delay: si * 0.06,
+                                  ease: [0.22, 1, 0.36, 1],
+                                }}
+                                style={{
+                                  backgroundColor: stage.color,
+                                  opacity: 0.7,
+                                }}
+                              />
+                            </div>
+                            {/* L3: ms value — body content */}
+                            <span className="w-14 shrink-0 text-right font-mono text-[12px] tabular-nums font-medium text-[var(--color-ink-muted)]">
+                              {ms}ms
+                            </span>
                           </div>
-                          {/* L3: ms value — body content */}
-                          <span className="w-14 shrink-0 text-right font-mono text-[12px] tabular-nums font-medium text-[var(--color-ink-muted)]">
-                            {ms}ms
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Annotated image */}
-              {activeFile.preview && activeFile.result.violations.length > 0 && (
-                <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 overflow-hidden">
-                  <CardContent className="p-2">
-                    <AnnotatedViewer
-                      imageUrl={activeFile.preview}
-                      violations={activeFile.result.violations}
-                      alt="Detected violations"
-                    />
+                        );
+                      })}
+                    </div>
                   </CardContent>
                 </Card>
-              )}
 
-              {/* Violation result cards — staggered entrance */}
-              <motion.div
-                className="space-y-2"
-                variants={prefersReduced ? {} : { hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
-                initial="hidden"
-                animate="visible"
-              >
-                {activeFile.result.violations.map((v: ViolationRecord) => (
-                  <ViolationResultCard key={v.id} violation={v} prefersReduced={prefersReduced ?? false} />
-                ))}
-              </motion.div>
-            </motion.div>
-          ) : activeFile?.error ? (
-            <motion.div
-              key="error-state"
-              initial={prefersReduced ? {} : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <Card className="flex h-80 items-center justify-center border-[var(--color-danger)]/30 bg-[var(--color-danger)]/5">
-                <div className="text-center">
-                  <XCircle className="mx-auto mb-3 h-8 w-8 text-[var(--color-danger)]" />
-                  <p className="text-sm font-medium text-[var(--color-danger)]">
-                    Detection Failed
-                  </p>
-                  <p className="mt-1 text-[11px] text-[var(--color-danger)]/70">
-                    {activeFile.error}
-                  </p>
-                  <p className="mt-0.5 text-[11px] text-[var(--color-ink-faint)]">
-                    — {activeFile.file.name}
-                  </p>
-                </div>
-              </Card>
-            </motion.div>
-          ) : activeFile ? (
-            <motion.div
-              key={`preview-${activeIndex}`}
-              initial={prefersReduced ? {} : { opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="space-y-4"
-            >
-              <div className="flex items-center gap-3 rounded-lg bg-[var(--color-paper-3)]/30 px-4 py-2.5 ring-1 ring-[var(--color-paper-4)]/50">
-                <FileImage className="h-4 w-4 text-[var(--color-ink-faint)]" />
-                <span className="text-sm font-medium text-[var(--color-ink)]">
-                  Ready for detection
-                </span>
-                <Separator orientation="vertical" className="h-4 bg-[var(--color-paper-4)]" />
-                <span className="text-[11px] text-[var(--color-ink-faint)]">
-                  {activeFile.file.name}
-                </span>
-              </div>
-              <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 overflow-hidden flex flex-col items-center justify-center p-2 min-h-[400px]">
-                {activeFile.preview && (
-                  <img
-                    src={activeFile.preview}
-                    alt="Preview"
-                    className="max-h-[600px] w-auto rounded object-contain"
-                  />
+                {/* Annotated image */}
+                {activeFile.preview && activeFile.result.violations.length > 0 && (
+                  <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 overflow-hidden">
+                    <CardContent className="p-2">
+                      <AnnotatedViewer
+                        imageUrl={activeFile.preview}
+                        violations={activeFile.result.violations}
+                        alt="Detected violations"
+                      />
+                    </CardContent>
+                  </Card>
                 )}
-              </Card>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="empty-state"
-              initial={prefersReduced ? {} : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <Card className="flex h-[584px] items-center justify-center border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/30">
-                <div className="text-center">
-                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-paper-3)]/30">
-                    <AlertTriangle className="h-5 w-5 text-[var(--color-ink-faint)]" />
+
+                {/* Violation result cards — staggered entrance */}
+                <motion.div
+                  className="space-y-2"
+                  variants={prefersReduced ? {} : { hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {activeFile.result.violations.map((v: ViolationRecord) => (
+                    <ViolationResultCard key={v.id} violation={v} prefersReduced={prefersReduced ?? false} />
+                  ))}
+                </motion.div>
+              </motion.div>
+            ) : activeFile?.error ? (
+              <motion.div
+                key="error-state"
+                initial={prefersReduced ? {} : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <Card className="flex h-80 items-center justify-center border-[var(--color-danger)]/30 bg-[var(--color-danger)]/5">
+                  <div className="text-center">
+                    <XCircle className="mx-auto mb-3 h-8 w-8 text-[var(--color-danger)]" />
+                    <p className="text-sm font-medium text-[var(--color-danger)]">
+                      Detection Failed
+                    </p>
+                    <p className="mt-1 text-[11px] text-[var(--color-danger)]/70">
+                      {activeFile.error}
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-[var(--color-ink-faint)]">
+                      — {activeFile.file.name}
+                    </p>
                   </div>
-                  <p className="text-sm text-[var(--color-ink-muted)]">
-                    Upload images to see detection results
-                  </p>
-                  <p className="mt-1 text-[11px] text-[var(--color-ink-faint)]">
-                    Select up to {MAX_BATCH_SIZE} files for batch processing
-                  </p>
+                </Card>
+              </motion.div>
+            ) : activeFile ? (
+              <motion.div
+                key={`preview-${activeIndex}`}
+                initial={prefersReduced ? {} : { opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-4"
+              >
+                <div className="flex items-center gap-3 rounded-lg bg-[var(--color-paper-3)]/30 px-4 py-2.5 ring-1 ring-[var(--color-paper-4)]/50">
+                  <FileImage className="h-4 w-4 text-[var(--color-ink-faint)]" />
+                  <span className="text-sm font-medium text-[var(--color-ink)]">
+                    Ready for detection
+                  </span>
+                  <Separator orientation="vertical" className="h-4 bg-[var(--color-paper-4)]" />
+                  <span className="text-[11px] text-[var(--color-ink-faint)]">
+                    {activeFile.file.name}
+                  </span>
                 </div>
-              </Card>
-            </motion.div>
-          )}
+                <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 overflow-hidden flex flex-col items-center justify-center p-2 min-h-[400px]">
+                  {activeFile.preview && (
+                    <img
+                      src={activeFile.preview}
+                      alt="Preview"
+                      className="max-h-[600px] w-auto rounded object-contain"
+                    />
+                  )}
+                </Card>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="empty-state"
+                initial={prefersReduced ? {} : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <Card className="flex h-[584px] items-center justify-center border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/30">
+                  <div className="text-center">
+                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-paper-3)]/30">
+                      <AlertTriangle className="h-5 w-5 text-[var(--color-ink-faint)]" />
+                    </div>
+                    <p className="text-sm text-[var(--color-ink-muted)]">
+                      Upload images to see detection results
+                    </p>
+                    <p className="mt-1 text-[11px] text-[var(--color-ink-faint)]">
+                      Select up to {MAX_BATCH_SIZE} files for batch processing
+                    </p>
+                  </div>
+                </Card>
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
       </div>
@@ -948,58 +948,58 @@ function ViolationResultCard({ violation: v, prefersReduced }: { violation: Viol
         visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 26 } },
       }}
     >
-    <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 overflow-hidden">
-      <div className="flex">
-        {/* Left color accent strip */}
-        <div className="w-1 shrink-0" style={{ backgroundColor: vColor }} />
-        <CardContent className="flex-1 p-3.5">
-          {/* Top row: type (L3) + badges + plate */}
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex flex-wrap items-center gap-2">
-              {/* L3: violation type — primary card content */}
-              <span className="text-[14px] font-semibold text-[var(--color-ink)]">
-                {vLabel}
-              </span>
-              <Badge variant="outline" className={cn("text-[11px]", tierColor)}>
-                {v.confidence_tier}
-              </Badge>
-              {v.danger_score > 0 && (
-                <Badge variant="outline" className="text-[11px] border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
-                  ⚠ {v.danger_score}
+      <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 overflow-hidden">
+        <div className="flex">
+          {/* Left color accent strip */}
+          <div className="w-1 shrink-0" style={{ backgroundColor: vColor }} />
+          <CardContent className="flex-1 p-3.5">
+            {/* Top row: type (L3) + badges + plate */}
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                {/* L3: violation type — primary card content */}
+                <span className="text-[14px] font-semibold text-[var(--color-ink)]">
+                  {vLabel}
+                </span>
+                <Badge variant="outline" className={cn("text-[11px]", tierColor)}>
+                  {v.confidence_tier}
                 </Badge>
+                {v.danger_score > 0 && (
+                  <Badge variant="outline" className="text-[11px] border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
+                    ⚠ {v.danger_score}
+                  </Badge>
+                )}
+              </div>
+              {/* License plate — distinctive accent mono */}
+              {v.license_plate && (
+                <span className="shrink-0 rounded bg-[var(--color-accent)]/10 px-2 py-0.5 font-mono text-[12px] font-semibold text-[var(--color-accent)]">
+                  {v.license_plate.text}
+                </span>
               )}
             </div>
-            {/* License plate — distinctive accent mono */}
-            {v.license_plate && (
-              <span className="shrink-0 rounded bg-[var(--color-accent)]/10 px-2 py-0.5 font-mono text-[12px] font-semibold text-[var(--color-accent)]">
-                {v.license_plate.text}
+
+            {/* Bottom row: fine (L1 hero) + supporting meta */}
+            <div className="mt-2 flex items-end justify-between gap-2">
+              {/* L1: fine amount — dominant metric on this card */}
+              <span className="font-mono text-[18px] font-bold tabular-nums text-[var(--color-warning)]">
+                ₹{v.fine_amount.toLocaleString("en-IN")}
               </span>
-            )}
-          </div>
-
-          {/* Bottom row: fine (L1 hero) + supporting meta */}
-          <div className="mt-2 flex items-end justify-between gap-2">
-            {/* L1: fine amount — dominant metric on this card */}
-            <span className="font-mono text-[18px] font-bold tabular-nums text-[var(--color-warning)]">
-              ₹{v.fine_amount.toLocaleString("en-IN")}
-            </span>
-            {/* L5: aux metadata — confidence, section, camera */}
-            <div className="flex items-center gap-3 text-[10px] text-[var(--color-ink-faint)]">
-              <span className="font-mono">{(v.confidence * 100).toFixed(0)}% conf</span>
-              <span className="font-mono">{vSection}</span>
-              {v.camera_id && <span>{v.camera_id}</span>}
+              {/* L5: aux metadata — confidence, section, camera */}
+              <div className="flex items-center gap-3 text-[10px] text-[var(--color-ink-faint)]">
+                <span className="font-mono">{(v.confidence * 100).toFixed(0)}% conf</span>
+                <span className="font-mono">{vSection}</span>
+                {v.camera_id && <span>{v.camera_id}</span>}
+              </div>
             </div>
-          </div>
 
-          {/* AI explanation — tertiary, only if present */}
-          {v.ai_explanation && (
-            <p className="mt-2 truncate text-[11px] text-[var(--color-ink-faint)]" title={v.ai_explanation}>
-              {v.ai_explanation.slice(0, 100)}{v.ai_explanation.length > 100 ? "…" : ""}
-            </p>
-          )}
-        </CardContent>
-      </div>
-    </Card>
+            {/* AI explanation — tertiary, only if present */}
+            {v.ai_explanation && (
+              <p className="mt-2 truncate text-[11px] text-[var(--color-ink-faint)]" title={v.ai_explanation}>
+                {v.ai_explanation.slice(0, 100)}{v.ai_explanation.length > 100 ? "…" : ""}
+              </p>
+            )}
+          </CardContent>
+        </div>
+      </Card>
     </motion.div>
   );
 }

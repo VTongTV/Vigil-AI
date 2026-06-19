@@ -122,7 +122,7 @@ export default function Layout() {
           layout
           animate={{ width: collapsed ? 64 : 240 }}
           transition={sidebarSpring}
-          className="relative flex flex-col border-r border-[var(--rule-color)] bg-[var(--color-paper-1)]"
+          className="relative flex flex-col border-r border-[var(--rule-color)] bg-[var(--color-paper-1)] z-[2000]"
           style={{ minWidth: collapsed ? 64 : 240, overflow: "visible" }}
         >
           {/* Signal line at top */}

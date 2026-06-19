@@ -134,7 +134,13 @@ export default function Map() {
         style={{ background: "var(--color-paper)" }}
       >
         <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
-        <ZoomControl position="bottomright" />
+        <ZoomControl position="topleft" />
+        <style>{`
+          .leaflet-top.leaflet-left {
+            left: 200px;
+            top: 6px;
+          }
+        `}</style>
 
         {/* F5: Heatmap layer — shown when viewMode === "heatmap" */}
         {viewMode === "heatmap" && (
