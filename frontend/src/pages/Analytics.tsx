@@ -18,15 +18,10 @@
  */
 
 import { useEffect, useState } from "react";
-import {
-  BarChart3,
-  Camera,
-  TrendingUp,
-  AlertTriangle,
-  IndianRupee,
-  PieChart as PieIcon,
-  Activity,
+import { 
+  BarChart3, Camera, AlertTriangle, IndianRupee, PieChart as PieIcon, Activity
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   BarChart,
   Bar,
@@ -247,28 +242,34 @@ export default function Analytics() {
         animate="visible"
       >
         <motion.div variants={motionVariants}>
-          <StatBox
-            icon={AlertTriangle}
-            label="Total Violations"
-            value={totalViolations.toLocaleString("en-IN")}
-            color="var(--color-accent)"
-          />
+          <motion.div whileHover={prefersReduced ? {} : { y: -2, transition: { duration: 0.15 } }}>
+            <StatBox
+              icon={AlertTriangle}
+              label="Total Violations"
+              value={totalViolations.toLocaleString("en-IN")}
+              color="var(--color-accent)"
+            />
+          </motion.div>
         </motion.div>
         <motion.div variants={motionVariants}>
-          <StatBox
-            icon={TrendingUp}
-            label="Avg Confidence"
-            value={`${avgConf.toFixed(1)}%`}
-            color="var(--color-success)"
-          />
+          <motion.div whileHover={prefersReduced ? {} : { y: -2, transition: { duration: 0.15 } }}>
+            <StatBox
+              icon={Activity}
+              label="Avg Confidence"
+              value={`${avgConf.toFixed(1)}%`}
+              color="var(--color-phosphor)"
+            />
+          </motion.div>
         </motion.div>
         <motion.div variants={motionVariants}>
-          <StatBox
-            icon={IndianRupee}
-            label="Total Fines"
-            value={`₹${totalFines.toLocaleString("en-IN")}`}
-            color="var(--color-warning)"
-          />
+          <motion.div whileHover={prefersReduced ? {} : { y: -2, transition: { duration: 0.15 } }}>
+            <StatBox
+              icon={IndianRupee}
+              label="Total Fines"
+              value={`₹${totalFines.toLocaleString("en-IN")}`}
+              color="var(--color-accent-bright)"
+            />
+          </motion.div>
         </motion.div>
       </motion.div>
 
@@ -532,10 +533,26 @@ function StatBox({
   value: string | number;
   color: string;
 }) {
+  // Determine the glow class based on the color string
+  let glowClass = "glow-accent";
+  if (color.includes("phosphor")) glowClass = "glow-phosphor";
+  else if (color.includes("success")) glowClass = "glow-success";
+
   return (
-    <Card className="group relative overflow-hidden border-[var(--rule-color)] bg-[var(--color-paper-1)] hover:border-[var(--color-accent)]/25 transition-colors duration-200">
+    <Card className={cn(
+      "group relative overflow-hidden border-[var(--rule-color)] bg-[var(--color-paper-1)] hover:border-[var(--color-accent)]/25 transition-colors duration-200",
+      glowClass
+    )}>
+      {/* Accent glow on hover */}
+      <div 
+        className="absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity duration-300 group-hover:opacity-100" 
+        style={{ backgroundImage: `linear-gradient(to bottom right, color-mix(in oklch, ${color} 10%, transparent), transparent)` }} 
+      />
       {/* Accent top line on hover */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-accent)]/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+      <div 
+        className="absolute inset-x-0 top-0 h-px opacity-0 transition-opacity group-hover:opacity-100" 
+        style={{ backgroundImage: `linear-gradient(to right, transparent, color-mix(in oklch, ${color} 40%, transparent), transparent)` }} 
+      />
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
           {/* Icon badge — same pattern as Dashboard */}

@@ -488,33 +488,33 @@ code, pre, .font-mono {
 /* ── Leaflet zoom control — themed to match Signal Console ── */
 
 .leaflet-control-zoom {
-  border: 1px solid var(--rule-color) !important;
-  border-radius: 8px !important;
-  overflow: hidden;
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 4px !important;
+  border: none !important;
+  background: transparent !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
-  margin-bottom: 20px !important;
-  margin-right: 12px !important;
+  margin-top: 20px !important;
+  margin-left: 16px !important;
 }
 
 .leaflet-control-zoom a {
   background: var(--color-paper-1) !important;
   color: var(--color-ink-muted) !important;
-  border-bottom: 1px solid var(--rule-color) !important;
+  border: 1px solid var(--rule-color) !important;
+  border-radius: 6px !important;
   width: 28px !important;
   height: 28px !important;
-  line-height: 28px !important;
+  line-height: 26px !important;
   font-size: 14px !important;
   font-weight: 600 !important;
-  transition: background 0.15s, color 0.15s;
-}
-
-.leaflet-control-zoom a:last-child {
-  border-bottom: none !important;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
 .leaflet-control-zoom a:hover {
   background: var(--color-paper-3) !important;
   color: var(--color-ink) !important;
+  border-color: var(--color-accent) !important;
 }
 
 /* ── Leaflet popup — themed to match Signal Console ── */
