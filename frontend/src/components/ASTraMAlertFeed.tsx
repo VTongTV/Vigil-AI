@@ -112,13 +112,9 @@ export default function ASTraMAlertFeed() {
 
   const criticalCount = alerts.filter((a) => a.danger_score >= CRITICAL_DANGER_THRESHOLD).length;
 
-  if (!alertPanelOpen && alerts.length === 0) {
-    return null;
-  }
-
   return (
     <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
-      {/* Toggle button — fixed: added `relative` so the badge counter positions correctly */}
+      {/* Toggle button — always visible */}
       <motion.button
         whileTap={prefersReduced ? {} : { scale: 0.88 }}
         onClick={() => setAlertPanelOpen(!alertPanelOpen)}

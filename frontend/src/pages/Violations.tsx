@@ -731,19 +731,6 @@ function ViolationRow({
   );
 }
 
-/** Key-value row for the detail sheet — supports ReactNode values. */
-function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <span className="shrink-0 text-[11px] text-[var(--color-ink-faint)]">{label}</span>
-      <span className="text-right">{typeof value === "string"
-        ? <span className="text-[12px] font-medium text-[var(--color-ink)]">{value}</span>
-        : value
-      }</span>
-    </div>
-  );
-}
-
 /** Icon + label key-value row used in the restyled detail sheet. */
 function SheetDetailRow({
   icon: Icon,

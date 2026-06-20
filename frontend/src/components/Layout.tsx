@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { Outlet, NavLink, useLocation } from "react-router-dom";
+import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Upload,
@@ -40,12 +40,12 @@ import ASTraMAlertFeed from "@/components/ASTraMAlertFeed";
 import { VigilLogo } from "@/components/icons";
 
 const NAV_ITEMS = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard, short: "DASH" },
-  { to: "/upload", label: "Detect", icon: Upload, short: "DET" },
-  { to: "/violations", label: "Violations", icon: AlertTriangle, short: "VIO" },
-  { to: "/evidence", label: "Evidence", icon: FileImage, short: "EVI" },
-  { to: "/analytics", label: "Analytics", icon: BarChart3, short: "ANA" },
-  { to: "/map", label: "Map", icon: MapPin, short: "MAP" },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, short: "DASH" },
+  { to: "/dashboard/upload", label: "Detect", icon: Upload, short: "DET" },
+  { to: "/dashboard/violations", label: "Violations", icon: AlertTriangle, short: "VIO" },
+  { to: "/dashboard/evidence", label: "Evidence", icon: FileImage, short: "EVI" },
+  { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3, short: "ANA" },
+  { to: "/dashboard/map", label: "Map", icon: MapPin, short: "MAP" },
 ] as const;
 
 /** Format a Date as HH:MM:SS IST. */
@@ -94,6 +94,7 @@ export default function Layout() {
   const [clock, setClock] = useState(() => formatIST(new Date()));
   const [date, setDate] = useState(() => formatDate(new Date()));
   const location = useLocation();
+  const navigate = useNavigate();
   const prefersReduced = useReducedMotion();
 
   useEffect(() => {
@@ -129,9 +130,10 @@ export default function Layout() {
           <div className="signal-line" />
 
           {/* Logo */}
-          <div
+          <button
+            onClick={() => navigate("/")}
             className={cn(
-              "flex items-center gap-3 border-b border-[var(--rule-color)] px-4 py-4",
+              "flex items-center gap-3 border-b border-[var(--rule-color)] px-4 py-4 w-full text-left hover:bg-[var(--color-paper-2)] transition-colors",
               collapsed && "justify-center px-0",
             )}
           >
@@ -166,19 +168,17 @@ export default function Layout() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
-
-          {/* Navigation */}
+          </button>
           <nav className={cn("flex-1 py-3", collapsed ? "flex flex-col items-center gap-0.5 px-0" : "space-y-0.5 px-2.5")}>
             {NAV_ITEMS.map(({ to, label, icon: Icon, short }) => {
-              const isActive =
-                to === "/" ? location.pathname === "/" : location.pathname.startsWith(to);
+              const isActive = to === "/dashboard"
+                ? location.pathname === "/dashboard"
+                : location.pathname.startsWith(to);
 
               const link = (
                 <NavLink
                   key={to}
                   to={to}
-                  end={to === "/"}
                   className={() =>
                     cn(
                       "group relative flex items-center gap-3 rounded-md py-2.5 text-[14px] font-medium",
