@@ -414,7 +414,7 @@ def detect_wrong_side(
                     "confidence": vehicle["confidence"] * 0.8,
                     "metadata": {
                         "lane_id": lane.get("id", "unknown"),
-                        "vehicle_category": vehicle.get("class_name", "unknown"),
+                        "vehicle_type": vehicle.get("class_name", "unknown"),
                     },
                 })
                 break
@@ -468,7 +468,7 @@ def detect_illegal_parking(
                     "metadata": {
                         "zone_id": zone.get("id", "unknown"),
                         "zone_name": zone.get("name", "No Parking Zone"),
-                        "vehicle_category": vehicle.get("class_name", "unknown"),
+                        "vehicle_type": vehicle.get("class_name", "unknown"),
                     },
                 })
                 break
@@ -695,7 +695,7 @@ def detect_stop_line_violations(
                     "confidence": vehicle["confidence"] * conf_discount,
                     "metadata": {
                         "zone_id": zone.get("id", "unknown"),
-                        "vehicle_category": vehicle.get("class_name", "unknown"),
+                        "vehicle_type": vehicle.get("class_name", "unknown"),
                     },
                 })
                 break
@@ -759,7 +759,7 @@ def detect_red_light_violations(
                     "metadata": {
                         "zone_id": zone.get("id", "unknown"),
                         "signal_state": signal_state,
-                        "vehicle_category": vehicle.get("class_name", "unknown"),
+                        "vehicle_type": vehicle.get("class_name", "unknown"),
                     },
                 })
                 break
