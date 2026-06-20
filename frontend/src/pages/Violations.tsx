@@ -247,6 +247,9 @@ export default function Violations() {
                     Type
                   </TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                    Vehicle
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
                     Confidence
                   </TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
@@ -270,7 +273,7 @@ export default function Violations() {
                 <AnimatePresence mode="wait">
                   {loading ? (
                     <TableRow key="loading">
-                      <TableCell colSpan={7} className="h-32 text-center">
+                      <TableCell colSpan={8} className="h-32 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <div className="h-4 w-4 rounded-full border-2 border-t-transparent border-[var(--color-accent)] animate-spin" />
                           <span className="text-xs text-[var(--color-ink-faint)]">Loading...</span>
@@ -279,7 +282,7 @@ export default function Violations() {
                     </TableRow>
                   ) : violations.length === 0 ? (
                     <TableRow key="empty">
-                      <TableCell colSpan={7} className="h-32 text-center text-xs text-[var(--color-ink-faint)]">
+                      <TableCell colSpan={8} className="h-32 text-center text-xs text-[var(--color-ink-faint)]">
                         No violations found
                       </TableCell>
                     </TableRow>
@@ -669,6 +672,11 @@ function ViolationRow({
           />
           <span className="text-[12px] font-semibold text-[var(--color-ink)]">{vLabel}</span>
         </div>
+      </TableCell>
+      <TableCell className="py-2.5">
+        <span className="text-[12px] font-medium text-[var(--color-ink-muted)] capitalize">
+          {v.metadata?.vehicle_type ?? "Unknown"}
+        </span>
       </TableCell>
       <TableCell className="py-2.5">
         <div className="flex items-center gap-1.5">
