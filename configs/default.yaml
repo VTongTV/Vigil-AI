@@ -14,7 +14,7 @@ models:
   helmet:
     path: weights/helmet.pt
     device: cuda
-    conf_threshold: 0.15
+    conf_threshold: 0.10
     iou_threshold: 0.45
     resident: true
     classes:
@@ -57,7 +57,7 @@ violations:
   triple_riding:
     max_riders: 2
     horizontal_center_threshold: 0.15
-    vertical_overlap_threshold: 0.3
+    vertical_overlap_threshold: 0.20
     person_iou_threshold: 0.15
   wrong_side:
     enabled: true
@@ -105,29 +105,29 @@ violations:
     - id: park_kormangala
       camera_id: KORMANGALA-01
       name: No Parking - Bus Bay
-      # Small curb-side zone (bottom-right corner)
+      # Right-side curb parking zone (covers parked vehicles)
       polygon:
-      - - 0.7
-        - 0.75
-      - - 0.95
-        - 0.75
-      - - 0.95
-        - 0.95
-      - - 0.7
-        - 0.95
+      - - 0.4
+        - 0.55
+      - - 0.98
+        - 0.55
+      - - 0.98
+        - 0.98
+      - - 0.4
+        - 0.98
     - id: park_mgroad
       camera_id: MGROAD-01
       name: No Parking - Bus Stop
-      # Small curb-side zone (bottom-left corner)
+      # Center-right curb parking zone
       polygon:
-      - - 0.05
-        - 0.78
-      - - 0.3
-        - 0.78
-      - - 0.3
-        - 0.95
-      - - 0.05
-        - 0.95
+      - - 0.35
+        - 0.45
+      - - 0.7
+        - 0.45
+      - - 0.7
+        - 0.75
+      - - 0.35
+        - 0.75
     - id: park_silkboard
       camera_id: SILKBOARD-01
       name: No Parking - Service Road
@@ -155,16 +155,16 @@ violations:
     stop_line_zones:
     - id: stop_electronic
       camera_id: ELECTRONIC-01
-      # Narrow band across road near bottom of frame (stop line)
+      # Band across road at intersection (vehicles past stop line)
       polygon:
       - - 0.15
-        - 0.72
+        - 0.45
       - - 0.85
-        - 0.72
+        - 0.45
       - - 0.85
-        - 0.8
+        - 0.70
       - - 0.15
-        - 0.8
+        - 0.70
     - id: stop_krpuram
       camera_id: KRPURAM-01
       # Narrow band across road near bottom of frame (stop line)
