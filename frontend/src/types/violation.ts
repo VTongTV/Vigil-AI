@@ -69,12 +69,40 @@ export interface TimingBreakdown {
   evidence_gen_ms: number;
 }
 
+export interface DetectionSummary {
+  persons: number;
+  riders: number;
+  pedestrians: number;
+  cars: number;
+  motorcycles: number;
+  buses: number;
+  trucks: number;
+  bicycles: number;
+  total_objects: number;
+  vehicle_categories: string[];
+}
+
+export interface PreprocessingStep {
+  name: string;
+  enabled: boolean;
+  parameters: Record<string, unknown>;
+}
+
+export interface PreprocessingApplied {
+  steps: PreprocessingStep[];
+  image_brightness: number | null;
+  image_contrast: number | null;
+  condition_flags: string[];
+}
+
 export interface DetectResponse {
   success: boolean;
   processing_time_ms: number;
   timing_breakdown: TimingBreakdown;
   violations: ViolationRecord[];
   image_dimensions: ImageDimensions;
+  detection_summary: DetectionSummary;
+  preprocessing_applied: PreprocessingApplied;
 }
 
 export interface ViolationListResponse {

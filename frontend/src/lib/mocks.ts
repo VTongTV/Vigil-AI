@@ -212,6 +212,28 @@ export const MOCK_DETECT_RESPONSE: DetectResponse = {
   },
   violations: MOCK_VIOLATIONS,
   image_dimensions: { width: 1280, height: 720 },
+  detection_summary: {
+    persons: 4,
+    riders: 3,
+    pedestrians: 1,
+    cars: 2,
+    motorcycles: 3,
+    buses: 0,
+    trucks: 1,
+    bicycles: 0,
+    total_objects: 14,
+    vehicle_categories: ["car", "motorcycle", "truck"],
+  },
+  preprocessing_applied: {
+    steps: [
+      { name: "CLAHE Denoise", enabled: true, parameters: { clip_limit: 2.0 } },
+      { name: "Gamma Correction", enabled: true, parameters: { gamma: 1.2 } },
+      { name: "Sharpen", enabled: false, parameters: {} },
+    ],
+    image_brightness: 112.45,
+    image_contrast: 48.32,
+    condition_flags: ["low_light_detected"],
+  },
 };
 
 // ---------------------------------------------------------------------------
