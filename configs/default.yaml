@@ -64,77 +64,83 @@ violations:
     lane_polygons:
     - id: ws_bannerghatta
       camera_id: BANNERGHATTA-01
+      # Left-side lane (oncoming traffic zone)
       polygon:
       - - 0.0
-        - 0.0
-      - - 1.0
-        - 0.0
-      - - 1.0
-        - 1.0
+        - 0.3
+      - - 0.45
+        - 0.3
+      - - 0.45
+        - 0.85
       - - 0.0
-        - 1.0
+        - 0.85
     - id: ws_electronic
       camera_id: ELECTRONIC-01
+      # Left-side lane (oncoming traffic zone)
       polygon:
       - - 0.0
-        - 0.0
-      - - 1.0
-        - 0.0
-      - - 1.0
-        - 1.0
+        - 0.25
+      - - 0.4
+        - 0.25
+      - - 0.4
+        - 0.8
       - - 0.0
-        - 1.0
+        - 0.8
     - id: ws_yelahanka
       camera_id: YELAHANKA-01
+      # Left-side lane (oncoming traffic zone)
       polygon:
       - - 0.0
-        - 0.0
-      - - 1.0
-        - 0.0
-      - - 1.0
-        - 1.0
+        - 0.3
+      - - 0.42
+        - 0.3
+      - - 0.42
+        - 0.82
       - - 0.0
-        - 1.0
+        - 0.82
     direction: left_to_right
   illegal_parking:
     enabled: true
     zone_polygons:
     - id: park_kormangala
       camera_id: KORMANGALA-01
-      name: No Parking
+      name: No Parking - Bus Bay
+      # Small curb-side zone (bottom-right corner)
       polygon:
-      - - 0.0
-        - 0.0
-      - - 1.0
-        - 0.0
-      - - 1.0
-        - 1.0
-      - - 0.0
-        - 1.0
+      - - 0.7
+        - 0.75
+      - - 0.95
+        - 0.75
+      - - 0.95
+        - 0.95
+      - - 0.7
+        - 0.95
     - id: park_mgroad
       camera_id: MGROAD-01
-      name: No Parking
+      name: No Parking - Bus Stop
+      # Small curb-side zone (bottom-left corner)
       polygon:
-      - - 0.0
-        - 0.0
-      - - 1.0
-        - 0.0
-      - - 1.0
-        - 1.0
-      - - 0.0
-        - 1.0
+      - - 0.05
+        - 0.78
+      - - 0.3
+        - 0.78
+      - - 0.3
+        - 0.95
+      - - 0.05
+        - 0.95
     - id: park_silkboard
       camera_id: SILKBOARD-01
-      name: No Parking
+      name: No Parking - Service Road
+      # Small curb-side zone (bottom-right area)
       polygon:
-      - - 0.0
-        - 0.0
-      - - 1.0
-        - 0.0
-      - - 1.0
-        - 1.0
-      - - 0.0
-        - 1.0
+      - - 0.72
+        - 0.7
+      - - 0.98
+        - 0.7
+      - - 0.98
+        - 0.92
+      - - 0.72
+        - 0.92
     min_confidence: 0.5
   seatbelt:
     enabled: true
@@ -149,26 +155,28 @@ violations:
     stop_line_zones:
     - id: stop_electronic
       camera_id: ELECTRONIC-01
+      # Narrow band across road near bottom of frame (stop line)
       polygon:
-      - - 0.0
-        - 0.0
-      - - 1.0
-        - 0.0
-      - - 1.0
-        - 1.0
-      - - 0.0
-        - 1.0
+      - - 0.15
+        - 0.72
+      - - 0.85
+        - 0.72
+      - - 0.85
+        - 0.8
+      - - 0.15
+        - 0.8
     - id: stop_krpuram
       camera_id: KRPURAM-01
+      # Narrow band across road near bottom of frame (stop line)
       polygon:
-      - - 0.0
-        - 0.0
-      - - 1.0
-        - 0.0
-      - - 1.0
-        - 1.0
-      - - 0.0
-        - 1.0
+      - - 0.1
+        - 0.7
+      - - 0.9
+        - 0.7
+      - - 0.9
+        - 0.78
+      - - 0.1
+        - 0.78
     min_confidence: 0.3
     confidence_discount: 0.75
   red_light:

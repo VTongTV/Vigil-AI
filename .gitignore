@@ -53,3 +53,6 @@ data/sample_videos/*.mp4
 
 # Temp scripts
 tune_demo.py
+tune_triple.py
+debug_seatbelt.py
+debug_triple.py
