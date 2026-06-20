@@ -182,25 +182,28 @@ export function getEvidenceUrl(violationId: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// FIR PDF (F2)
+// Challan PDF (F2)
 // ---------------------------------------------------------------------------
 
-export function getFirPdfUrl(violationId: string): string {
-  return `${API_BASE}/evidence/${violationId}/fir-pdf`;
+export function getChallanPdfUrl(violationId: string): string {
+  return `${API_BASE}/evidence/${violationId}/challan-pdf`;
 }
 
-export async function generateFirPdf(violationId: string): Promise<Blob> {
+export async function generateChallanPdf(violationId: string): Promise<Blob> {
   if (useAppStore.getState().demoMode) {
-    // In demo mode, return a placeholder text blob
-    const text = `FIR PDF for violation ${violationId}\n\nThis is a demo placeholder.\nIn production, this would be a court-admissible PDF.`;
-    return new Blob([text], { type: "application/pdf" });
+    // In demo mode, return a valid minimal PDF to prevent "Failed to load PDF document" error
+    const base64 = "JVBERi0xLjQKJcOkw7zDtsOfCjIgMCBvYmoKPDwvTGVuZ3RoIDMgMCBSL0ZpbHRlci9GbGF0ZURlY29kZT4+CnN0cmVhbQp4nDPQM1Qo5ypUMFAwALJMLY31jBQsTAz1LBSKUrnCtRTyuVIVUhUScxTSMw1MDHUMdI11jIx0wCxNl8xcLpA2G1w+oDYA2s8PsgplbmRzdHJlYW0KZW5kb2JqCgozIDAgb2JqCjQ4CmVuZG9iagoKMSAwIG9iago8PC9UeXBlL1BhZ2UvTWVkaWFCb3hbMCAwIDU5NSA4NDJdL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vQ29udGVudHMgMiAwIFIvUGFyZW50IDUgMCBSPj4KZW5kb2JqCgo0IDAgb2JqCjw8L1R5cGUvRm9udC9TdWJ0eXBlL1R5cGUxL0Jhc2VGb250L0hlbHZldGljYT4+CmVuZG9iagoKNSAwIG9iago8PC9UeXBlL1BhZ2VzL0NvdW50IDEvS2lkc1sxIDAgUl0+PgplbmRvYmoKCjYgMCBvYmoKPDwvVHlwZS9DYXRhbG9nL1BhZ2VzIDUgMCBSPj4KZW5kb2JqCgo3IDAgb2JqCjw8L1Byb2R1Y2VyKGlUZXh0IDUuNS4xKS9DcmVhdGlvbkRhdGUoRDoyMDIwMTExNzE0MzcwNCswMScwMCcpPj4KZW5kb2JqCgp4cmVmCjAgOAowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAxMTEgMDAwMDAgbiAKMDAwMDAwMDAxOSAwMDAwMCBuIAowMDAwMDAwMDkyIDAwMDAwIG4gCjAwMDAwMDAyMTUgMDAwMDAgbiAKMDAwMDAwMDI5NiAwMDAwMCBuIAowMDAwMDAwMzUyIDAwMDAwIG4gCjAwMDAwMDAzOTkgMDAwMDAgbiAKdHJhaWxlcgo8PC9TaXplIDgvUm9vdCA2IDAgUi9JbmZvIDcgMCBSPj4Kc3RhcnR4cmVmCjQ5MQolJUVPRgo=";
+    const binary = atob(base64);
+    const array = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) array[i] = binary.charCodeAt(i);
+    return new Blob([array], { type: "application/pdf" });
   }
 
-  const res = await fetch(`${API_BASE}/evidence/${violationId}/fir-pdf`, {
+  const res = await fetch(`${API_BASE}/evidence/${violationId}/challan-pdf`, {
     method: "POST",
   });
   if (!res.ok) {
-    throw new Error(`Failed to generate FIR PDF: ${res.status}`);
+    throw new Error(`Failed to generate Challan PDF: ${res.status}`);
   }
   return res.blob();
 }

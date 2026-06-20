@@ -42,7 +42,7 @@ import {
   VIOLATION_SECTIONS,
 } from "@/types/violation";
 import { cn } from "@/lib/utils";
-import { generateFirPdf } from "@/lib/api";
+import { generateChallanPdf } from "@/lib/api";
 import AnnotatedViewer from "@/components/AnnotatedViewer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -54,8 +54,8 @@ export default function Evidence() {
   const lastDetection = useAppStore((s) => s.lastDetection);
   const [viewingId, setViewingId] = useState<string | null>(null);
   const [copiedHash, setCopiedHash] = useState(false);
-  const [firLoading, setFirLoading] = useState(false);
-  const [firError, setFirError] = useState<string | null>(null);
+  const [challanLoading, setChallanLoading] = useState(false);
+  const [challanError, setChallanError] = useState<string | null>(null);
   const prefersReduced = useReducedMotion();
 
   const violations = lastDetection ?? [];
@@ -76,25 +76,25 @@ export default function Evidence() {
     }
   };
 
-  /** Generate and download the FIR PDF for the selected violation. */
-  const handleFirDownload = async () => {
+  /** Generate and download the Challan PDF for the selected violation. */
+  const handleChallanDownload = async () => {
     if (!selectedViolation) return;
-    setFirLoading(true);
-    setFirError(null);
+    setChallanLoading(true);
+    setChallanError(null);
     try {
-      const blob = await generateFirPdf(selectedViolation.id);
+      const blob = await generateChallanPdf(selectedViolation.id);
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `FIR_${selectedViolation.id}.pdf`;
+      link.download = `Challan_${selectedViolation.id}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (err) {
-      setFirError(err instanceof Error ? err.message : "FIR generation failed");
+      setChallanError(err instanceof Error ? err.message : "Challan generation failed");
     } finally {
-      setFirLoading(false);
+      setChallanLoading(false);
     }
   };
 
@@ -250,23 +250,23 @@ export default function Evidence() {
                         Chain of Custody
                       </h3>
                       <div className="flex items-center gap-2">
-                        {/* PRIMARY CTA — FIR PDF: solid accent, high visual weight */}
+                        {/* PRIMARY CTA — Challan PDF: solid accent, high visual weight */}
                         <Button
                           variant="default"
                           size="sm"
                           className={cn(
                             "h-7 bg-[var(--color-accent)] text-[12px] font-semibold text-white hover:bg-[var(--color-accent-bright)]",
-                            firLoading && "opacity-60 cursor-wait",
+                            challanLoading && "opacity-60 cursor-wait",
                           )}
-                          onClick={handleFirDownload}
-                          disabled={firLoading}
+                          onClick={handleChallanDownload}
+                          disabled={challanLoading}
                         >
-                          {firLoading ? (
+                          {challanLoading ? (
                             <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
                           ) : (
                             <FileDown className="mr-1.5 h-3.5 w-3.5" />
                           )}
-                          {firLoading ? "Generating…" : "Download FIR PDF"}
+                          {challanLoading ? "Generating…" : "Download E-Challan"}
                         </Button>
                         {/* SECONDARY CTA — Print: outline, lower visual weight */}
                         <Button
@@ -281,18 +281,18 @@ export default function Evidence() {
                       </div>
                     </div>
 
-                    {/* FIR error message */}
+                    {/* Challan error message */}
                     <AnimatePresence>
-                      {firError && (
+                      {challanError && (
                         <motion.div
-                          key="fir-error"
+                          key="challan-error"
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: "auto" }}
                           exit={{ opacity: 0, height: 0 }}
-                          className="mb-4 flex items-center gap-2 rounded-md bg-[var(--color-danger)]/10 px-3 py-2"
+                          className="flex items-center gap-1.5 rounded-md bg-[var(--color-danger)]/10 px-3 py-2"
                         >
-                          <AlertCircle className="h-3.5 w-3.5 shrink-0 text-[var(--color-danger)]" />
-                          <span className="text-[11px] text-[var(--color-danger)]">{firError}</span>
+                          <AlertCircle className="h-3.5 w-3.5 text-[var(--color-danger)]" />
+                          <span className="text-[11px] text-[var(--color-danger)]">{challanError}</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
