@@ -18,7 +18,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { 
+import {
   BarChart3, Camera, AlertTriangle, IndianRupee, PieChart as PieIcon, Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -160,24 +160,24 @@ export default function Analytics() {
 
   const typeData = analytics
     ? Object.entries(analytics.violations_by_type).map(([key, value]) => ({
-        name: VIOLATION_LABELS[key as keyof typeof VIOLATION_LABELS] ?? key,
-        value,
-        key,
-      }))
+      name: VIOLATION_LABELS[key as keyof typeof VIOLATION_LABELS] ?? key,
+      value,
+      key,
+    }))
     : [];
 
   const dailyData = analytics
     ? analytics.daily_counts.map((d) => ({
-        date: d.date.slice(5),
-        count: d.count,
-      }))
+      date: d.date.slice(5),
+      count: d.count,
+    }))
     : [];
 
   const statusData = analytics
     ? Object.entries(analytics.violations_by_status).map(([key, value]) => ({
-        name: key.charAt(0).toUpperCase() + key.slice(1),
-        value,
-      }))
+      name: key.charAt(0).toUpperCase() + key.slice(1),
+      value,
+    }))
     : [];
 
   const motionVariants = prefersReduced
@@ -214,13 +214,13 @@ export default function Analytics() {
           </div>
 
           {/* Period selector — explicit label prevents ambiguity */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0 mr-22">
             <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-faint)]">
               Period
             </span>
             <div className="relative z-50">
               <Select value={String(days)} onValueChange={(v) => setDays(Number(v))}>
-                <SelectTrigger className="h-7 w-36 border-[var(--rule-color)] bg-[var(--color-paper-2)] text-[11px]">
+                <SelectTrigger className="h-7 w-18 border-[var(--rule-color)] bg-[var(--color-paper-2)] text-[11px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent side="bottom" align="end">
@@ -544,14 +544,14 @@ function StatBox({
       glowClass
     )}>
       {/* Accent glow on hover */}
-      <div 
-        className="absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity duration-300 group-hover:opacity-100" 
-        style={{ backgroundImage: `linear-gradient(to bottom right, color-mix(in oklch, ${color} 10%, transparent), transparent)` }} 
+      <div
+        className="absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{ backgroundImage: `linear-gradient(to bottom right, color-mix(in oklch, ${color} 10%, transparent), transparent)` }}
       />
       {/* Accent top line on hover */}
-      <div 
-        className="absolute inset-x-0 top-0 h-px opacity-0 transition-opacity group-hover:opacity-100" 
-        style={{ backgroundImage: `linear-gradient(to right, transparent, color-mix(in oklch, ${color} 40%, transparent), transparent)` }} 
+      <div
+        className="absolute inset-x-0 top-0 h-px opacity-0 transition-opacity group-hover:opacity-100"
+        style={{ backgroundImage: `linear-gradient(to right, transparent, color-mix(in oklch, ${color} 40%, transparent), transparent)` }}
       />
       <CardContent className="p-4">
         <div className="flex items-start justify-between">

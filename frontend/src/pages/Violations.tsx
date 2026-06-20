@@ -181,7 +181,7 @@ export default function Violations() {
           </div>
           {/* L1: total count — hero metric in accent pill so it registers within 3 seconds */}
           {total > 0 && (
-            <span className="rounded-md bg-[var(--color-accent-soft)] px-3 py-1 font-mono text-[15px] font-bold tabular-nums text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/20">
+            <span className="rounded-md bg-[var(--color-accent-soft)] px-3 py-1 mr-22 font-mono text-[15px] font-bold tabular-nums text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/20">
               {total.toLocaleString("en-IN")}
             </span>
           )}
@@ -240,70 +240,70 @@ export default function Violations() {
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-accent)]/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
           <ScrollArea className="w-full relative z-10">
             <Table>
-            <TableHeader>
-              {/* Header row — visually separated from data by stronger border */}
-              <TableRow className="border-b-2 border-b-[var(--color-paper-3)]/70 hover:bg-transparent">
-                {/* L4: column heads — smallest, most subdued */}
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                  Type
-                </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                  Confidence
-                </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                  Plate
-                </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                  Fine
-                </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                  Camera
-                </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                  Status
-                </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
-                  Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <AnimatePresence mode="wait">
-                {loading ? (
-                  <TableRow key="loading">
-                    <TableCell colSpan={7} className="h-32 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="h-4 w-4 rounded-full border-2 border-t-transparent border-[var(--color-accent)] animate-spin" />
-                        <span className="text-xs text-[var(--color-ink-faint)]">Loading...</span>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : violations.length === 0 ? (
-                  <TableRow key="empty">
-                    <TableCell colSpan={7} className="h-32 text-center text-xs text-[var(--color-ink-faint)]">
-                      No violations found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  violations.map((v, i) => (
-                    <ViolationRow
-                      key={v.id}
-                      violation={v}
-                      index={i}
-                      onAction={handleAction}
-                      onSelect={() => {
-                        setSelectedViolation(v);
-                        setDetailViolation(v);
-                      }}
-                      prefersReduced={prefersReduced ?? false}
-                    />
-                  ))
-                )}
-              </AnimatePresence>
-            </TableBody>
-          </Table>
-        </ScrollArea>
-      </Card>
+              <TableHeader>
+                {/* Header row — visually separated from data by stronger border */}
+                <TableRow className="border-b-2 border-b-[var(--color-paper-3)]/70 hover:bg-transparent">
+                  {/* L4: column heads — smallest, most subdued */}
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                    Type
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                    Confidence
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                    Plate
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                    Fine
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                    Camera
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                    Status
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <AnimatePresence mode="wait">
+                  {loading ? (
+                    <TableRow key="loading">
+                      <TableCell colSpan={7} className="h-32 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="h-4 w-4 rounded-full border-2 border-t-transparent border-[var(--color-accent)] animate-spin" />
+                          <span className="text-xs text-[var(--color-ink-faint)]">Loading...</span>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : violations.length === 0 ? (
+                    <TableRow key="empty">
+                      <TableCell colSpan={7} className="h-32 text-center text-xs text-[var(--color-ink-faint)]">
+                        No violations found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    violations.map((v, i) => (
+                      <ViolationRow
+                        key={v.id}
+                        violation={v}
+                        index={i}
+                        onAction={handleAction}
+                        onSelect={() => {
+                          setSelectedViolation(v);
+                          setDetailViolation(v);
+                        }}
+                        prefersReduced={prefersReduced ?? false}
+                      />
+                    ))
+                  )}
+                </AnimatePresence>
+              </TableBody>
+            </Table>
+          </ScrollArea>
+        </Card>
       </motion.div>
 
       {/* ── Pagination ── */}

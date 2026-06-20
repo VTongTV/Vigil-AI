@@ -441,7 +441,7 @@ export default function Layout() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.2 }}
-              className="pointer-events-none absolute right-4 top-4 z-50"
+              className="pointer-events-none absolute right-4 top-8 z-50"
             >
               <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-warning-soft)] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--color-warning)] shadow-sm ring-1 ring-[var(--color-warning)]/20">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-warning)] pulse-dot" />
