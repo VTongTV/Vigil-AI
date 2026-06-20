@@ -94,7 +94,7 @@ export default function LiveMetricsSection() {
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-50px" }}
         >
           {/* Section header */}
           <motion.div variants={staggerItem} className="text-center mb-16">

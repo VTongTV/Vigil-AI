@@ -23,7 +23,7 @@ export default function CTASection() {
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-50px" }}
         >
           {/* Headline */}
           <motion.h2
