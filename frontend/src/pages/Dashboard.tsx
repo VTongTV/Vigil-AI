@@ -15,6 +15,10 @@ import {
   Wifi,
   WifiOff,
   Clock,
+  ScanEye,
+  Car,
+  SunMedium,
+  Cpu,
 } from "lucide-react";
 import {
   motion,
@@ -572,7 +576,7 @@ function DashboardContent({
 
       {/* Bottom: Top cameras + Camera health + Status breakdown */}
       <motion.div
-        className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3"
+        className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-4"
         variants={motionContainerVariants}
         initial="hidden"
         animate="visible"
@@ -726,6 +730,62 @@ function DashboardContent({
                     },
                   )
                   : null}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* CV Capabilities */}
+        <motion.div variants={motionCardVariants}>
+          <Card className="border-[var(--color-paper-3)]/50 bg-[var(--color-paper-1)]/80">
+            <CardContent className="p-4">
+              <h2 className="mb-3 flex items-center gap-2 text-[13px] font-semibold text-[var(--color-ink)]">
+                <Cpu className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                CV Capabilities
+              </h2>
+              <div className="space-y-3">
+                <div className="flex items-start gap-2.5">
+                  <ScanEye className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-accent)]" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[12px] font-medium text-[var(--color-ink)]">
+                      Object Detection
+                    </div>
+                    <p className="mt-0.5 text-[11px] text-[var(--color-ink-faint)] leading-relaxed">
+                      Multi-class detection: persons, riders, pedestrians, vehicles via YOLOv8n COCO
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-full border border-[var(--color-success)]/20 bg-[var(--color-success)]/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[var(--color-success)]">
+                    Active
+                  </span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <Car className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-accent)]" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[12px] font-medium text-[var(--color-ink)]">
+                      Vehicle Classification
+                    </div>
+                    <p className="mt-0.5 text-[11px] text-[var(--color-ink-faint)] leading-relaxed">
+                      Cars, motorcycles, buses, trucks, bicycles — categorized in real-time
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-full border border-[var(--color-success)]/20 bg-[var(--color-success)]/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[var(--color-success)]">
+                    Active
+                  </span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <SunMedium className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-accent)]" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[12px] font-medium text-[var(--color-ink)]">
+                      Image Preprocessing
+                    </div>
+                    <p className="mt-0.5 text-[11px] text-[var(--color-ink-faint)] leading-relaxed">
+                      CLAHE, denoise, gamma correction for low-light, shadow, noise conditions
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-full border border-[var(--color-success)]/20 bg-[var(--color-success)]/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[var(--color-success)]">
+                    Active
+                  </span>
+                </div>
               </div>
             </CardContent>
           </Card>
