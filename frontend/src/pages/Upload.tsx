@@ -33,6 +33,8 @@ import {
   FileImage,
   Trash2,
   ImagePlay,
+  Eye,
+  Sun,
 } from "lucide-react";
 import { detectViolation } from "@/lib/api";
 import type { DetectResponse, ViolationRecord } from "@/types/violation";
@@ -842,6 +844,106 @@ export default function Upload() {
                   </CardContent>
                 </Card>
 
+                {/* Object Detection Summary */}
+                {activeFile.result.detection_summary && activeFile.result.detection_summary.total_objects > 0 && (
+                  <Card className="border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5">
+                    <CardContent className="p-4">
+                      <div className="mb-3 flex items-center gap-2">
+                        <Eye className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                        <h3 className="text-[13px] font-semibold text-[var(--color-ink)]">
+                          Object Detection Summary
+                        </h3>
+                        <span className="ml-auto font-mono text-[11px] text-[var(--color-ink-faint)]">
+                          {activeFile.result.detection_summary.total_objects} objects
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-4 gap-2">
+                        {[
+                          { label: "Persons", count: activeFile.result.detection_summary.persons, color: "var(--color-ink)" },
+                          { label: "Riders", count: activeFile.result.detection_summary.riders, color: "var(--color-accent)" },
+                          { label: "Pedestrians", count: activeFile.result.detection_summary.pedestrians, color: "var(--color-ink-muted)" },
+                          { label: "Cars", count: activeFile.result.detection_summary.cars, color: "var(--color-warning)" },
+                          { label: "Motorcycles", count: activeFile.result.detection_summary.motorcycles, color: "var(--color-accent-bright)" },
+                          { label: "Buses", count: activeFile.result.detection_summary.buses, color: "var(--color-triple)" },
+                          { label: "Trucks", count: activeFile.result.detection_summary.trucks, color: "var(--color-danger)" },
+                          { label: "Bicycles", count: activeFile.result.detection_summary.bicycles, color: "var(--color-success)" },
+                        ].map((item) => (
+                          <div key={item.label} className="rounded-md bg-[var(--color-paper-1)]/70 px-2 py-1.5 text-center ring-1 ring-[var(--color-paper-3)]/50">
+                            <span className="block font-mono text-[14px] font-bold tabular-nums" style={{ color: item.color }}>
+                              {item.count}
+                            </span>
+                            <span className="block text-[10px] text-[var(--color-ink-faint)]">{item.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                      {activeFile.result.detection_summary.vehicle_categories.length > 0 && (
+                        <div className="mt-2.5 flex items-center gap-2">
+                          <span className="text-[11px] text-[var(--color-ink-faint)]">Vehicles:</span>
+                          {activeFile.result.detection_summary.vehicle_categories.map((cat) => (
+                            <Badge key={cat} variant="outline" className="text-[10px] border-[var(--color-accent)]/30 bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
+                              {cat}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Preprocessing Pipeline */}
+                {activeFile.result.preprocessing_applied && (
+                  <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70">
+                    <CardContent className="p-4">
+                      <div className="mb-3 flex items-center gap-2">
+                        <Sun className="h-3.5 w-3.5 text-[var(--color-warning)]" />
+                        <h3 className="text-[13px] font-semibold text-[var(--color-ink)]">
+                          Preprocessing Pipeline
+                        </h3>
+                        {(activeFile.result.preprocessing_applied.image_brightness != null || activeFile.result.preprocessing_applied.image_contrast != null) && (
+                          <span className="ml-auto flex items-center gap-3 text-[11px] text-[var(--color-ink-faint)]">
+                            {activeFile.result.preprocessing_applied.image_brightness != null && (
+                              <span>Brightness: {activeFile.result.preprocessing_applied.image_brightness.toFixed(2)}</span>
+                            )}
+                            {activeFile.result.preprocessing_applied.image_contrast != null && (
+                              <span>Contrast: {activeFile.result.preprocessing_applied.image_contrast.toFixed(2)}</span>
+                            )}
+                          </span>
+                        )}
+                      </div>
+                      <div className="space-y-1.5">
+                        {activeFile.result.preprocessing_applied.steps.map((step) => (
+                          <div key={step.name} className="flex items-center gap-2.5">
+                            <span className={cn(
+                              "h-2 w-2 shrink-0 rounded-full",
+                              step.enabled ? "bg-[var(--color-success)]" : "bg-[var(--color-paper-4)]"
+                            )} />
+                            <span className="text-[12px] font-medium text-[var(--color-ink)]">{step.name}</span>
+                            <span className="text-[11px] text-[var(--color-ink-faint)]">
+                              {step.enabled ? "Applied" : "Skipped"}
+                            </span>
+                            {step.enabled && Object.keys(step.parameters).length > 0 && (
+                              <span className="ml-auto text-[10px] font-mono text-[var(--color-ink-faint)]">
+                                {Object.entries(step.parameters).map(([k, v]) => `${k}=${v}`).join(", ")}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      {activeFile.result.preprocessing_applied.condition_flags.length > 0 && (
+                        <div className="mt-2.5 flex items-center gap-2">
+                          <AlertTriangle className="h-3 w-3 text-[var(--color-warning)]" />
+                          <span className="text-[11px] text-[var(--color-ink-faint)]">Conditions:</span>
+                          {activeFile.result.preprocessing_applied.condition_flags.map((flag) => (
+                            <Badge key={flag} variant="outline" className="text-[10px] border-[var(--color-warning)]/30 bg-[var(--color-warning)]/10 text-[var(--color-warning)]">
+                              {flag.replace(/_/g, " ")}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* Annotated image */}
                 {activeFile.preview && activeFile.result.violations.length > 0 && (
                   <Card className="border-[var(--color-paper-3)]/60 bg-[var(--color-paper-1)]/70 overflow-hidden">
@@ -975,7 +1077,7 @@ function ViolationResultCard({ violation: v, prefersReduced }: { violation: Viol
                 </Badge>
                 {v.danger_score > 0 && (
                   <Badge variant="outline" className="text-[11px] border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
-                    ⚠ {v.danger_score}
+                    <AlertTriangle className="mr-0.5 h-3 w-3" /> {v.danger_score}
                   </Badge>
                 )}
               </div>

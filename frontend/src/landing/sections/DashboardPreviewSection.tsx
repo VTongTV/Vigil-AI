@@ -1,14 +1,22 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, type ElementType } from "react";
 import { motion, type Variants } from "framer-motion";
+import {
+  Monitor,
+  Zap,
+  ListChecks,
+  ShieldCheck,
+  BarChart3,
+  Map,
+} from "lucide-react";
 import { staggerContainer, staggerItem } from "../animations/variants";
 
-const dashboardFeatures = [
-  { label: "Command Center", description: "Real-time violation overview with sparkline trends and camera health monitoring", icon: "⌘" },
-  { label: "Batch Detection", description: "Upload up to 10 images with pipeline timing waterfall and annotated results", icon: "⚡" },
-  { label: "Violation Docket", description: "Tabular list with filters, approve/reject actions, and audit trail", icon: "📋" },
-  { label: "Evidence Viewer", description: "Chain-of-custody metadata, SHA-256 hashes, and E-Challan generation", icon: "🔐" },
-  { label: "Analytics", description: "Recharts-powered trends, ROI calculator, and camera breakdown", icon: "📊" },
-  { label: "Tactical Map", description: "Leaflet heatmap with danger scores across 10 Bengaluru junctions", icon: "🗺" },
+const dashboardFeatures: { label: string; description: string; icon: ElementType }[] = [
+  { label: "Command Center", description: "Real-time violation overview with sparkline trends and camera health monitoring", icon: Monitor },
+  { label: "Batch Detection", description: "Upload up to 10 images with pipeline timing waterfall and annotated results", icon: Zap },
+  { label: "Violation Docket", description: "Tabular list with filters, approve/reject actions, and audit trail", icon: ListChecks },
+  { label: "Evidence Viewer", description: "Chain-of-custody metadata, SHA-256 hashes, and E-Challan generation", icon: ShieldCheck },
+  { label: "Analytics", description: "Recharts-powered trends, ROI calculator, and camera breakdown", icon: BarChart3 },
+  { label: "Tactical Map", description: "Leaflet heatmap with danger scores across 10 Bengaluru junctions", icon: Map },
 ];
 
 const cardVariant = (i: number): Variants => ({
@@ -347,7 +355,7 @@ export default function DashboardPreviewSection() {
                   hover:translate-x-1 hover:border-blue-500/30"
               >
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-base">{feature.icon}</span>
+                  {(() => { const Icon = feature.icon; return <Icon className="h-4 w-4 text-blue-400" />; })()}
                   <h3 className="text-sm font-bold text-white">{feature.label}</h3>
                 </div>
                 <p className="text-xs text-slate-400 leading-relaxed">
