@@ -117,6 +117,46 @@ class TimingBreakdown(BaseModel):
     evidence_gen_ms: int
 
 
+class DetectionSummary(BaseModel):
+    """Summary of all detected objects by category.
+
+    Provides explicit visibility into vehicle/rider/pedestrian detection
+    and vehicle classification for judge evaluation.
+    """
+
+    persons: int = 0
+    riders: int = 0
+    pedestrians: int = 0
+    cars: int = 0
+    motorcycles: int = 0
+    buses: int = 0
+    trucks: int = 0
+    bicycles: int = 0
+    total_objects: int = 0
+    vehicle_categories: list[str] = Field(default_factory=list)
+
+
+class PreprocessingStep(BaseModel):
+    """A single preprocessing step with its parameters and status."""
+
+    name: str
+    enabled: bool
+    parameters: dict = Field(default_factory=dict)
+
+
+class PreprocessingApplied(BaseModel):
+    """Preprocessing steps applied to the input image.
+
+    Shows which image enhancement steps were used to handle
+    challenging conditions like low light, shadows, and noise.
+    """
+
+    steps: list[PreprocessingStep] = Field(default_factory=list)
+    image_brightness: Optional[float] = None
+    image_contrast: Optional[float] = None
+    condition_flags: list[str] = Field(default_factory=list)
+
+
 class DetectResponse(BaseModel):
     """Response from POST /api/v1/detect."""
 
@@ -125,6 +165,8 @@ class DetectResponse(BaseModel):
     timing_breakdown: TimingBreakdown
     violations: list[ViolationRecord]
     image_dimensions: ImageDimensions
+    detection_summary: DetectionSummary = Field(default_factory=DetectionSummary)
+    preprocessing_applied: PreprocessingApplied = Field(default_factory=PreprocessingApplied)
 
 
 class ViolationListResponse(BaseModel):
