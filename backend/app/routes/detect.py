@@ -14,7 +14,7 @@ import numpy as np
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from sqlalchemy.orm import Session
 
-from backend.app.config import get_camera_info, get_violation_config, settings
+from backend.app.config import get_camera_info, get_preprocessing_config, get_violation_config, settings
 from backend.app.core.evidence import (
     VIOLATION_INFO,
     generate_evidence_image,
@@ -41,8 +41,11 @@ from backend.app.schemas import (
     ConfidenceTier,
     DataSource,
     DetectResponse,
+    DetectionSummary,
     ImageDimensions,
     LicensePlateResult,
+    PreprocessingApplied,
+    PreprocessingStep,
     TimingBreakdown,
     ViolationRecord,
     ViolationStatus,
@@ -51,6 +54,160 @@ from backend.app.schemas import (
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+# COCO class ID → DetectionSummary field mapping
+_COCO_CLASS_MAP: dict[int, str] = {
+    0: "persons",    # person
+    1: "bicycles",   # bicycle
+    2: "cars",       # car
+    3: "motorcycles", # motorcycle
+    5: "buses",      # bus
+    7: "trucks",     # truck
+}
+
+# Categories considered "vehicles" for vehicle_categories list
+_VEHICLE_CLASS_IDS = {2, 3, 5, 7}
+_VEHICLE_NAMES = {2: "car", 3: "motorcycle", 5: "bus", 7: "truck"}
+
+# Categories considered "riders" (person on a motorized 2-wheeler)
+_RIDER_VEHICLE_IDS = {3}  # motorcycle → implies rider
+
+
+def _build_detection_summary(coco_dets: list[dict]) -> DetectionSummary:
+    """Build DetectionSummary from COCO detection results.
+
+    Counts objects by category, distinguishes riders from pedestrians,
+    and lists unique vehicle categories detected.
+
+    Args:
+        coco_dets: List of COCO detection dicts with class_id, class_name, confidence.
+
+    Returns:
+        DetectionSummary with counts per category.
+    """
+    counts: dict[str, int] = {
+        "persons": 0,
+        "riders": 0,
+        "pedestrians": 0,
+        "cars": 0,
+        "motorcycles": 0,
+        "buses": 0,
+        "trucks": 0,
+        "bicycles": 0,
+    }
+    vehicle_cats: set[str] = set()
+    motorcycle_count = 0
+
+    for det in coco_dets:
+        cls_id = det.get("class_id")
+        if cls_id is None:
+            continue
+
+        field = _COCO_CLASS_MAP.get(cls_id)
+        if field and field in counts:
+            counts[field] += 1
+
+        if cls_id in _VEHICLE_CLASS_IDS:
+            vehicle_cats.add(_VEHICLE_NAMES[cls_id])
+
+        if cls_id == 3:
+            motorcycle_count += 1
+
+    # Riders = persons detected near motorcycles (approximation: count = min(persons, motorcycles))
+    # For simplicity, each motorcycle implies one rider
+    counts["riders"] = motorcycle_count
+
+    # Pedestrians = persons not associated with vehicles (total persons minus riders)
+    counts["pedestrians"] = max(0, counts["persons"] - counts["riders"])
+
+    total = sum(counts.values())
+
+    return DetectionSummary(
+        persons=counts["persons"],
+        riders=counts["riders"],
+        pedestrians=counts["pedestrians"],
+        cars=counts["cars"],
+        motorcycles=counts["motorcycles"],
+        buses=counts["buses"],
+        trucks=counts["trucks"],
+        bicycles=counts["bicycles"],
+        total_objects=total,
+        vehicle_categories=sorted(vehicle_cats),
+    )
+
+
+def _build_preprocessing_applied(
+    image: np.ndarray,
+    config: Optional[dict] = None,
+) -> PreprocessingApplied:
+    """Build PreprocessingApplied from image metrics and config.
+
+    Computes brightness/contrast from the image, determines which
+    preprocessing steps would be active, and flags challenging conditions.
+
+    Args:
+        image: Original BGR image before preprocessing.
+        config: Preprocessing config dict. If None, loaded from default.yaml.
+
+    Returns:
+        PreprocessingApplied with step details and condition flags.
+    """
+    if config is None:
+        config = get_preprocessing_config()
+
+    # Compute image metrics
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    brightness = float(np.mean(gray)) / 255.0  # Normalized 0-1
+    contrast = float(np.std(gray)) / 255.0     # Normalized ~0-0.5
+
+    # Build steps from config
+    steps: list[PreprocessingStep] = []
+    condition_flags: list[str] = []
+
+    clahe_cfg = config.get("clahe", {})
+    steps.append(PreprocessingStep(
+        name="CLAHE",
+        enabled=clahe_cfg.get("enabled", True),
+        parameters={
+            "clip_limit": clahe_cfg.get("clip_limit", 2.0),
+            "tile_grid_size": clahe_cfg.get("tile_grid_size", [8, 8]),
+        },
+    ))
+
+    denoise_cfg = config.get("denoise", {})
+    steps.append(PreprocessingStep(
+        name="Denoise",
+        enabled=denoise_cfg.get("enabled", True),
+        parameters={
+            "h": denoise_cfg.get("h", 10),
+            "template_window_size": denoise_cfg.get("template_window_size", 7),
+            "search_window_size": denoise_cfg.get("search_window_size", 21),
+        },
+    ))
+
+    gamma_cfg = config.get("gamma", {})
+    steps.append(PreprocessingStep(
+        name="Gamma Correction",
+        enabled=gamma_cfg.get("enabled", True),
+        parameters={"gamma": gamma_cfg.get("value", 1.2)},
+    ))
+
+    # Detect challenging conditions
+    if brightness < 0.3:
+        condition_flags.append("low_light")
+    if brightness > 0.8:
+        condition_flags.append("overexposed")
+    if contrast < 0.1:
+        condition_flags.append("low_contrast")
+    if contrast > 0.4:
+        condition_flags.append("high_contrast")
+
+    return PreprocessingApplied(
+        steps=steps,
+        image_brightness=round(brightness, 3),
+        image_contrast=round(contrast, 3),
+        condition_flags=condition_flags,
+    )
 
 
 @router.post("/detect", response_model=DetectResponse)
@@ -96,8 +253,12 @@ async def detect_violations(
 
     # Step 1: Preprocessing
     t0 = time.time()
-    preprocessed = preprocess_image(img_bgr)
+    preprocessing_config = get_preprocessing_config()
+    preprocessed = preprocess_image(img_bgr, preprocessing_config)
     preprocess_ms = int((time.time() - t0) * 1000)
+
+    # Build preprocessing metadata (from original image)
+    preprocessing_applied = _build_preprocessing_applied(img_bgr, preprocessing_config)
 
     # Step 2: COCO detection (resident)
     t0 = time.time()
@@ -106,6 +267,9 @@ async def detect_violations(
         raise HTTPException(status_code=503, detail="Models not loaded")
     coco_dets = mm.detect_coco(preprocessed)
     detect_coco_ms = int((time.time() - t0) * 1000)
+
+    # Build detection summary from COCO detections
+    detection_summary = _build_detection_summary(coco_dets)
 
     # Step 3: Helmet detection (resident)
     t0 = time.time()
@@ -285,6 +449,8 @@ async def detect_violations(
         ),
         violations=violation_records,
         image_dimensions=ImageDimensions(width=img_w, height=img_h),
+        detection_summary=detection_summary,
+        preprocessing_applied=preprocessing_applied,
     )
 
 
