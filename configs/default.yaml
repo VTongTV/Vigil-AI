@@ -2,7 +2,7 @@ models:
   coco:
     path: weights/yolov8n.pt
     device: cuda
-    conf_threshold: 0.25
+    conf_threshold: 0.20
     iou_threshold: 0.45
     resident: true
     classes:
