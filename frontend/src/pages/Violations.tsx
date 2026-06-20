@@ -67,7 +67,6 @@ import {
 import {
   Sheet as SheetPrimitive,
   SheetContent,
-  SheetHeader,
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";

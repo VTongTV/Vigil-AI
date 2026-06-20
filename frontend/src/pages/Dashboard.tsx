@@ -255,25 +255,25 @@ function DashboardContent({
   // Overall trend: average of all violation type trends
   const overallTrend = analytics?.trend_forecast?.length
     ? analytics.trend_forecast.reduce((acc, tf) => {
+      if (tf.trend_direction === "up") return acc + 1;
+      if (tf.trend_direction === "down") return acc - 1;
+      return acc;
+    }, 0) > 0
+      ? "up" as const
+      : analytics.trend_forecast.reduce((acc, tf) => {
         if (tf.trend_direction === "up") return acc + 1;
         if (tf.trend_direction === "down") return acc - 1;
         return acc;
-      }, 0) > 0
-      ? "up" as const
-      : analytics.trend_forecast.reduce((acc, tf) => {
-            if (tf.trend_direction === "up") return acc + 1;
-            if (tf.trend_direction === "down") return acc - 1;
-            return acc;
-          }, 0) < 0
+      }, 0) < 0
         ? "down" as const
         : "stable" as const
     : undefined;
 
   const overallTrendPct = analytics?.trend_forecast?.length
     ? Math.round(
-        analytics.trend_forecast.reduce((acc, tf) => acc + tf.trend_percentage, 0) /
-          analytics.trend_forecast.length,
-      )
+      analytics.trend_forecast.reduce((acc, tf) => acc + tf.trend_percentage, 0) /
+      analytics.trend_forecast.length,
+    )
     : undefined;
 
   // Sparkline data from daily_counts
@@ -555,12 +555,12 @@ function DashboardContent({
               {/* Date labels */}
               {recentDays.length > 0 && (
                 <div className="mt-1.5 flex gap-[3px]">
-                  {recentDays.map(({ date }, i) => (
+                  {recentDays.map(({ date, count }) => (
                     <div
                       key={date}
                       className="flex-1 text-center font-mono text-[11px] text-[var(--color-ink-faint)]"
                     >
-                      {i % 7 === 0 ? date.slice(8) : ""}
+                      {count}
                     </div>
                   ))}
                 </div>
@@ -684,47 +684,47 @@ function DashboardContent({
               <div className="space-y-3">
                 {analytics
                   ? Object.entries(analytics.violations_by_status).map(
-                      ([status, count]) => {
-                        const total = analytics.total_violations || 1;
-                        const pct = ((count / total) * 100).toFixed(0);
-                        const colorMap: Record<string, string> = {
-                          pending: "var(--color-accent)",
-                          under_review: "#3b82f6",
-                          approved: "var(--color-phosphor)",
-                          issued: "#06b6d4",
-                          rejected: "var(--color-danger)",
-                        };
-                        const color = colorMap[status] ?? "var(--color-accent)";
-                        return (
-                          <div key={status}>
-                            <div className="mb-1 flex items-center justify-between">
-                              <span className="flex items-center gap-2 text-[11px] capitalize text-[var(--color-ink-muted)]">
-                                <span
-                                  className="h-2 w-2 rounded-full"
-                                  style={{ backgroundColor: color }}
-                                />
-                                {status.replace("_", " ")}
-                              </span>
-                              <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink)]">
-                                {count}
-                                <span className="ml-1 text-[var(--color-ink-faint)]">
-                                  ({pct}%)
-                                </span>
-                              </span>
-                            </div>
-                            <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/40">
-                              <motion.div
-                                className="h-1.5 rounded-full"
-                                initial={prefersReduced ? { width: `${pct}%` } : { width: 0 }}
-                                animate={{ width: `${pct}%` }}
-                                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                                style={{ backgroundColor: color, opacity: 0.7 }}
+                    ([status, count]) => {
+                      const total = analytics.total_violations || 1;
+                      const pct = ((count / total) * 100).toFixed(0);
+                      const colorMap: Record<string, string> = {
+                        pending: "var(--color-accent)",
+                        under_review: "#3b82f6",
+                        approved: "var(--color-phosphor)",
+                        issued: "#06b6d4",
+                        rejected: "var(--color-danger)",
+                      };
+                      const color = colorMap[status] ?? "var(--color-accent)";
+                      return (
+                        <div key={status}>
+                          <div className="mb-1 flex items-center justify-between">
+                            <span className="flex items-center gap-2 text-[11px] capitalize text-[var(--color-ink-muted)]">
+                              <span
+                                className="h-2 w-2 rounded-full"
+                                style={{ backgroundColor: color }}
                               />
-                            </div>
+                              {status.replace("_", " ")}
+                            </span>
+                            <span className="font-mono text-[11px] tabular-nums text-[var(--color-ink)]">
+                              {count}
+                              <span className="ml-1 text-[var(--color-ink-faint)]">
+                                ({pct}%)
+                              </span>
+                            </span>
                           </div>
-                        );
-                      },
-                    )
+                          <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-paper-3)]/40">
+                            <motion.div
+                              className="h-1.5 rounded-full"
+                              initial={prefersReduced ? { width: `${pct}%` } : { width: 0 }}
+                              animate={{ width: `${pct}%` }}
+                              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                              style={{ backgroundColor: color, opacity: 0.7 }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    },
+                  )
                   : null}
               </div>
             </CardContent>
