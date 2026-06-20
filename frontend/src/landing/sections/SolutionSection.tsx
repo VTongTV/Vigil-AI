@@ -32,7 +32,7 @@ const steps = [
     icon: FileCheck,
     title: "Court-Ready Evidence",
     description:
-      "Approved violations generate annotated evidence images with SHA-256 hashes, FIR PDFs, and chain-of-custody metadata — ready for challan issuance.",
+      "Approved violations generate annotated evidence images with SHA-256 hashes, E-Challans, and chain-of-custody metadata — ready for challan issuance.",
     color: "from-emerald-500 to-teal-500",
     bgColor: "bg-emerald-500/10",
     borderColor: "border-emerald-500/30",

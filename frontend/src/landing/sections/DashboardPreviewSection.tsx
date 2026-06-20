@@ -6,7 +6,7 @@ const dashboardFeatures = [
   { label: "Command Center", description: "Real-time violation overview with sparkline trends and camera health monitoring", icon: "⌘" },
   { label: "Batch Detection", description: "Upload up to 10 images with pipeline timing waterfall and annotated results", icon: "⚡" },
   { label: "Violation Docket", description: "Tabular list with filters, approve/reject actions, and audit trail", icon: "📋" },
-  { label: "Evidence Viewer", description: "Chain-of-custody metadata, SHA-256 hashes, and FIR PDF generation", icon: "🔐" },
+  { label: "Evidence Viewer", description: "Chain-of-custody metadata, SHA-256 hashes, and E-Challan generation", icon: "🔐" },
   { label: "Analytics", description: "Recharts-powered trends, ROI calculator, and camera breakdown", icon: "📊" },
   { label: "Tactical Map", description: "Leaflet heatmap with danger scores across 10 Bengaluru junctions", icon: "🗺" },
 ];

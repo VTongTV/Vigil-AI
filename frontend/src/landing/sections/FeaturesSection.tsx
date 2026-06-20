@@ -104,7 +104,7 @@ const features = [
   {
     icon: FileText,
     title: "Court-Ready Evidence",
-    description: "Annotated images with bounding boxes, SHA-256 integrity hashes, FIR PDF generation, and chain-of-custody metadata for challan issuance.",
+    description: "Annotated images with bounding boxes, SHA-256 integrity hashes, E-Challan generation, and chain-of-custody metadata for challan issuance.",
     color: "text-emerald-400",
     bg: "bg-emerald-500/10",
     border: "border-emerald-500/20",
