@@ -555,12 +555,12 @@ function DashboardContent({
               {/* Date labels */}
               {recentDays.length > 0 && (
                 <div className="mt-1.5 flex gap-[3px]">
-                  {recentDays.map(({ date, count }) => (
+                  {["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"].map((value) => (
                     <div
-                      key={date}
+                      key={value}
                       className="flex-1 text-center font-mono text-[11px] text-[var(--color-ink-faint)]"
                     >
-                      {count}
+                      {value}
                     </div>
                   ))}
                 </div>
