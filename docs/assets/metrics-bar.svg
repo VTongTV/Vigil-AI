@@ -1,0 +1,28 @@
+<svg width="780" height="60" viewBox="0 0 780 60" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="780" height="60" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  
+  <!-- Badges row -->
+  <rect x="15" y="10" width="120" height="40" rx="6" fill="#1e1b4b" stroke="#6366f1" stroke-width="1"/>
+  <text x="75" y="28" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#818cf8">269 TESTS</text>
+  <text x="75" y="42" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#64748b">211 BE + 58 FE</text>
+  
+  <rect x="145" y="10" width="120" height="40" rx="6" fill="#1e1b4b" stroke="#22c55e" stroke-width="1"/>
+  <text x="205" y="28" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#4ade80">7/7 VIOLATIONS</text>
+  <text x="205" y="42" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#64748b">All implemented</text>
+  
+  <rect x="275" y="10" width="120" height="40" rx="6" fill="#1e1b4b" stroke="#3b82f6" stroke-width="1"/>
+  <text x="335" y="28" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#60a5fa">0.023 GB VRAM</text>
+  <text x="335" y="42" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#64748b">4 GB budget</text>
+  
+  <rect x="405" y="10" width="120" height="40" rx="6" fill="#1e1b4b" stroke="#f59e0b" stroke-width="1"/>
+  <text x="465" y="28" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#fbbf24">~1.2s LATENCY</text>
+  <text x="465" y="42" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#64748b">End-to-end</text>
+  
+  <rect x="535" y="10" width="120" height="40" rx="6" fill="#1e1b4b" stroke="#ef4444" stroke-width="1"/>
+  <text x="595" y="28" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#f87171">SHA-256 EVIDENCE</text>
+  <text x="595" y="42" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#64748b">Court-admissible</text>
+  
+  <rect x="665" y="10" width="100" height="40" rx="6" fill="#1e1b4b" stroke="#818cf8" stroke-width="1"/>
+  <text x="715" y="28" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#a78bfa">RULE 166A</text>
+  <text x="715" y="42" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#64748b">Compliant</text>
+</svg>
