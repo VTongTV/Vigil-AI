@@ -38,6 +38,7 @@ FILENAME_TO_VIOLATION = {
     "demo_illegal_parking": "illegal_parking",
     "demo_no_seatbelt": "no_seatbelt",
     "demo_stop_line_violation": "stop_line_violation",
+    "demo_red_light_violation": "red_light_violation",
 }
 
 

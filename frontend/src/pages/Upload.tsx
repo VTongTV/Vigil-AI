@@ -146,16 +146,9 @@ const DEMO_IMAGES: {
     {
       type: "illegal_parking",
       label: "Illegal Parking — Brigade Road",
-      description: "Sedan parked in a no-parking bay off Brigade Road near MG Road",
+      description: "Sedan parked in a no-parking bay off Brigade Road near Koramangala",
       cameraId: "KORMANGALA-01",
       placeholderText: "Illegal parking\\nNo-parking bay\\nBrigade zone",
-    },
-    {
-      type: "illegal_parking",
-      label: "Illegal Parking — Metro Approach",
-      description: "SUV blocking curbside pickup lane near MG Road metro approach",
-      cameraId: "MGROAD-01",
-      placeholderText: "Illegal parking\\nMetro approach\\nMG Road",
     },
     {
       type: "illegal_parking",
@@ -184,6 +177,13 @@ const DEMO_IMAGES: {
       description: "Cab driver without seatbelt near Whitefield tech park exit",
       cameraId: "WHITEFIELD-01",
       placeholderText: "No seatbelt\\nCab driver\\nWhitefield",
+    },
+    {
+      type: "no_seatbelt",
+      label: "No Seatbelt — E-City Sedan",
+      description: "Driver without seatbelt on Hosur Road near Electronic City",
+      cameraId: "ELECTRONIC-01",
+      placeholderText: "No seatbelt\\nSedan driver\\nElectronic City",
     },
     {
       type: "stop_line_violation",
@@ -226,27 +226,6 @@ const DEMO_IMAGES: {
       description: "Car running the red near Hebbal loop ramp during signal cycle",
       cameraId: "HEBBAL-01",
       placeholderText: "Red light jump\\nLoop ramp\\nHebbal",
-    },
-    {
-      type: "license_plate_mismatch",
-      label: "Plate Mismatch — Obscured RE",
-      description: "Blurry or partially obscured Royal Enfield plate near Bannerghatta junction",
-      cameraId: "BANNERGHATTA-01",
-      placeholderText: "Plate mismatch\\nObscured RE plate\\nBannerghatta",
-    },
-    {
-      type: "license_plate_mismatch",
-      label: "Plate Mismatch — Folded Plate",
-      description: "Folded rear plate on scooter near Koramangala 100 Feet Road",
-      cameraId: "KORMANGALA-01",
-      placeholderText: "Plate mismatch\\nFolded rear plate\\nKoramangala",
-    },
-    {
-      type: "license_plate_mismatch",
-      label: "Plate Mismatch — Mud Smeared",
-      description: "Mud-smeared commercial plate near Marathahalli bridge camera zone",
-      cameraId: "MARATHAHALLI-01",
-      placeholderText: "Plate mismatch\\nMud-smeared plate\\nMarathahalli",
     },
   ];
 
