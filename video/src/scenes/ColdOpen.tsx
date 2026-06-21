@@ -6,8 +6,21 @@ import {
   interpolate,
   spring,
 } from "remotion";
-import { COLORS } from "../constants";
-import { typewriter, fadeIn } from "../animations";
+import { COLORS, FPS } from "../constants";
+import {
+  typewriter,
+  fadeIn,
+  fadeInEased,
+  floatY,
+  glowOp,
+  slowRotate,
+  cameraZoom,
+  pulse,
+  transforms,
+  CONFIG_SMOOTH,
+  CONFIG_BOUNCY,
+} from "../animations";
+import { AnimatedBackground } from "../AnimatedBackground";
 import { loadFont } from "@remotion/google-fonts/Inter";
 
 const { fontFamily } = loadFont("normal", {
@@ -15,13 +28,19 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
+const TOTAL_FRAMES = 5 * FPS;
+
 /**
  * Scene 1: Cold Open
- * Typewriter text: "Every 4 minutes, a traffic violation goes undetected in Bengaluru."
+ * Cinematic typewriter reveal with floating particles,
+ * grid background, and continuous ambient motion.
  */
 export const ColdOpen: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+
+  // Camera slow zoom
+  const zoom = cameraZoom(frame, TOTAL_FRAMES, 1.06);
 
   // Line 1 typewriter
   const line1Full = "Every 4 minutes,";
@@ -49,112 +68,160 @@ export const ColdOpen: React.FC = () => {
   );
   const line3 = line3Full.slice(0, line3Visible);
 
-  // Cursor blink
-  const cursorOn = frame % 40 < 20;
+  // Cursor blink — faster for urgency
+  const cursorOn = frame % 30 < 15;
 
-  // Subtitle
-  const subtitleOp = fadeIn(frame, Math.round(3.5 * fps), 25);
+  // Subtitle with spring entrance
+  const subtitleProgress = spring({ frame, fps, delay: Math.round(3.2 * fps), config: CONFIG_SMOOTH });
+  const subtitleOp = interpolate(subtitleProgress, [0, 1], [0, 1]);
+  const subtitleY = interpolate(subtitleProgress, [0, 1], [12, 0]);
 
-  // Ambient glow
-  const glowAlpha = interpolate(
-    Math.sin(frame * 0.03),
-    [-1, 1],
-    [0.06, 0.16],
-  );
+  // Counter highlight line — draws across bottom
+  const accentProgress = interpolate(frame, [Math.round(0.5 * fps), Math.round(2.5 * fps)], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  // Floating "4" stat — breathes and drifts
+  const statFloat = floatY(frame, 0.02, 4);
+  const statPulse = pulse(frame, 0.04, 0.04, 1);
+  const statProgress = spring({ frame, fps, delay: Math.round(0.8 * fps), config: CONFIG_BOUNCY });
+  const statOp = interpolate(statProgress, [0, 1], [0, 0.15]);
+
+  // Decorative corner brackets
+  const bracketProgress = spring({ frame, fps, delay: Math.round(0.3 * fps), config: CONFIG_SMOOTH });
+  const bracketOp = interpolate(bracketProgress, [0, 1], [0, 0.25]);
 
   return (
-    <AbsoluteFill
-      style={{
-        backgroundColor: COLORS.bg,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      {/* Ambient glow */}
+    <AbsoluteFill style={{ overflow: "hidden" }}>
+      {/* Animated background */}
+      <AnimatedBackground particleCount={20} glowCount={2} seed={7} />
+
+      {/* Camera zoom container */}
       <div
         style={{
           position: "absolute",
-          width: 800,
-          height: 400,
-          borderRadius: "50%",
-          background: `radial-gradient(ellipse, rgba(6,182,212,${glowAlpha}), transparent 70%)`,
-          filter: "blur(80px)",
+          inset: 0,
+          transform: `scale(${zoom})`,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
         }}
-      />
-
-      <div style={{ position: "relative", zIndex: 1, textAlign: "center" }}>
-        {/* Line 1 */}
+      >
+        {/* Large floating "4" in background */}
         <div
           style={{
+            position: "absolute",
             fontFamily,
-            fontSize: 72,
-            fontWeight: 300,
-            color: COLORS.textMuted,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.35,
-          }}
-        >
-          {line1}
-          {line1Visible < line1Full.length && cursorOn && (
-            <span style={{ color: COLORS.primary }}>|</span>
-          )}
-        </div>
-
-        {/* Line 2 */}
-        <div
-          style={{
-            fontFamily,
-            fontSize: 72,
-            fontWeight: 300,
-            color: COLORS.textMuted,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.35,
-          }}
-        >
-          {line2}
-          {line2Visible > 0 && line2Visible < line2Full.length && cursorOn && (
-            <span style={{ color: COLORS.primary }}>|</span>
-          )}
-        </div>
-
-        {/* Line 3 — emphasized */}
-        <div
-          style={{
-            fontFamily,
-            fontSize: 72,
-            fontWeight: 700,
+            fontSize: 600,
+            fontWeight: 800,
             color: COLORS.primary,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.35,
+            opacity: statOp,
+            transform: transforms(
+              `translateY(${statFloat}px)`,
+              `scale(${statPulse})`,
+            ),
+            letterSpacing: "-0.06em",
+            lineHeight: 1,
+            userSelect: "none",
           }}
         >
-          {line3}
-          {line3Visible > 0 && line3Visible < line3Full.length && cursorOn && (
-            <span style={{ color: COLORS.primary }}>|</span>
-          )}
-          {line3Visible >= line3Full.length && cursorOn && (
-            <span style={{ color: COLORS.primary, opacity: 0.5 }}>▎</span>
-          )}
+          4
         </div>
 
-        {/* Subtitle */}
-        <div
-          style={{
-            fontFamily,
-            fontSize: 22,
-            fontWeight: 400,
-            color: COLORS.textSubtle,
-            opacity: subtitleOp,
-            marginTop: 40,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase" as const,
-          }}
-        >
-          500+ junctions · Zero AI coverage
+        {/* Text content */}
+        <div style={{ position: "relative", zIndex: 2, textAlign: "center" }}>
+          {/* Line 1 */}
+          <div
+            style={{
+              fontFamily,
+              fontSize: 68,
+              fontWeight: 300,
+              color: COLORS.textMuted,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.35,
+            }}
+          >
+            {line1}
+            {line1Visible < line1Full.length && cursorOn && (
+              <span style={{ color: COLORS.primary, fontWeight: 200 }}>|</span>
+            )}
+          </div>
+
+          {/* Line 2 */}
+          <div
+            style={{
+              fontFamily,
+              fontSize: 68,
+              fontWeight: 300,
+              color: COLORS.textMuted,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.35,
+            }}
+          >
+            {line2}
+            {line2Visible > 0 && line2Visible < line2Full.length && cursorOn && (
+              <span style={{ color: COLORS.primary, fontWeight: 200 }}>|</span>
+            )}
+          </div>
+
+          {/* Line 3 — emphasized with glow */}
+          <div
+            style={{
+              fontFamily,
+              fontSize: 68,
+              fontWeight: 700,
+              color: COLORS.primary,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.35,
+              textShadow: `0 0 30px ${COLORS.primaryGlow}`,
+            }}
+          >
+            {line3}
+            {line3Visible > 0 && line3Visible < line3Full.length && cursorOn && (
+              <span style={{ color: COLORS.primary, fontWeight: 200 }}>|</span>
+            )}
+            {line3Visible >= line3Full.length && cursorOn && (
+              <span style={{ color: COLORS.primary, opacity: 0.5, fontWeight: 200 }}>▎</span>
+            )}
+          </div>
+
+          {/* Subtitle */}
+          <div
+            style={{
+              fontFamily,
+              fontSize: 20,
+              fontWeight: 400,
+              color: COLORS.textSubtle,
+              opacity: subtitleOp,
+              transform: `translateY(${subtitleY}px)`,
+              marginTop: 36,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase" as const,
+            }}
+          >
+            500+ junctions · Zero AI coverage
+          </div>
         </div>
       </div>
 
-      {/* Bottom accent line */}
+      {/* Decorative corner brackets */}
+      {/* Top-left */}
+      <div style={{ position: "absolute", top: 40, left: 40, opacity: bracketOp }}>
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke={COLORS.primary} strokeWidth="1.5">
+          <line x1="0" y1="30" x2="0" y2="0" />
+          <line x1="0" y1="0" x2="30" y2="0" />
+        </svg>
+      </div>
+      {/* Bottom-right */}
+      <div style={{ position: "absolute", bottom: 40, right: 40, opacity: bracketOp }}>
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke={COLORS.primary} strokeWidth="1.5">
+          <line x1="30" y1="0" x2="30" y2="30" />
+          <line x1="30" y1="30" x2="0" y2="30" />
+        </svg>
+      </div>
+
+      {/* Bottom accent line — draws in */}
       <div
         style={{
           position: "absolute",
@@ -162,10 +229,39 @@ export const ColdOpen: React.FC = () => {
           left: 0,
           right: 0,
           height: 2,
-          background: `linear-gradient(90deg, transparent, ${COLORS.primary}, transparent)`,
-          opacity: 0.3,
         }}
-      />
+      >
+        <div
+          style={{
+            height: "100%",
+            background: `linear-gradient(90deg, transparent, ${COLORS.primary}, transparent)`,
+            transform: `scaleX(${accentProgress})`,
+            transformOrigin: "center",
+            opacity: 0.4,
+          }}
+        />
+      </div>
+
+      {/* Top accent line — mirrors bottom */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 1,
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            background: `linear-gradient(90deg, transparent, ${COLORS.secondary}, transparent)`,
+            transform: `scaleX(${accentProgress * 0.6})`,
+            transformOrigin: "center",
+            opacity: 0.2,
+          }}
+        />
+      </div>
     </AbsoluteFill>
   );
 };
