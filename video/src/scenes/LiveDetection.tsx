@@ -148,7 +148,7 @@ export const LiveDetection: React.FC = () => {
           >
             {/* Demo image */}
             <Img
-              src={staticFile("demo/traffic_01.jpg")}
+              src={staticFile("demo/demo_no_helmet_silkboard-01.jpg")}
               style={{
                 width: "100%",
                 height: "100%",

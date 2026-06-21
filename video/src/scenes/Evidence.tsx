@@ -171,7 +171,7 @@ export const Evidence: React.FC = () => {
           >
             {/* Demo image */}
             <Img
-              src={staticFile("demo/traffic_02.jpg")}
+              src={staticFile("demo/demo_triple_riding_whitefield-01.jpg")}
               style={{
                 width: "100%",
                 height: "100%",
