@@ -156,11 +156,11 @@ const ViolationCard: React.FC<{
   const glow = borderGlow(frame, 0.02 + index * 0.003);
   const iconPulse = pulse(frame, 0.03 + index * 0.003, 0.05, 1);
 
-  // Severity color based on fine amount
+  // Severity color based on fine string
   const severityColor =
-    violation.fine >= 1000
+    violation.color === COLORS.danger
       ? COLORS.danger
-      : violation.fine >= 500
+      : violation.color === COLORS.warning
         ? COLORS.warning
         : COLORS.success;
 
@@ -226,7 +226,7 @@ const ViolationCard: React.FC<{
             color: COLORS.text,
           }}
         >
-          {violation.name}
+          {violation.type}
         </div>
       </div>
 
@@ -260,7 +260,7 @@ const ViolationCard: React.FC<{
         </div>
       </div>
 
-      {/* Category badge */}
+      {/* Section reference */}
       <div
         style={{
           marginTop: 10,
@@ -280,7 +280,7 @@ const ViolationCard: React.FC<{
             textTransform: "uppercase" as const,
           }}
         >
-          {violation.category}
+          {violation.section}
         </span>
       </div>
     </div>

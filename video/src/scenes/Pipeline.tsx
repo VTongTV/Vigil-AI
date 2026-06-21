@@ -6,7 +6,7 @@ import {
   interpolate,
   spring,
 } from "remotion";
-import { COLORS, PIPELINE_STEPS, FPS } from "../constants";
+import { COLORS, PIPELINE_STAGES, FPS } from "../constants";
 import {
   fadeIn,
   fadeInEased,
@@ -32,7 +32,7 @@ const { fontFamily } = loadFont("normal", {
 });
 
 const TOTAL_FRAMES = 14 * FPS;
-const STEP_COUNT = PIPELINE_STEPS.length;
+const STEP_COUNT = PIPELINE_STAGES.length;
 
 /**
  * Scene 4: AI Pipeline
@@ -138,7 +138,7 @@ export const Pipeline: React.FC = () => {
             position: "relative",
           }}
         >
-          {PIPELINE_STEPS.map((step, i) => {
+          {PIPELINE_STAGES.map((step: typeof PIPELINE_STAGES[number], i: number) => {
             const delay = stagger(i, 12) + 30;
 
             return (
@@ -195,7 +195,7 @@ export const Pipeline: React.FC = () => {
 /* ──────────────────────── Pipeline Step Card ──────────────────────── */
 
 const PipelineStep: React.FC<{
-  step: typeof PIPELINE_STEPS[number];
+  step: typeof PIPELINE_STAGES[number];
   index: number;
   frame: number;
   fps: number;

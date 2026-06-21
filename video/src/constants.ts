@@ -78,7 +78,11 @@ export type IconName =
   | "chain"
   | "cpu"
   | "gpu"
-  | "roi";
+  | "roi"
+  | "check"
+  | "hash"
+  | "scan"
+  | "clock";
 
 /* ──────────────────────── Staged Data ──────────────────────── */
 
