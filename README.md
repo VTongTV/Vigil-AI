@@ -527,6 +527,27 @@ Computes mAP@50, Precision, Recall, F1 per violation type, OCR accuracy on label
 
 > "Conservative assumes 50% detection effectiveness vs existing BTP AI cameras. Aggressive assumes parity with current system." -- Based on 30% fine compliance rate and average Rs.500/violation.
 
+### ROI Methodology
+
+```
+Conservative:
+  500 junctions x 80 violations/day x 0.50 detection rate x Rs.500 avg fine
+  x 30% compliance rate x 365 days = Rs.219 Cr/year
+
+Aggressive:
+  500 junctions x 80 violations/day x 1.00 detection rate x Rs.500 avg fine
+  x 30% compliance rate x 365 days = Rs.438 Cr/year
+
+Investment:
+  Rs.50,000/junction x 500 junctions = Rs.2.5 Cr (software + edge compute)
+  
+Payback:
+  Rs.219 Cr / Rs.2.5 Cr = 87x ROI (Year 1)
+  Rs.438 Cr / Rs.2.5 Cr = 175x ROI (Year 1)
+```
+
+The compliance rate of 30% is based on BTP's published challan collection rate. The 80 violations/day per junction is conservative -- Silk Board junction alone processes 200+ violations during peak hours.
+
 ---
 
 ## Demo Data
