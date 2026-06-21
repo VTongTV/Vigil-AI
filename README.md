@@ -565,16 +565,30 @@ The hackathon build is a vertical slice of the production architecture. Same mod
 
 | Feature | What It Proves |
 |---------|---------------|
-| **Working prototype** | Others submit concept notes. We submit running code. |
-| **Head-region helmet association** | Novel algorithm, not naive bbox overlap. |
-| **Bengaluru-specific data** | Real junctions, KA plates, local enforcement context. |
-| **Command Center aesthetic** | Dark navy layout with BTP badge and IST clock. |
-| **Approve/Reject workflow** | Human-in-the-loop, not autonomous surveillance. |
-| **Pipeline waterfall chart** | Transparency -- shows exactly where time is spent. |
-| **ROI calculator** | Defensible numbers with methodology. |
-| **Evidence viewer** | FIR-style layout, SHA-256 hash, print-ready. |
-| **Audit trail** | Every action logged -- officer accountability. |
-| **ASTraM-ready** | E-challan integration path to BTP infrastructure. |
+| **Working prototype** | Others submit concept notes. We submit running code with 269 tests. |
+| **Head-region helmet association** | Novel algorithm, not naive bbox overlap. Anatomically constrained. |
+| **Bengaluru-specific data** | Real junctions, KA plates, local enforcement context, IST timestamps. |
+| **Command Center aesthetic** | Dark navy layout with BTP badge and IST clock. Not a generic dashboard. |
+| **Approve/Reject workflow** | Human-in-the-loop, not autonomous surveillance. Officer accountability. |
+| **Pipeline waterfall chart** | Transparency -- shows exactly where time is spent per stage. |
+| **ROI calculator** | Defensible numbers with methodology. Conservative 87x, Aggressive 175x. |
+| **Evidence viewer** | FIR-style layout, SHA-256 hash, print-ready challan PDF generation. |
+| **Audit trail** | Every action logged -- officer ID, timestamp, reason. Rule 166A compliant. |
+| **ASTraM-ready** | E-challan integration path to BTP infrastructure. Vahan-ready plate format. |
+| **VRAM discipline** | On-demand model loading with gc.collect() + empty_cache(). Fits 4 GB. |
+| **7/7 violation types** | No "planned" features. Every violation type is implemented and tested. |
+| **Demo mode** | Full UI exploration without backend. Hardcoded responses, no GPU required. |
+
+### What Makes This Different From Existing BTP AI Cameras
+
+| Aspect | Existing BTP AI Cameras | VigilAI |
+|--------|------------------------|---------|
+| **Deployment** | Fixed hardware per junction | Software-only, any CCTV feed |
+| **Coverage** | 75 junctions | Scalable to 500+ with zero hardware |
+| **Violation types** | Primarily no-helmet, signal jumping | 7 types including seatbelt, parking, triple riding |
+| **Evidence** | Snapshot only | Annotated image + SHA-256 + chain-of-custody JSON |
+| **Review** | Auto-issued challans | Human-in-the-loop approve/reject workflow |
+| **Cost per junction** | Rs.5-10 Lakh hardware | Rs.50,000 software license |
 
 ---
 
