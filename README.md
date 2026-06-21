@@ -333,6 +333,43 @@ Any violation can transition to `REJECTED` from any status except `REJECTED` its
 
 ## Quick Start
 
+### Configuration
+
+All model paths, thresholds, and zone polygons are configured in `configs/default.yaml`. No hardcoded values.
+
+```yaml
+# configs/default.yaml (key sections)
+models:
+  coco_helmet:
+    path: backend/weights/yolov8n_coco_helmet.pt
+    device: cuda
+    confidence_threshold: 0.25
+  plate:
+    path: backend/weights/yolov8n_plate.pt
+    device: cuda
+    on_demand: true              # Load only when needed
+  seatbelt:
+    path: backend/weights/yolov11s_seatbelt.pt
+    device: cuda
+    on_demand: true
+
+violations:
+  helmet:
+    head_fraction: 0.30          # Top 30% of person bbox = head region
+    iou_threshold: 0.15           # Minimum IoU for helmet overlap
+    two_wheeler_margin: 0.05     # 5% margin on vehicle bbox
+  triple_riding:
+    min_riders: 3
+    vertical_overlap_threshold: 0.30
+  ocr:
+    plate_regex: "KA[0-9]{2}[A-Z]{1,2}[0-9]{4}"  # Karnataka format
+    
+vram:
+  resident_models: ["coco_helmet"]    # Always in GPU memory
+  on_demand_models: ["plate", "seatbelt"]  # Load-infer-unload protocol
+  cleanup_after_inference: true
+```
+
 ### Prerequisites
 
 - Python 3.12+
