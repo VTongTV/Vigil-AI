@@ -332,6 +332,8 @@ python scripts/seed_bengaluru_demo.py
 python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
 ```
 
+The server performs model pre-warming on startup (dummy inference on all models) and validates ONNX Runtime has no CUDA provider for OCR. First request after startup will be at full speed.
+
 ### Frontend
 
 ```bash
@@ -341,6 +343,16 @@ npm run dev
 ```
 
 Dashboard available at `http://localhost:5173`
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VITE_API_BASE_URL` | `http://localhost:8000` | Backend API URL |
+| `VITE_DEMO_MODE` | `false` | Toggle demo mode (hardcoded responses) |
+| `CUDA_VISIBLE_DEVICES` | `0` | GPU device for inference |
+| `OMP_NUM_THREADS` | `4` | OpenMP threads for RapidOCR |
+| `ONNX_NUM_THREADS` | `4` | ONNX Runtime threads for RapidOCR |
 
 ### Demo Mode
 
