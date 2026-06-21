@@ -123,9 +123,17 @@ IoU >= 0.15 with no_helmet --> VIOLATION (conf = no_helmet.confidence)
 Nothing overlaps head      --> VIOLATION (conservative, conf *= 0.8)
 ```
 
+**Why not naive overlap?** A person standing next to a motorcycle with a helmet on the handlebars would produce a false positive with simple bbox IoU. The head-region constraint ensures the helmet must be on the person's head, not just nearby.
+
 ### Triple Riding (2D Spatial Constraints)
 
 Three persons on one two-wheeler detected when: (1) horizontal center of each person is within the two-wheeler bbox, (2) vertical overlap between riders exceeds 30%, (3) minimum 3 persons associated with a single vehicle.
+
+The algorithm handles partial occlusion by allowing a 5% margin on the vehicle bbox and requires at least 30% vertical overlap between rider bboxes to filter adjacent pillion riders from separate vehicles at intersections.
+
+### Wrong-Side Driving (Lane-Position Heuristic)
+
+Detection uses configurable polygon zones defined per camera in `configs/default.yaml`. Vehicles detected in designated "wrong-side" zones (opposite lane polygons) trigger violations. This requires one-time camera calibration -- mapping the physical road layout to pixel polygons. The same approach handles illegal parking zones and stop-line violations.
 
 ### License Plate OCR (Two-Stage Pipeline)
 
@@ -135,6 +143,8 @@ Stage 2: RapidOCR (CPU, ONNX)     --> Text extraction + Indian KA##XX#### regex
 ```
 
 RapidOCR runs exclusively on CPU with `OMP_NUM_THREADS=4` and `ONNX_NUM_THREADS=4`. ONNX Runtime verified to have NO CUDA provider. Post-processing handles O/0 confusion, I/1 confusion, and missing spaces common in Indian plate OCR.
+
+The two-stage approach (detect then recognize) outperforms end-to-end OCR on Indian plates because plate detectors are trained on the specific visual patterns of Indian license plates (white text on black background for commercial, black text on white for private).
 
 ---
 
