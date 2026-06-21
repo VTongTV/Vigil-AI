@@ -26,6 +26,10 @@
 
 </div>
 
+<div align="center">
+<img src="docs/assets/metrics-bar.svg" alt="Key metrics: 269 tests, 7/7 violations, 0.023 GB VRAM, ~1.2s latency, SHA-256 evidence, Rule 166A" width="780" />
+</div>
+
 ---
 
 ## The Problem
