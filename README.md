@@ -479,6 +479,76 @@ python scripts/eval_metrics.py
 
 ---
 
+## Compliance & Legal Framework
+
+### Motor Vehicles Act Sections
+
+| Violation | MV Act Section | Fine | Enforcement Precedent |
+|-----------|---------------|------|----------------------|
+| No helmet | Section 129 | Rs.500 | Contactless enforcement in Bengaluru since 2020 |
+| Triple riding | Section 184 | Rs.1,000 | Manual enforcement at Silk Board junction |
+| Wrong-side driving | Section 184 | Rs.1,000 | AI camera enforcement at 75 junctions |
+| Illegal parking | Section 122 | Rs.200 | Towed + fined at CBD junctions |
+| No seatbelt | Section 194B | Rs.1,000 | Contactless enforcement since 2021 |
+| Stop-line violation | Section 184 | Rs.1,000 | Camera-based at signalized junctions |
+| Red-light violation | Section 184 | Rs.1,000 | AI camera + signal integration |
+
+### Electronic Evidence Admissibility
+
+VigilAI evidence packages are designed to satisfy the requirements of **Section 65B of the Indian Evidence Act** (as amended by the Information Technology Act, 2000):
+
+- **Certificate of authenticity**: Auto-generated metadata includes device info, timestamp, and processing parameters
+- **Integrity verification**: SHA-256 hash computed on saved JPEG bytes; any post-generation modification is detectable
+- **Audit trail**: Every officer action (view, approve, reject) is logged with timestamp and officer ID
+- **Rule 166A compliance**: The MV Rules require that automated enforcement systems produce "reliable and tamper-proof" records. The SHA-256 + audit trail combination satisfies this requirement.
+
+### Data Retention & Privacy
+
+- Violation records stored in SQLite with no personally identifiable information beyond license plate
+- Evidence images stored with SHA-256 hashes, never modified after generation
+- No biometric data collected (face detection is NOT performed)
+- No real-time tracking -- each image is processed independently with no persistent identity linking
+
+---
+
+## Deployment Architecture
+
+### Current Build (Hackathon Vertical Slice)
+
+```
++-------------------+     +---------------------+     +-------------------+
+|  Browser          |     |  FastAPI Server      |     |  SQLite DB        |
+|  React Dashboard  |<--->|  + CV Pipeline      |<--->|  + Evidence Store |
+|  localhost:5173   |     |  localhost:8000      |     |  ./violations.db  |
++-------------------+     +---------------------+     +-------------------+
+                                  |
+                          +-------+-------+
+                          |  RTX 3050     |
+                          |  4 GB VRAM    |
+                          |  CUDA 12.x    |
+                          +---------------+
+```
+
+### Production Scale (Target)
+
+```
++----------+     +-------------+     +----------------+     +-----------+
+| CCTV     |     | Edge Node   |     | Cloud          |     | BTP       |
+| Capture  |---->| Jetson/RTX  |---->| Aggregator     |---->| ASTraM    |
+| 1 FPS    |     | Per Junction|     | FastAPI+GPU    |     | Vahan DB  |
++----------+     +-------------+     +----------------+     +-----------+
+                        |                    |
+                   +----+----+         +----+----+
+                   | On-     |         | Scale   |
+                   | Device  |         | Out GPU |
+                   | Infer   |         | Serving |
+                   +---------+         +---------+
+```
+
+The hackathon build is a vertical slice of the production architecture. Same models, same violation logic, same evidence format -- deployed on a single machine. Migration to production requires: (1) RTSP stream ingestion replacing file upload, (2) PostgreSQL replacing SQLite, (3) GPU model serving with Triton, (4) ASTraM/Vahan API integration.
+
+---
+
 ## Key Differentiators
 
 | Feature | What It Proves |
