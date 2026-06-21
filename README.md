@@ -419,6 +419,20 @@ Round 2/
 | Frontend tests | 58 passing | -- |
 | Total test suite | 269 passing | -- |
 
+### Pipeline Timing Breakdown (RTX 3050, 640x480 image)
+
+| Stage | Avg Time | Notes |
+|-------|----------|-------|
+| Preprocessing (CLAHE + Denoise + Gamma) | ~45 ms | OpenCV on CPU, parallelized |
+| YOLOv8n COCO+Helmet Detection | ~187 ms | CUDA, resident model |
+| Violation Logic (all types) | ~12 ms | Pure NumPy, no GPU |
+| YOLOv8n Plate Detection | ~150 ms | On-demand CUDA load + infer + unload |
+| RapidOCR (CPU) | ~234 ms | ONNX Runtime, 4 threads |
+| Evidence Generation (annotated JPEG) | ~89 ms | OpenCV drawing + imencode |
+| **Total** | **~717 ms** | Excludes model load overhead on first request |
+
+> On-demand model loading adds ~2-3 seconds on the first request that requires plate/seatbelt detection. Subsequent requests within the same process avoid this overhead if models are kept resident. The VRAM strategy section describes the load/unload protocol.
+
 ### Evaluation Protocol
 
 Run full pipeline evaluation with:
