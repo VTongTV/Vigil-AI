@@ -36,7 +36,9 @@
 
 Bengaluru has 75 AI-enabled junctions covering approximately 87% contactless enforcement. The remaining 500+ junctions depend entirely on manual surveillance -- no automated detection, no evidence generation, no e-challan pipeline. Officers monitor live feeds and file reports by hand.
 
-**VigilAI retrofits onto any existing CCTV feed.** No hardware upgrade. No new cameras. No RTSP reconfiguration. Upload an image, get violations, evidence, and license plates in under 1.2 seconds.
+**The enforcement gap is structural, not technological.** Existing AI cameras cover high-traffic corridors but cannot be retrofitted to the 500+ remaining junctions without capital expenditure. Manual surveillance produces inconsistent evidence, delayed challans, and low conviction rates in traffic courts.
+
+**VigilAI retrofits onto any existing CCTV feed.** No hardware upgrade. No new cameras. No RTSP reconfiguration. Upload an image, get violations, evidence, and license plates in under 1.2 seconds. The system is designed for incremental deployment -- one junction at a time, with zero integration friction.
 
 ---
 
