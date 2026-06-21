@@ -6,8 +6,22 @@ import {
   interpolate,
   spring,
 } from "remotion";
-import { COLORS, VIOLATION_TYPES } from "../constants";
-import { fadeIn, stagger, CONFIG_SMOOTH } from "../animations";
+import { COLORS, VIOLATION_TYPES, FPS } from "../constants";
+import {
+  fadeIn,
+  fadeInEased,
+  stagger,
+  floatY,
+  shimmerPosition,
+  borderGlow,
+  pulse,
+  transforms,
+  CONFIG_SNAPPY,
+  CONFIG_SMOOTH,
+  CONFIG_BOUNCY,
+} from "../animations";
+import { AnimatedBackground } from "../AnimatedBackground";
+import { Icon } from "../Icon";
 import { loadFont } from "@remotion/google-fonts/Inter";
 
 const { fontFamily } = loadFont("normal", {
@@ -15,66 +29,106 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
+const TOTAL_FRAMES = 12 * FPS;
+
+// Bento layout — 2 rows of 4 cards each
+const LAYOUT = [
+  // Row 1
+  [0, 1, 2, 3],
+  // Row 2
+  [4, 5, 6, 7],
+];
+
 /**
- * Scene 6: 7 Violation Types
- * Bento-style grid of all violation types with icons, fines, and MV Act sections.
+ * Scene 6: Violation Types
+ * Bento grid with animated cards, shimmer effects,
+ * SVG icons, severity indicators, and continuous motion.
  */
 export const ViolationTypes: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const titleOp = fadeIn(frame, 5, 20);
+  // Section label
+  const labelProgress = spring({ frame, fps, delay: 0, config: CONFIG_SMOOTH });
+  const labelOp = interpolate(labelProgress, [0, 1], [0, 1]);
+
+  // Title
+  const titleProgress = spring({ frame, fps, delay: 8, config: CONFIG_BOUNCY });
+  const titleOp = interpolate(titleProgress, [0, 1], [0, 1]);
+  const titleY = interpolate(titleProgress, [0, 1], [20, 0]);
 
   return (
-    <AbsoluteFill
-      style={{
-        backgroundColor: COLORS.bg,
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "60px 100px",
-      }}
-    >
-      {/* Section label */}
-      <div
-        style={{
-          fontFamily,
-          fontSize: 16,
-          fontWeight: 600,
-          color: COLORS.primary,
-          letterSpacing: "0.2em",
-          textTransform: "uppercase" as const,
-          opacity: fadeIn(frame, 0, 15),
-          marginBottom: 12,
-        }}
-      >
-        Violation Detection
-      </div>
+    <AbsoluteFill style={{ overflow: "hidden" }}>
+      {/* Animated background */}
+      <AnimatedBackground particleCount={18} seed={42} />
 
       <div
         style={{
-          fontFamily,
-          fontSize: 44,
-          fontWeight: 700,
-          color: COLORS.text,
-          textAlign: "center",
-          opacity: titleOp,
-          marginBottom: 50,
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "50px 60px",
         }}
       >
-        7 Violation Types. <span style={{ color: COLORS.primary }}>One Pipeline.</span>
-      </div>
-
-      {/* Grid — 4 top, 3 bottom centered */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "center" }}>
-        <div style={{ display: "flex", gap: 16 }}>
-          {VIOLATION_TYPES.slice(0, 4).map((v, i) => (
-            <ViolationCard key={i} violation={v} index={i} frame={frame} fps={fps} />
-          ))}
+        {/* Section label */}
+        <div
+          style={{
+            fontFamily,
+            fontSize: 14,
+            fontWeight: 600,
+            color: COLORS.primary,
+            letterSpacing: "0.25em",
+            textTransform: "uppercase" as const,
+            opacity: labelOp,
+            marginBottom: 16,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <div style={{ width: 20, height: 1, backgroundColor: COLORS.primary }} />
+          Detection Capabilities
+          <div style={{ width: 20, height: 1, backgroundColor: COLORS.primary }} />
         </div>
-        <div style={{ display: "flex", gap: 16 }}>
-          {VIOLATION_TYPES.slice(4, 7).map((v, i) => (
-            <ViolationCard key={i + 4} violation={v} index={i + 4} frame={frame} fps={fps} />
+
+        {/* Title */}
+        <div
+          style={{
+            fontFamily,
+            fontSize: 46,
+            fontWeight: 700,
+            color: COLORS.text,
+            textAlign: "center",
+            opacity: titleOp,
+            transform: `translateY(${titleY}px)`,
+            marginBottom: 50,
+          }}
+        >
+          8 Violation Types
+        </div>
+
+        {/* Bento grid */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {LAYOUT.map((row, rowIdx) => (
+            <div key={rowIdx} style={{ display: "flex", gap: 16 }}>
+              {row.map((violationIdx) => {
+                const v = VIOLATION_TYPES[violationIdx];
+                if (!v) return null;
+
+                return (
+                  <ViolationCard
+                    key={violationIdx}
+                    violation={v}
+                    index={violationIdx}
+                    frame={frame}
+                    fps={fps}
+                  />
+                );
+              })}
+            </div>
           ))}
         </div>
       </div>
@@ -82,7 +136,7 @@ export const ViolationTypes: React.FC = () => {
   );
 };
 
-/* ──────────────────────── Card ──────────────────────── */
+/* ──────────────────────── Violation Card ──────────────────────── */
 
 const ViolationCard: React.FC<{
   violation: typeof VIOLATION_TYPES[number];
@@ -90,73 +144,144 @@ const ViolationCard: React.FC<{
   frame: number;
   fps: number;
 }> = ({ violation, index, frame, fps }) => {
-  const delay = stagger(index, 7) + 20;
-  const progress = spring({ frame, fps, delay, config: CONFIG_SMOOTH });
+  const delay = stagger(index, 8) + 25;
+
+  const progress = spring({ frame, fps, delay, config: CONFIG_SNAPPY });
   const opacity = interpolate(progress, [0, 1], [0, 1]);
-  const translateY = interpolate(progress, [0, 1], [25, 0]);
+  const translateY = interpolate(progress, [0, 1], [35, 0]);
+  const scale = interpolate(progress, [0.3, 1], [0.92, 1]);
+
+  const cardFloat = floatY(frame, 0.018 + index * 0.002, 2, index * 0.7);
+  const shimmerPos = shimmerPosition(frame, 200, delay + 30);
+  const glow = borderGlow(frame, 0.02 + index * 0.003);
+  const iconPulse = pulse(frame, 0.03 + index * 0.003, 0.05, 1);
+
+  // Severity color based on fine amount
+  const severityColor =
+    violation.fine >= 1000
+      ? COLORS.danger
+      : violation.fine >= 500
+        ? COLORS.warning
+        : COLORS.success;
 
   return (
     <div
       style={{
-        width: 240,
+        width: 210,
         backgroundColor: COLORS.bgCard,
-        border: `1px solid ${violation.color}22`,
+        border: `1px solid rgba(6,182,212,${glow * 0.3})`,
         borderRadius: 14,
-        padding: "28px 22px",
+        padding: "22px 18px",
         opacity,
-        transform: `translateY(${translateY}px)`,
-        textAlign: "center",
+        transform: transforms(
+          `translateY(${translateY + cardFloat}px)`,
+          `scale(${scale})`,
+        ),
         position: "relative",
         overflow: "hidden",
       }}
     >
-      {/* Top accent */}
+      {/* Shimmer sweep */}
       <div
         style={{
           position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 3,
-          backgroundColor: violation.color,
-          opacity: 0.8,
+          inset: 0,
+          background: `linear-gradient(105deg, transparent 40%, rgba(6,182,212,${shimmerPos * 0.04}) 50%, transparent 60%)`,
+          pointerEvents: "none",
         }}
       />
 
-      <div style={{ fontSize: 32, marginBottom: 14 }}>{violation.icon}</div>
-
+      {/* Severity indicator — left accent */}
       <div
         style={{
-          fontFamily,
-          fontSize: 16,
-          fontWeight: 600,
-          color: COLORS.text,
-          marginBottom: 8,
+          position: "absolute",
+          left: 0,
+          top: 12,
+          bottom: 12,
+          width: 3,
+          backgroundColor: severityColor,
+          borderRadius: 2,
+          opacity: 0.7,
+        }}
+      />
+
+      {/* Icon + Name row */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 10,
+          paddingLeft: 6,
         }}
       >
-        {violation.type}
+        <div style={{ transform: `scale(${iconPulse})` }}>
+          <Icon name={violation.icon} size={20} color={COLORS.primary} />
+        </div>
+        <div
+          style={{
+            fontFamily,
+            fontSize: 14,
+            fontWeight: 600,
+            color: COLORS.text,
+          }}
+        >
+          {violation.name}
+        </div>
       </div>
 
+      {/* Section + Fine */}
       <div
         style={{
-          fontFamily,
-          fontSize: 26,
-          fontWeight: 800,
-          color: violation.color,
-          marginBottom: 6,
+          paddingLeft: 6,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        {violation.fine}
+        <div
+          style={{
+            fontFamily,
+            fontSize: 11,
+            color: COLORS.textSubtle,
+          }}
+        >
+          {violation.section}
+        </div>
+        <div
+          style={{
+            fontFamily,
+            fontSize: 13,
+            fontWeight: 700,
+            color: severityColor,
+          }}
+        >
+          {violation.fine}
+        </div>
       </div>
 
+      {/* Category badge */}
       <div
         style={{
-          fontFamily,
-          fontSize: 12,
-          color: COLORS.textSubtle,
+          marginTop: 10,
+          paddingLeft: 6,
         }}
       >
-        {violation.section}
+        <span
+          style={{
+            fontFamily,
+            fontSize: 10,
+            fontWeight: 600,
+            color: COLORS.textSubtle,
+            backgroundColor: COLORS.bgElevated,
+            padding: "3px 8px",
+            borderRadius: 4,
+            letterSpacing: "0.06em",
+            textTransform: "uppercase" as const,
+          }}
+        >
+          {violation.category}
+        </span>
       </div>
     </div>
   );

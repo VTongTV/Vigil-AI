@@ -6,8 +6,22 @@ import {
   interpolate,
   spring,
 } from "remotion";
-import { COLORS } from "../constants";
-import { fadeIn, CONFIG_BOUNCY, CONFIG_SMOOTH } from "../animations";
+import { COLORS, FPS } from "../constants";
+import {
+  fadeIn,
+  fadeInEased,
+  floatY,
+  glowOp,
+  slowRotate,
+  pulse,
+  cameraZoom,
+  transforms,
+  CONFIG_BOUNCY,
+  CONFIG_SMOOTH,
+  CONFIG_GENTLE,
+} from "../animations";
+import { AnimatedBackground } from "../AnimatedBackground";
+import { Icon } from "../Icon";
 import { loadFont } from "@remotion/google-fonts/Inter";
 
 const { fontFamily } = loadFont("normal", {
@@ -15,151 +29,222 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
+const TOTAL_FRAMES = 8 * FPS;
+const RING_PARTICLES = 24;
+
 /**
- * Scene 3: VigilAI Intro
- * Logo reveal with rotating accent rings and tagline.
+ * Scene 3: VigilAI Introduction
+ * Logo reveal with rotating particle ring, depth layers,
+ * and continuous glow animation.
  */
 export const Intro: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, width, height } = useVideoConfig();
+
+  // Camera slow drift
+  const zoom = cameraZoom(frame, TOTAL_FRAMES, 1.03);
 
   // Logo spring entrance
-  const logoProgress = spring({ frame, fps, delay: 5, config: CONFIG_BOUNCY });
-  const logoScale = interpolate(logoProgress, [0, 1], [0.7, 1]);
-  const logoOp = fadeIn(frame, 5, 15);
+  const logoProgress = spring({ frame, fps, delay: 10, config: CONFIG_BOUNCY });
+  const logoScale = interpolate(logoProgress, [0, 1], [0.3, 1]);
+  const logoOp = interpolate(logoProgress, [0, 1], [0, 1]);
 
-  // Tagline
-  const tagProgress = spring({ frame, fps, delay: 40, config: CONFIG_SMOOTH });
-  const tagY = interpolate(tagProgress, [0, 1], [15, 0]);
-  const tagOp = fadeIn(frame, 40, 20);
+  // Ring rotation (continuous)
+  const ringRotation = slowRotate(frame, 0.08);
 
-  // Subtitle
-  const subOp = fadeIn(frame, 70, 20);
+  // Ring particles scale in
+  const ringScale = spring({ frame, fps, delay: 20, config: CONFIG_GENTLE });
+  const ringOp = interpolate(ringScale, [0, 1], [0, 1]);
 
-  // Ring rotation
-  const ringRot = interpolate(frame, [0, 5 * fps], [0, 45]);
+  // Title entrance
+  const titleProgress = spring({ frame, fps, delay: 35, config: CONFIG_SMOOTH });
+  const titleOp = interpolate(titleProgress, [0, 1], [0, 1]);
+  const titleY = interpolate(titleProgress, [0, 1], [20, 0]);
 
-  // Ambient glow
-  const glowAlpha = interpolate(
-    Math.sin(frame * 0.03),
-    [-1, 1],
-    [0.1, 0.22],
-  );
+  // Tagline entrance
+  const tagProgress = spring({ frame, fps, delay: 55, config: CONFIG_SMOOTH });
+  const tagOp = interpolate(tagProgress, [0, 1], [0, 1]);
+  const tagY = interpolate(tagProgress, [0, 1], [12, 0]);
+
+  // Features entrance (staggered)
+  const featureLabels = ["AI-Powered Detection", "Real-Time Evidence", "Court-Admissible"];
+
+  // Icon pulse
+  const iconPulse = pulse(frame, 0.03, 0.08, 1);
+
+  // Center of composition
+  const cx = width / 2;
+  const cy = height / 2 - 30;
 
   return (
-    <AbsoluteFill
-      style={{
-        backgroundColor: COLORS.bg,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      {/* Glow */}
-      <div
-        style={{
-          position: "absolute",
-          width: 600,
-          height: 600,
-          borderRadius: "50%",
-          background: `radial-gradient(circle, rgba(6,182,212,${glowAlpha}), transparent 60%)`,
-          filter: "blur(60px)",
-        }}
-      />
+    <AbsoluteFill style={{ overflow: "hidden" }}>
+      {/* Animated background */}
+      <AnimatedBackground particleCount={15} glowCount={2} seed={14} />
 
-      {/* Rotating rings */}
+      {/* Camera zoom container */}
       <div
         style={{
           position: "absolute",
-          width: 320,
-          height: 320,
-          borderRadius: "50%",
-          border: `1px solid rgba(6,182,212,0.2)`,
-          transform: `rotate(${ringRot}deg)`,
-          opacity: logoOp * 0.4,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          width: 400,
-          height: 400,
-          borderRadius: "50%",
-          border: `1px solid rgba(59,130,246,0.12)`,
-          transform: `rotate(${-ringRot * 0.7}deg)`,
-          opacity: logoOp * 0.25,
-        }}
-      />
-
-      {/* Logo + Title */}
-      <div
-        style={{
-          opacity: logoOp,
-          transform: `scale(${logoScale})`,
-          position: "relative",
-          zIndex: 2,
+          inset: 0,
+          transform: `scale(${zoom})`,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        {/* Shield SVG */}
-        <div style={{ width: 120, height: 120, margin: "0 auto 28px" }}>
-          <svg width="120" height="120" viewBox="0 0 140 140" fill="none">
-            <path
-              d="M70 10 L120 35 L120 75 Q120 110 70 130 Q20 110 20 75 L20 35 Z"
-              stroke={COLORS.primary}
-              strokeWidth="2.5"
-              fill="rgba(6,182,212,0.06)"
-            />
-            <circle cx="70" cy="65" r="18" stroke={COLORS.primary} strokeWidth="2" fill="none" />
-            <circle cx="70" cy="65" r="6" fill={COLORS.primary} />
-            <line x1="38" y1="95" x2="102" y2="95" stroke={COLORS.primary} strokeWidth="1" opacity="0.4" />
-            <line x1="45" y1="102" x2="95" y2="102" stroke={COLORS.primary} strokeWidth="1" opacity="0.25" />
-          </svg>
+        {/* Rotating particle ring */}
+        <div
+          style={{
+            position: "absolute",
+            left: cx - 120,
+            top: cy - 120,
+            width: 240,
+            height: 240,
+            opacity: ringOp,
+            transform: `rotate(${ringRotation}deg)`,
+          }}
+        >
+          {Array.from({ length: RING_PARTICLES }).map((_, i) => {
+            const angle = (i / RING_PARTICLES) * Math.PI * 2;
+            const radius = 115 + floatY(frame, 0.015 + i * 0.001, 3, i);
+            const px = 120 + Math.cos(angle) * radius;
+            const py = 120 + Math.sin(angle) * radius;
+            const particleOp = glowOp(frame, 0.025 + i * 0.002, 0.2, 0.8);
+
+            return (
+              <div
+                key={i}
+                style={{
+                  position: "absolute",
+                  left: px - 2,
+                  top: py - 2,
+                  width: 4,
+                  height: 4,
+                  borderRadius: "50%",
+                  backgroundColor: COLORS.primary,
+                  opacity: particleOp,
+                  boxShadow: `0 0 6px ${COLORS.primaryGlow}`,
+                }}
+              />
+            );
+          })}
         </div>
 
-        {/* Product name */}
+        {/* Central logo */}
+        <div
+          style={{
+            opacity: logoOp,
+            transform: `scale(${logoScale})`,
+            position: "relative",
+            zIndex: 2,
+          }}
+        >
+          {/* Glow ring behind icon */}
+          <div
+            style={{
+              position: "absolute",
+              inset: -20,
+              borderRadius: "50%",
+              background: `radial-gradient(circle, ${COLORS.primaryGlow}, transparent 70%)`,
+              opacity: glowOp(frame, 0.025, 0.15, 0.4),
+              filter: "blur(15px)",
+            }}
+          />
+
+          {/* Icon container */}
+          <div
+            style={{
+              width: 80,
+              height: 80,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 20,
+              backgroundColor: COLORS.bgCard,
+              border: `1px solid ${COLORS.border}`,
+              transform: `scale(${iconPulse})`,
+              boxShadow: `0 0 40px ${COLORS.primaryGlow}, 0 4px 20px rgba(0,0,0,0.3)`,
+            }}
+          >
+            <Icon name="shield" size={40} color={COLORS.primary} />
+          </div>
+        </div>
+
+        {/* Title */}
         <div
           style={{
             fontFamily,
-            fontSize: 80,
+            fontSize: 72,
             fontWeight: 800,
             color: COLORS.text,
-            textAlign: "center",
-            letterSpacing: "-0.04em",
+            letterSpacing: "-0.03em",
+            opacity: titleOp,
+            transform: `translateY(${titleY}px)`,
+            marginTop: 28,
           }}
         >
-          Vigil<span style={{ color: COLORS.primary }}>AI</span>
+          Vigil
+          <span style={{ color: COLORS.primary }}>AI</span>
         </div>
-      </div>
 
-      {/* Tagline */}
-      <div
-        style={{
-          fontFamily,
-          fontSize: 28,
-          fontWeight: 400,
-          color: COLORS.textMuted,
-          textAlign: "center",
-          opacity: tagOp,
-          transform: `translateY(${tagY}px)`,
-          marginTop: 8,
-        }}
-      >
-        AI-Powered Traffic Enforcement
-      </div>
+        {/* Tagline */}
+        <div
+          style={{
+            fontFamily,
+            fontSize: 22,
+            fontWeight: 300,
+            color: COLORS.textMuted,
+            letterSpacing: "0.12em",
+            opacity: tagOp,
+            transform: `translateY(${tagY}px)`,
+            marginTop: 12,
+            textTransform: "uppercase" as const,
+          }}
+        >
+          Intelligent Traffic Enforcement
+        </div>
 
-      {/* Subtitle */}
-      <div
-        style={{
-          fontFamily,
-          fontSize: 18,
-          fontWeight: 400,
-          color: COLORS.textSubtle,
-          textAlign: "center",
-          opacity: subOp,
-          marginTop: 24,
-          letterSpacing: "0.04em",
-        }}
-      >
-        Retrofits onto any CCTV camera. No hardware upgrade needed.
+        {/* Feature pills */}
+        <div
+          style={{
+            display: "flex",
+            gap: 16,
+            marginTop: 40,
+          }}
+        >
+          {featureLabels.map((label, i) => {
+            const fp = spring({
+              frame,
+              fps,
+              delay: 70 + i * 8,
+              config: CONFIG_SMOOTH,
+            });
+            const fop = interpolate(fp, [0, 1], [0, 1]);
+            const fy = interpolate(fp, [0, 1], [15, 0]);
+
+            return (
+              <div
+                key={i}
+                style={{
+                  fontFamily,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: COLORS.textSubtle,
+                  backgroundColor: COLORS.bgElevated,
+                  border: `1px solid ${COLORS.border}`,
+                  borderRadius: 20,
+                  padding: "8px 20px",
+                  opacity: fop,
+                  transform: `translateY(${fy}px)`,
+                  letterSpacing: "0.04em",
+                }}
+              >
+                {label}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </AbsoluteFill>
   );

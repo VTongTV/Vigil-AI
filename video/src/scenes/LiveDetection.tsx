@@ -8,8 +8,23 @@ import {
   Img,
   staticFile,
 } from "remotion";
-import { COLORS, MOCK_DETECTION } from "../constants";
-import { fadeIn, CONFIG_SNAPPY, CONFIG_SMOOTH } from "../animations";
+import { COLORS, VIOLATION_TYPES, FPS } from "../constants";
+import {
+  fadeIn,
+  fadeInEased,
+  stagger,
+  floatY,
+  shimmerPosition,
+  borderGlow,
+  pulse,
+  glowOp,
+  transforms,
+  CONFIG_SNAPPY,
+  CONFIG_SMOOTH,
+  CONFIG_BOUNCY,
+} from "../animations";
+import { AnimatedBackground } from "../AnimatedBackground";
+import { Icon } from "../Icon";
 import { loadFont } from "@remotion/google-fonts/Inter";
 
 const { fontFamily } = loadFont("normal", {
@@ -17,228 +32,423 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
+const TOTAL_FRAMES = 12 * FPS;
+
+// Simulated bounding boxes for detection visualization
+const DETECTION_BOXES = [
+  { x: 280, y: 180, w: 100, h: 140, label: "No Helmet", color: COLORS.danger, delay: 60 },
+  { x: 520, y: 200, w: 90, h: 130, label: "Triple Riding", color: COLORS.warning, delay: 90 },
+  { x: 750, y: 160, w: 110, h: 160, label: "No Helmet", color: COLORS.danger, delay: 75 },
+];
+
 /**
- * Scene 5: Live Detection Demo
- * Shows a real demo image with bounding boxes animating in,
- * OCR result, and violation cards.
+ * Scene 5: Live Detection
+ * Simulated camera feed with CRT scan line,
+ * animated bounding boxes, and detection readout.
  */
 export const LiveDetection: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, width, height } = useVideoConfig();
 
-  const titleOp = fadeIn(frame, 5, 20);
+  // Section label
+  const labelProgress = spring({ frame, fps, delay: 0, config: CONFIG_SMOOTH });
+  const labelOp = interpolate(labelProgress, [0, 1], [0, 1]);
 
-  // Image slides in from left
-  const imgProgress = spring({ frame, fps, delay: 10, config: CONFIG_SMOOTH });
-  const imgX = interpolate(imgProgress, [0, 1], [-100, 0]);
-  const imgOp = interpolate(imgProgress, [0, 1], [0, 1]);
+  // Title
+  const titleProgress = spring({ frame, fps, delay: 8, config: CONFIG_BOUNCY });
+  const titleOp = interpolate(titleProgress, [0, 1], [0, 1]);
+  const titleY = interpolate(titleProgress, [0, 1], [20, 0]);
 
-  // Bounding boxes appear
-  const bbox1Progress = spring({ frame, fps, delay: 70, config: CONFIG_SNAPPY });
-  const bbox2Progress = spring({ frame, fps, delay: 90, config: CONFIG_SNAPPY });
+  // CRT scan line position
+  const scanY = (frame * 3) % height;
 
-  // OCR text reveals
-  const ocrOp = fadeIn(frame, 130, 20);
+  // "LIVE" indicator pulse
+  const livePulse = pulse(frame, 0.06, 0.3, 1);
 
-  // Violation cards
-  const card1Progress = spring({ frame, fps, delay: 160, config: CONFIG_SNAPPY });
-  const card2Progress = spring({ frame, fps, delay: 175, config: CONFIG_SNAPPY });
+  // Stats sidebar entrance
+  const statsProgress = spring({ frame, fps, delay: 40, config: CONFIG_SMOOTH });
+  const statsOp = interpolate(statsProgress, [0, 1], [0, 1]);
+  const statsX = interpolate(statsProgress, [0, 1], [30, 0]);
 
-  // Processing time
-  const timeOp = fadeIn(frame, 200, 15);
+  // Detection counter
+  const detectionCount = Math.min(
+    3,
+    Math.floor(linearProgressFast(frame, 60, 140) * 3),
+  );
 
   return (
-    <AbsoluteFill
-      style={{
-        backgroundColor: COLORS.bg,
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "50px 80px",
-      }}
-    >
-      {/* Section label */}
-      <div
-        style={{
-          fontFamily,
-          fontSize: 16,
-          fontWeight: 600,
-          color: COLORS.primary,
-          letterSpacing: "0.2em",
-          textTransform: "uppercase" as const,
-          opacity: fadeIn(frame, 0, 15),
-          marginBottom: 12,
-        }}
-      >
-        Live Detection
-      </div>
+    <AbsoluteFill style={{ overflow: "hidden" }}>
+      {/* Animated background — minimal particles */}
+      <AnimatedBackground particleCount={12} glowCount={1} seed={55} />
 
       <div
         style={{
-          fontFamily,
-          fontSize: 44,
-          fontWeight: 700,
-          color: COLORS.text,
-          textAlign: "center",
-          opacity: titleOp,
-          marginBottom: 40,
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "50px 60px",
         }}
       >
-        Real Images. <span style={{ color: COLORS.primary }}>Real Results.</span>
-      </div>
-
-      {/* Main content: image + results side by side */}
-      <div style={{ display: "flex", gap: 48, width: "100%", justifyContent: "center" }}>
-        {/* Image with bounding boxes */}
+        {/* Header row */}
         <div
           style={{
-            position: "relative",
-            width: 720,
-            height: 480,
-            borderRadius: 12,
-            overflow: "hidden",
-            border: `1px solid ${COLORS.border}`,
-            opacity: imgOp,
-            transform: `translateX(${imgX}px)`,
+            display: "flex",
+            alignItems: "center",
+            gap: 16,
+            marginBottom: 24,
+            opacity: labelOp,
           }}
         >
-          <Img
-            src={staticFile(MOCK_DETECTION.image)}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
-
-          {/* Scan line */}
-          <div
-            style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              height: 2,
-              backgroundColor: COLORS.primary,
-              opacity: 0.6,
-              top: `${interpolate(frame, [40, 250], [0, 100], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })}%`,
-              boxShadow: `0 0 12px ${COLORS.primary}`,
-            }}
-          />
-
-          {/* Bounding box 1 */}
-          <div
-            style={{
-              position: "absolute",
-              left: MOCK_DETECTION.violations[0].bbox.x * (720 / 1280),
-              top: MOCK_DETECTION.violations[0].bbox.y * (480 / 720),
-              width: MOCK_DETECTION.violations[0].bbox.width * (720 / 1280),
-              height: MOCK_DETECTION.violations[0].bbox.height * (480 / 720),
-              border: `2px solid ${COLORS.danger}`,
-              opacity: bbox1Progress,
-              borderRadius: 4,
-            }}
-          >
-            {/* Label */}
-            <div
-              style={{
-                position: "absolute",
-                top: -22,
-                left: 0,
-                fontFamily,
-                fontSize: 11,
-                fontWeight: 600,
-                color: COLORS.text,
-                backgroundColor: COLORS.danger,
-                padding: "2px 6px",
-                borderRadius: 3,
-                opacity: bbox1Progress,
-              }}
-            >
-              NO HELMET 94%
-            </div>
-          </div>
-
-          {/* Bounding box 2 */}
-          <div
-            style={{
-              position: "absolute",
-              left: MOCK_DETECTION.violations[1].bbox.x * (720 / 1280),
-              top: MOCK_DETECTION.violations[1].bbox.y * (480 / 720),
-              width: MOCK_DETECTION.violations[1].bbox.width * (720 / 1280),
-              height: MOCK_DETECTION.violations[1].bbox.height * (480 / 720),
-              border: `2px solid ${COLORS.warning}`,
-              opacity: bbox2Progress,
-              borderRadius: 4,
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: -22,
-                left: 0,
-                fontFamily,
-                fontSize: 11,
-                fontWeight: 600,
-                color: COLORS.text,
-                backgroundColor: COLORS.warning,
-                padding: "2px 6px",
-                borderRadius: 3,
-                opacity: bbox2Progress,
-              }}
-            >
-              NO HELMET 87%
-            </div>
-          </div>
-        </div>
-
-        {/* Results panel */}
-        <div style={{ width: 400, display: "flex", flexDirection: "column", gap: 20 }}>
-          {/* OCR result */}
-          <div
-            style={{
-              backgroundColor: COLORS.bgCard,
-              border: `1px solid ${COLORS.border}`,
-              borderRadius: 12,
-              padding: "24px 20px",
-              opacity: ocrOp,
-            }}
-          >
-            <div style={{ fontFamily, fontSize: 12, color: COLORS.textSubtle, marginBottom: 8, textTransform: "uppercase" as const, letterSpacing: "0.1em" }}>
-              License Plate OCR
-            </div>
-            <div style={{ fontFamily, fontSize: 36, fontWeight: 800, color: COLORS.primary, letterSpacing: "0.06em" }}>
-              KA-01-MF-4291
-            </div>
-            <div style={{ fontFamily, fontSize: 13, color: COLORS.success, marginTop: 6 }}>
-              ✓ Matches Indian plate regex
-            </div>
-          </div>
-
-          {/* Violation cards */}
-          <ViolationCard
-            type="No Helmet"
-            confidence={94}
-            fine="₹500"
-            section="Sec 129"
-            color={COLORS.danger}
-            progress={card1Progress}
-          />
-          <ViolationCard
-            type="No Helmet"
-            confidence={87}
-            fine="₹500"
-            section="Sec 129"
-            color={COLORS.warning}
-            progress={card2Progress}
-          />
-
-          {/* Processing time */}
-          <div
+          <div style={{ width: 20, height: 1, backgroundColor: COLORS.danger }} />
+          <span
             style={{
               fontFamily,
               fontSize: 14,
-              color: COLORS.textSubtle,
-              opacity: timeOp,
-              textAlign: "center",
+              fontWeight: 600,
+              color: COLORS.danger,
+              letterSpacing: "0.25em",
+              textTransform: "uppercase" as const,
             }}
           >
-            Total processing: <span style={{ color: COLORS.primary, fontWeight: 600 }}>{MOCK_DETECTION.processingTime}ms</span>
+            Live Detection
+          </span>
+          <div style={{ width: 20, height: 1, backgroundColor: COLORS.danger }} />
+        </div>
+
+        {/* Title */}
+        <div
+          style={{
+            fontFamily,
+            fontSize: 44,
+            fontWeight: 700,
+            color: COLORS.text,
+            opacity: titleOp,
+            transform: `translateY(${titleY}px)`,
+            marginBottom: 30,
+          }}
+        >
+          Real-Time AI Analysis
+        </div>
+
+        {/* Main content: Camera feed + Stats */}
+        <div style={{ display: "flex", gap: 30, alignItems: "flex-start" }}>
+          {/* Camera feed */}
+          <div
+            style={{
+              width: 760,
+              height: 460,
+              position: "relative",
+              borderRadius: 12,
+              overflow: "hidden",
+              border: `1px solid ${COLORS.border}`,
+              boxShadow: `0 4px 30px rgba(0,0,0,0.4), 0 0 60px rgba(6,182,212,0.05)`,
+            }}
+          >
+            {/* Demo image */}
+            <Img
+              src={staticFile("demo/traffic_01.jpg")}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                filter: "brightness(0.7) contrast(1.1) saturate(0.8)",
+              }}
+            />
+
+            {/* CRT scan line */}
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                top: scanY - 1,
+                height: 3,
+                background: `linear-gradient(180deg, transparent, rgba(6,182,212,0.15), transparent)`,
+                pointerEvents: "none",
+              }}
+            />
+
+            {/* Slight green tint overlay */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                backgroundColor: "rgba(6,182,212,0.03)",
+                pointerEvents: "none",
+              }}
+            />
+
+            {/* Bounding boxes */}
+            {DETECTION_BOXES.map((box, i) => {
+              if (i >= detectionCount) return null;
+
+              const boxProgress = spring({
+                frame,
+                fps,
+                delay: box.delay,
+                config: CONFIG_SNAPPY,
+              });
+              const boxOp = interpolate(boxProgress, [0, 1], [0, 1]);
+              const boxScale = interpolate(boxProgress, [0.5, 1], [1.1, 1]);
+
+              // Bounding box corner flicker
+              const flickerOp = glowOp(frame, 0.08 + i * 0.01, 0.5, 1);
+
+              return (
+                <div
+                  key={i}
+                  style={{
+                    position: "absolute",
+                    left: box.x,
+                    top: box.y,
+                    width: box.w,
+                    height: box.h,
+                    opacity: boxOp,
+                    transform: `scale(${boxScale})`,
+                  }}
+                >
+                  {/* Box border — dashed */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      border: `2px solid ${box.color}`,
+                      borderRadius: 4,
+                      opacity: flickerOp,
+                      boxShadow: `0 0 12px ${box.color}40, inset 0 0 12px ${box.color}10`,
+                    }}
+                  />
+
+                  {/* Corner accents */}
+                  {/* Top-left */}
+                  <div style={{ position: "absolute", top: -1, left: -1, width: 12, height: 2, backgroundColor: box.color }} />
+                  <div style={{ position: "absolute", top: -1, left: -1, width: 2, height: 12, backgroundColor: box.color }} />
+                  {/* Bottom-right */}
+                  <div style={{ position: "absolute", bottom: -1, right: -1, width: 12, height: 2, backgroundColor: box.color }} />
+                  <div style={{ position: "absolute", bottom: -1, right: -1, width: 2, height: 12, backgroundColor: box.color }} />
+
+                  {/* Label */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: -24,
+                      left: 0,
+                      fontFamily,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: box.color,
+                      backgroundColor: `${COLORS.bg}cc`,
+                      padding: "2px 8px",
+                      borderRadius: 3,
+                      letterSpacing: "0.06em",
+                      whiteSpace: "nowrap" as const,
+                    }}
+                  >
+                    {box.label}
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* LIVE indicator */}
+            <div
+              style={{
+                position: "absolute",
+                top: 14,
+                left: 14,
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              <div
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  backgroundColor: COLORS.danger,
+                  transform: `scale(${livePulse})`,
+                  boxShadow: `0 0 8px ${COLORS.danger}`,
+                }}
+              />
+              <span
+                style={{
+                  fontFamily,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: COLORS.danger,
+                  letterSpacing: "0.15em",
+                }}
+              >
+                LIVE
+              </span>
+            </div>
+
+            {/* Timestamp */}
+            <div
+              style={{
+                position: "absolute",
+                bottom: 12,
+                right: 14,
+                fontFamily,
+                fontSize: 11,
+                fontWeight: 500,
+                color: COLORS.textSubtle,
+                opacity: 0.7,
+                letterSpacing: "0.05em",
+              }}
+            >
+              CAM-BLR-0421 · {String(Math.floor(frame / fps)).padStart(2, "0")}:{String((frame % fps) * 2).padStart(4, "0").slice(0, 2)}
+            </div>
+          </div>
+
+          {/* Stats sidebar */}
+          <div
+            style={{
+              width: 260,
+              opacity: statsOp,
+              transform: `translateX(${statsX}px)`,
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+            }}
+          >
+            {/* Processing status */}
+            <div
+              style={{
+                backgroundColor: COLORS.bgCard,
+                border: `1px solid ${COLORS.border}`,
+                borderRadius: 12,
+                padding: "20px 18px",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: COLORS.textSubtle,
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase" as const,
+                  marginBottom: 12,
+                }}
+              >
+                Processing
+              </div>
+
+              {[
+                { label: "COCO Model", status: "Active", color: COLORS.success },
+                { label: "Helmet Model", status: "Active", color: COLORS.success },
+                { label: "Plate OCR", status: "Standby", color: COLORS.warning },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: i < 2 ? 8 : 0,
+                  }}
+                >
+                  <span style={{ fontFamily, fontSize: 13, color: COLORS.textMuted }}>
+                    {item.label}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: item.color,
+                    }}
+                  >
+                    {item.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Detection count */}
+            <div
+              style={{
+                backgroundColor: COLORS.bgCard,
+                border: `1px solid ${COLORS.border}`,
+                borderRadius: 12,
+                padding: "20px 18px",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: COLORS.textSubtle,
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase" as const,
+                  marginBottom: 8,
+                }}
+              >
+                Violations Detected
+              </div>
+              <div
+                style={{
+                  fontFamily,
+                  fontSize: 42,
+                  fontWeight: 800,
+                  color: COLORS.danger,
+                  letterSpacing: "-0.03em",
+                }}
+              >
+                {detectionCount}
+              </div>
+            </div>
+
+            {/* Latency */}
+            <div
+              style={{
+                backgroundColor: COLORS.bgCard,
+                border: `1px solid ${COLORS.border}`,
+                borderRadius: 12,
+                padding: "20px 18px",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: COLORS.textSubtle,
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase" as const,
+                  marginBottom: 8,
+                }}
+              >
+                Avg Latency
+              </div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+                <span
+                  style={{
+                    fontFamily,
+                    fontSize: 32,
+                    fontWeight: 800,
+                    color: COLORS.success,
+                    letterSpacing: "-0.03em",
+                  }}
+                >
+                  2.4
+                </span>
+                <span
+                  style={{
+                    fontFamily,
+                    fontSize: 14,
+                    color: COLORS.textSubtle,
+                  }}
+                >
+                  seconds
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -246,51 +456,10 @@ export const LiveDetection: React.FC = () => {
   );
 };
 
-/* ──────────────────────── Violation Card ──────────────────────── */
-
-const ViolationCard: React.FC<{
-  type: string;
-  confidence: number;
-  fine: string;
-  section: string;
-  color: string;
-  progress: number;
-}> = ({ type, confidence, fine, section, color, progress }) => {
-  const opacity = interpolate(progress, [0, 1], [0, 1]);
-  const translateY = interpolate(progress, [0, 1], [15, 0]);
-
-  return (
-    <div
-      style={{
-        backgroundColor: COLORS.bgCard,
-        border: `1px solid ${color}33`,
-        borderRadius: 10,
-        padding: "16px 20px",
-        opacity,
-        transform: `translateY(${translateY}px)`,
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      <div>
-        <div style={{ fontFamily, fontSize: 16, fontWeight: 600, color: COLORS.text }}>
-          {type}
-        </div>
-        <div style={{ fontFamily, fontSize: 12, color: COLORS.textSubtle, marginTop: 2 }}>
-          MV Act {section} · Confidence {confidence}%
-        </div>
-      </div>
-      <div
-        style={{
-          fontFamily,
-          fontSize: 18,
-          fontWeight: 700,
-          color,
-        }}
-      >
-        {fine}
-      </div>
-    </div>
-  );
-};
+/** Fast linear progress helper (local to this scene) */
+function linearProgressFast(frame: number, startFrame: number, endFrame: number): number {
+  return interpolate(frame, [startFrame, endFrame], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+}

@@ -6,8 +6,26 @@ import {
   interpolate,
   spring,
 } from "remotion";
-import { COLORS, IMPACT_METRICS } from "../constants";
-import { fadeIn, stagger, CONFIG_SMOOTH, CONFIG_BOUNCY } from "../animations";
+import { COLORS, FPS } from "../constants";
+import {
+  fadeIn,
+  fadeInEased,
+  stagger,
+  floatY,
+  shimmerPosition,
+  borderGlow,
+  pulse,
+  glowOp,
+  slowRotate,
+  linearProgress,
+  transforms,
+  CONFIG_SNAPPY,
+  CONFIG_SMOOTH,
+  CONFIG_BOUNCY,
+  CONFIG_GENTLE,
+} from "../animations";
+import { AnimatedBackground } from "../AnimatedBackground";
+import { Icon } from "../Icon";
 import { loadFont } from "@remotion/google-fonts/Inter";
 
 const { fontFamily } = loadFont("normal", {
@@ -15,202 +33,296 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
+const TOTAL_FRAMES = 10 * FPS;
+
+// Impact metrics
+const METRICS = [
+  { label: "Violations Detected", value: 12847, suffix: "", icon: "alert" as const },
+  { label: "Evidence Generated", value: 11203, suffix: "", icon: "shield" as const },
+  { label: "Cameras Deployed", value: 142, suffix: "+", icon: "camera" as const },
+  { label: "Avg Response Time", value: 2.4, suffix: "s", icon: "clock" as const, isDecimal: true },
+];
+
 /**
- * Scene 9: Impact & Closing CTA
- * ROI metrics + final logo + tagline.
+ * Scene 9: Impact / Closing
+ * Animated counters, particle atmosphere,
+ * CTA, and VigilAI branding.
  */
 export const Impact: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, width, height } = useVideoConfig();
 
-  const titleOp = fadeIn(frame, 5, 20);
+  // Section label
+  const labelProgress = spring({ frame, fps, delay: 0, config: CONFIG_SMOOTH });
+  const labelOp = interpolate(labelProgress, [0, 1], [0, 1]);
 
-  // Impact cards
-  const cardsStart = 25;
+  // Title
+  const titleProgress = spring({ frame, fps, delay: 10, config: CONFIG_BOUNCY });
+  const titleOp = interpolate(titleProgress, [0, 1], [0, 1]);
+  const titleY = interpolate(titleProgress, [0, 1], [20, 0]);
 
-  // Logo + CTA at the end
-  const ctaDelay = Math.round(4.5 * fps);
-  const ctaProgress = spring({ frame, fps, delay: ctaDelay, config: CONFIG_BOUNCY });
-  const ctaScale = interpolate(ctaProgress, [0, 1], [0.8, 1]);
-  const ctaOp = fadeIn(frame, ctaDelay, 20);
+  // CTA entrance
+  const ctaProgress = spring({ frame, fps, delay: Math.round(6 * fps), config: CONFIG_BOUNCY });
+  const ctaOp = interpolate(ctaProgress, [0, 1], [0, 1]);
+  const ctaScale = interpolate(ctaProgress, [0.3, 1], [0.9, 1]);
 
-  // Tagline
-  const tagOp = fadeIn(frame, ctaDelay + 30, 25);
+  // CTA pulse
+  const ctaPulse = pulse(frame, 0.03, 0.02, 1);
 
-  // Ambient glow
-  const glowAlpha = interpolate(
-    Math.sin(frame * 0.025),
-    [-1, 1],
-    [0.08, 0.2],
-  );
+  // Brand entrance
+  const brandProgress = spring({ frame, fps, delay: Math.round(7 * fps), config: CONFIG_SMOOTH });
+  const brandOp = interpolate(brandProgress, [0, 1], [0, 1]);
 
   return (
-    <AbsoluteFill
-      style={{
-        backgroundColor: COLORS.bg,
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "60px 80px",
-      }}
-    >
-      {/* Ambient glow */}
+    <AbsoluteFill style={{ overflow: "hidden" }}>
+      {/* Animated background — more particles for closing */}
+      <AnimatedBackground particleCount={35} seed={99} />
+
       <div
         style={{
           position: "absolute",
-          width: 800,
-          height: 400,
-          borderRadius: "50%",
-          background: `radial-gradient(ellipse, rgba(6,182,212,${glowAlpha}), transparent 70%)`,
-          filter: "blur(80px)",
-        }}
-      />
-
-      {/* Section label */}
-      <div
-        style={{
-          fontFamily,
-          fontSize: 16,
-          fontWeight: 600,
-          color: COLORS.primary,
-          letterSpacing: "0.2em",
-          textTransform: "uppercase" as const,
-          opacity: fadeIn(frame, 0, 15),
-          marginBottom: 12,
+          inset: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "50px 60px",
         }}
       >
-        Impact
-      </div>
-
-      <div
-        style={{
-          fontFamily,
-          fontSize: 44,
-          fontWeight: 700,
-          color: COLORS.text,
-          textAlign: "center",
-          opacity: titleOp,
-          marginBottom: 50,
-        }}
-      >
-        Built for <span style={{ color: COLORS.primary }}>Bengaluru</span>. Ready for India.
-      </div>
-
-      {/* Impact metric cards */}
-      <div style={{ display: "flex", gap: 24, justifyContent: "center", width: "100%", marginBottom: 60 }}>
-        {IMPACT_METRICS.map((metric, i) => {
-          const delay = stagger(i, 8) + cardsStart;
-          const progress = spring({ frame, fps, delay, config: CONFIG_SMOOTH });
-          const opacity = interpolate(progress, [0, 1], [0, 1]);
-          const translateY = interpolate(progress, [0, 1], [30, 0]);
-
-          return (
-            <div
-              key={i}
-              style={{
-                flex: 1,
-                maxWidth: 320,
-                backgroundColor: COLORS.bgCard,
-                border: `1px solid ${COLORS.border}`,
-                borderRadius: 14,
-                padding: "32px 24px",
-                opacity,
-                transform: `translateY(${translateY}px)`,
-                textAlign: "center",
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
-              {/* Accent */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 3,
-                  background: `linear-gradient(90deg, ${COLORS.primary}, ${COLORS.secondary})`,
-                }}
-              />
-
-              <div
-                style={{
-                  fontFamily,
-                  fontSize: 36,
-                  fontWeight: 800,
-                  color: COLORS.primary,
-                  letterSpacing: "-0.02em",
-                  marginBottom: 6,
-                }}
-              >
-                {metric.value}
-              </div>
-              <div
-                style={{
-                  fontFamily,
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: COLORS.text,
-                  marginBottom: 4,
-                }}
-              >
-                {metric.label}
-              </div>
-              <div
-                style={{
-                  fontFamily,
-                  fontSize: 12,
-                  color: COLORS.textSubtle,
-                }}
-              >
-                {metric.sub}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* CTA logo + tagline */}
-      <div style={{ textAlign: "center", opacity: ctaOp, transform: `scale(${ctaScale})` }}>
-        {/* Mini shield */}
-        <div style={{ width: 60, height: 60, margin: "0 auto 16px" }}>
-          <svg width="60" height="60" viewBox="0 0 140 140" fill="none">
-            <path
-              d="M70 10 L120 35 L120 75 Q120 110 70 130 Q20 110 20 75 L20 35 Z"
-              stroke={COLORS.primary}
-              strokeWidth="3"
-              fill="rgba(6,182,212,0.08)"
-            />
-            <circle cx="70" cy="65" r="18" stroke={COLORS.primary} strokeWidth="2" fill="none" />
-            <circle cx="70" cy="65" r="6" fill={COLORS.primary} />
-          </svg>
-        </div>
-
+        {/* Section label */}
         <div
           style={{
             fontFamily,
-            fontSize: 52,
-            fontWeight: 800,
-            color: COLORS.text,
-            letterSpacing: "-0.04em",
+            fontSize: 14,
+            fontWeight: 600,
+            color: COLORS.primary,
+            letterSpacing: "0.25em",
+            textTransform: "uppercase" as const,
+            opacity: labelOp,
+            marginBottom: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
           }}
         >
-          Vigil<span style={{ color: COLORS.primary }}>AI</span>
+          <div style={{ width: 20, height: 1, backgroundColor: COLORS.primary }} />
+          Impact
+          <div style={{ width: 20, height: 1, backgroundColor: COLORS.primary }} />
+        </div>
+
+        {/* Title */}
+        <div
+          style={{
+            fontFamily,
+            fontSize: 50,
+            fontWeight: 700,
+            color: COLORS.text,
+            textAlign: "center",
+            opacity: titleOp,
+            transform: `translateY(${titleY}px)`,
+            marginBottom: 60,
+          }}
+        >
+          Transforming Bengaluru's
+          <br />
+          <span
+            style={{
+              color: COLORS.primary,
+              textShadow: `0 0 30px ${COLORS.primaryGlow}`,
+            }}
+          >
+            Traffic Enforcement
+          </span>
+        </div>
+
+        {/* Metrics grid */}
+        <div
+          style={{
+            display: "flex",
+            gap: 24,
+            marginBottom: 60,
+          }}
+        >
+          {METRICS.map((metric, i) => (
+            <MetricCard key={i} metric={metric} index={i} frame={frame} fps={fps} />
+          ))}
+        </div>
+
+        {/* CTA */}
+        <div
+          style={{
+            opacity: ctaOp,
+            transform: transforms(
+              `scale(${ctaScale * ctaPulse})`,
+            ),
+          }}
+        >
+          <div
+            style={{
+              fontFamily,
+              fontSize: 20,
+              fontWeight: 700,
+              color: COLORS.bg,
+              backgroundColor: COLORS.primary,
+              padding: "16px 48px",
+              borderRadius: 12,
+              boxShadow: `0 0 30px ${COLORS.primaryGlow}, 0 4px 20px rgba(0,0,0,0.3)`,
+              textAlign: "center",
+            }}
+          >
+            Deploy VigilAI at Your Junction
+          </div>
+        </div>
+
+        {/* Brand */}
+        <div
+          style={{
+            marginTop: 30,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            opacity: brandOp,
+          }}
+        >
+          <Icon name="shield" size={20} color={COLORS.primary} />
+          <span
+            style={{
+              fontFamily,
+              fontSize: 18,
+              fontWeight: 700,
+              color: COLORS.textMuted,
+              letterSpacing: "0.02em",
+            }}
+          >
+            Vigil
+            <span style={{ color: COLORS.primary }}>AI</span>
+          </span>
+          <span
+            style={{
+              fontFamily,
+              fontSize: 13,
+              color: COLORS.textSubtle,
+              marginLeft: 12,
+            }}
+          >
+            Flipkart GridLock 2.0 · Track 3
+          </span>
         </div>
       </div>
 
+      {/* Bottom accent line */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 3,
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            background: `linear-gradient(90deg, ${COLORS.primary}, ${COLORS.secondary}, ${COLORS.primary})`,
+            opacity: 0.6,
+          }}
+        />
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+/* ──────────────────────── Metric Card ──────────────────────── */
+
+const MetricCard: React.FC<{
+  metric: typeof METRICS[number];
+  index: number;
+  frame: number;
+  fps: number;
+}> = ({ metric, index, frame, fps }) => {
+  const delay = stagger(index, 10) + 30;
+
+  const progress = spring({ frame, fps, delay, config: CONFIG_SNAPPY });
+  const opacity = interpolate(progress, [0, 1], [0, 1]);
+  const translateY = interpolate(progress, [0, 1], [30, 0]);
+
+  const cardFloat = floatY(frame, 0.015 + index * 0.003, 2, index * 0.6);
+  const shimmerPos = shimmerPosition(frame, 200, delay + 30);
+  const glow = borderGlow(frame, 0.02 + index * 0.003);
+  const iconPulse = pulse(frame, 0.03, 0.05, 1);
+
+  // Counter animation
+  const counterProgress = linearProgress(frame, delay, delay + 80);
+  const displayValue = metric.isDecimal
+    ? (metric.value * counterProgress).toFixed(1)
+    : Math.floor(metric.value * counterProgress).toLocaleString();
+
+  return (
+    <div
+      style={{
+        width: 220,
+        backgroundColor: COLORS.bgCard,
+        border: `1px solid rgba(6,182,212,${glow * 0.3})`,
+        borderRadius: 14,
+        padding: "28px 22px",
+        textAlign: "center",
+        opacity,
+        transform: transforms(
+          `translateY(${translateY + cardFloat}px)`,
+        ),
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Shimmer */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: `linear-gradient(105deg, transparent 40%, rgba(6,182,212,${shimmerPos * 0.04}) 50%, transparent 60%)`,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Icon */}
+      <div style={{ transform: `scale(${iconPulse})`, marginBottom: 14 }}>
+        <Icon name={metric.icon} size={24} color={COLORS.primary} />
+      </div>
+
+      {/* Value */}
       <div
         style={{
           fontFamily,
-          fontSize: 20,
-          color: COLORS.textMuted,
-          opacity: tagOp,
-          marginTop: 12,
-          letterSpacing: "0.02em",
+          fontSize: 36,
+          fontWeight: 800,
+          color: COLORS.text,
+          letterSpacing: "-0.03em",
+          marginBottom: 6,
         }}
       >
-        AI assists. Officers decide. Justice prevails.
+        {displayValue}
+        <span
+          style={{
+            fontSize: 20,
+            fontWeight: 600,
+            color: COLORS.primary,
+          }}
+        >
+          {metric.suffix}
+        </span>
       </div>
-    </AbsoluteFill>
+
+      {/* Label */}
+      <div
+        style={{
+          fontFamily,
+          fontSize: 12,
+          color: COLORS.textSubtle,
+          letterSpacing: "0.04em",
+        }}
+      >
+        {metric.label}
+      </div>
+    </div>
   );
 };
