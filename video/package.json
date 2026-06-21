@@ -1,0 +1,24 @@
+{
+  "name": "vigilai-launch-video",
+  "version": "1.0.0",
+  "description": "VigilAI Product Launch Video - Flipkart GridLock 2.0",
+  "private": true,
+  "scripts": {
+    "start": "npx remotion studio",
+    "build": "npx remotion render VigilAILaunch out/vigilai-launch.mp4 --codec=h264 --crf=18",
+    "build-4k": "npx remotion render VigilAILaunch out/vigilai-launch-4k.mp4 --codec=h264 --crf=18 --scale=2"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.242",
+    "@remotion/google-fonts": "4.0.242",
+    "@remotion/transitions": "4.0.242",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "4.0.242"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.5.3"
+  }
+}

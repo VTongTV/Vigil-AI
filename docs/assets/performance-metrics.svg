@@ -1,0 +1,28 @@
+<svg width="780" height="110" viewBox="0 0 780 110" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="780" height="110" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="390" y="22" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#e2e8f0" letter-spacing="2">PERFORMANCE METRICS</text>
+  
+  <!-- Latency -->
+  <rect x="20" y="35" width="175" height="60" rx="6" fill="#1e1b4b" stroke="#3b82f6" stroke-width="1"/>
+  <text x="107" y="58" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="800" font-size="20" fill="#60a5fa">1.2s</text>
+  <text x="107" y="74" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#64748b">End-to-End Latency</text>
+  <text x="107" y="86" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">Target: &lt; 3s</text>
+  
+  <!-- VRAM -->
+  <rect x="210" y="35" width="175" height="60" rx="6" fill="#1e1b4b" stroke="#22c55e" stroke-width="1"/>
+  <text x="297" y="58" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="800" font-size="20" fill="#4ade80">0.023 GB</text>
+  <text x="297" y="74" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#64748b">VRAM Allocated</text>
+  <text x="297" y="86" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">Budget: 4.0 GB</text>
+  
+  <!-- OCR Accuracy -->
+  <rect x="400" y="35" width="175" height="60" rx="6" fill="#1e1b4b" stroke="#f59e0b" stroke-width="1"/>
+  <text x="487" y="58" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="800" font-size="20" fill="#fbbf24">100%</text>
+  <text x="487" y="74" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#64748b">OCR Char Accuracy</text>
+  <text x="487" y="86" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">On synthetic plates</text>
+  
+  <!-- Tests -->
+  <rect x="590" y="35" width="175" height="60" rx="6" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1"/>
+  <text x="677" y="58" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="800" font-size="20" fill="#a78bfa">269</text>
+  <text x="677" y="74" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#64748b">Tests Passing</text>
+  <text x="677" y="86" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">211 BE + 58 FE</text>
+</svg>

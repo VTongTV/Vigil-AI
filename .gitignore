@@ -51,3 +51,5 @@ data/sample_videos/*.mp4
 # Agents
 .agents/
 agents.md
+
+video/node_modules

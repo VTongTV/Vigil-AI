@@ -1,0 +1,56 @@
+<svg width="780" height="260" viewBox="0 0 780 260" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="archBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e1b4b"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="780" height="260" rx="10" fill="url(#archBg)" stroke="#1e293b" stroke-width="1"/>
+  
+  <!-- Frontend Layer -->
+  <rect x="20" y="15" width="740" height="60" rx="6" fill="#1e1b4b" stroke="#6366f1" stroke-width="1" opacity="0.6"/>
+  <text x="390" y="38" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="12" fill="#818cf8">REACT 19 COMMAND CENTER</text>
+  <text x="390" y="56" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#64748b">Vite 6 | TailwindCSS v4 | shadcn/ui | Zustand | Recharts | React-Leaflet + CartoDB Dark</text>
+  
+  <!-- Arrow down -->
+  <line x1="390" y1="78" x2="390" y2="95" stroke="#475569" stroke-width="1.5" stroke-dasharray="3,3">
+    <animate attributeName="stroke-dashoffset" values="0;-12" dur="1.5s" repeatCount="indefinite"/>
+  </line>
+  <polygon points="386,93 394,93 390,99" fill="#475569"/>
+  
+  <!-- Backend Layer -->
+  <rect x="20" y="100" width="740" height="55" rx="6" fill="#0c1a2e" stroke="#3b82f6" stroke-width="1" opacity="0.6"/>
+  <text x="390" y="122" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="12" fill="#60a5fa">FASTAPI + SQLALCHEMY + SQLITE</text>
+  <text x="390" y="140" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#64748b">Uvicorn ASGI | Pydantic v2 Validation | StaticFiles Evidence Serving | CORS</text>
+  
+  <!-- Arrow down -->
+  <line x1="390" y1="158" x2="390" y2="175" stroke="#475569" stroke-width="1.5" stroke-dasharray="3,3">
+    <animate attributeName="stroke-dashoffset" values="0;-12" dur="1.5s" repeatCount="indefinite"/>
+  </line>
+  <polygon points="386,173 394,173 390,179" fill="#475569"/>
+  
+  <!-- CV Pipeline Layer -->
+  <rect x="20" y="180" width="740" height="60" rx="6" fill="#0a0f1e" stroke="#8b5cf6" stroke-width="1" opacity="0.6"/>
+  
+  <!-- Model boxes inside CV layer -->
+  <rect x="40" y="192" width="160" height="38" rx="4" fill="#1e1b4b" stroke="#3b82f6" stroke-width="1"/>
+  <text x="120" y="208" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="9" fill="#60a5fa">YOLOv8n COCO+Helmet</text>
+  <text x="120" y="222" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">RESIDENT | ~1.5 GB VRAM</text>
+  <rect x="215" y="192" width="150" height="38" rx="4" fill="#1e1b4b" stroke="#f59e0b" stroke-width="1"/>
+  <text x="290" y="208" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="9" fill="#fbbf24">YOLOv8n Plate</text>
+  <text x="290" y="222" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">ON-DEMAND | ~0.8 GB</text>
+  <rect x="380" y="192" width="130" height="38" rx="4" fill="#1e1b4b" stroke="#22c55e" stroke-width="1"/>
+  <text x="445" y="208" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="9" fill="#4ade80">RapidOCR</text>
+  <text x="445" y="222" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">CPU-ONLY | 0 GB VRAM</text>
+  <rect x="525" y="192" width="130" height="38" rx="4" fill="#1e1b4b" stroke="#ec4899" stroke-width="1"/>
+  <text x="590" y="208" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="9" fill="#f472b6">YOLOv11s Seatbelt</text>
+  <text x="590" y="222" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">ON-DEMAND | ~0.8 GB</text>
+  
+  <!-- Side label -->
+  <text x="730" y="215" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569" transform="rotate(-90, 760, 210)">GPU</text>
+  
+  <!-- Production arrow on right -->
+  <rect x="670" y="192" width="80" height="38" rx="4" fill="#1a1a2e" stroke="#1e293b" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="710" y="210" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">ASTraM</text>
+  <text x="710" y="222" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">Vahan API</text>
+</svg>

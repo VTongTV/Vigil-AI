@@ -1,0 +1,19 @@
+<svg width="780" height="130" viewBox="0 0 780 130" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="780" height="130" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="390" y="22" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#e2e8f0" letter-spacing="2">ROI PROJECTION -- BENGALURU TRAFFIC POLICE</text>
+  
+  <!-- Conservative column -->
+  <rect x="30" y="35" width="350" height="80" rx="6" fill="#1e1b4b" stroke="#3b82f6" stroke-width="1"/>
+  <text x="205" y="55" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#60a5fa" letter-spacing="1">CONSERVATIVE (50% EFFECTIVENESS)</text>
+  <text x="205" y="78" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="800" font-size="22" fill="#93c5fd">Rs.219 Cr/yr</text>
+  <text x="205" y="98" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#64748b">500 junctions | 40K violations/day | Payback &lt; 1 week | 87x ROI</text>
+  
+  <!-- Aggressive column -->
+  <rect x="400" y="35" width="350" height="80" rx="6" fill="#1e1b4b" stroke="#22c55e" stroke-width="1"/>
+  <text x="575" y="55" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#4ade80" letter-spacing="1">AGGRESSIVE (PARITY WITH EXISTING)</text>
+  <text x="575" y="78" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="800" font-size="22" fill="#86efac">Rs.438 Cr/yr</text>
+  <text x="575" y="98" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#64748b">500 junctions | 80K violations/day | Payback &lt; 1 week | 175x ROI</text>
+  
+  <!-- Investment line -->
+  <text x="390" y="128" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#475569">Total Investment: Rs.2.5 Cr (500 junctions x Rs.50K/junction) | 30% fine compliance rate</text>
+</svg>

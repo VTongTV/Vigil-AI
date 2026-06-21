@@ -1,0 +1,69 @@
+<svg width="780" height="200" viewBox="0 0 780 200" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="780" height="200" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  
+  <!-- VRAM bar background -->
+  <rect x="30" y="20" width="720" height="40" rx="4" fill="#1e293b"/>
+  
+  <!-- PyTorch Context - 0.5GB -->
+  <rect x="30" y="20" width="90" height="40" rx="4" fill="#475569" opacity="0.8">
+    <animate attributeName="opacity" values="0.6;0.9;0.6" dur="3s" repeatCount="indefinite"/>
+  </rect>
+  <text x="75" y="38" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#e2e8f0">PyTorch</text>
+  <text x="75" y="52" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#94a3b8">0.5 GB</text>
+  
+  <!-- COCO+Helmet - 1.5GB (RESIDENT) -->
+  <rect x="120" y="20" width="270" height="40" rx="0" fill="#3b82f6" opacity="0.7">
+    <animate attributeName="opacity" values="0.5;0.8;0.5" dur="2.5s" repeatCount="indefinite"/>
+  </rect>
+  <text x="255" y="38" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#e2e8f0">YOLOv8n COCO + Helmet [RESIDENT]</text>
+  <text x="255" y="52" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#bfdbfe">~1.5 GB</text>
+  
+  <!-- Plate model - 0.8GB (on-demand, shown as dashed) -->
+  <rect x="390" y="20" width="144" height="40" rx="0" fill="#f59e0b" opacity="0.3" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="462" y="38" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#fbbf24">Plate [ON-DEMAND]</text>
+  <text x="462" y="52" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#92400e">~0.8 GB</text>
+  
+  <!-- Free space -->
+  <rect x="534" y="20" width="216" height="40" rx="4" fill="#0f172a" stroke="#1e293b" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="642" y="38" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="10" fill="#22c55e">HEADROOM</text>
+  <text x="642" y="52" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#166534">~1.2 GB free</text>
+  
+  <!-- Scale markers -->
+  <line x1="30" y1="68" x2="750" y2="68" stroke="#334155" stroke-width="0.5"/>
+  <text x="30" y="82" font-family="system-ui, sans-serif" font-size="8" fill="#475569">0 GB</text>
+  <text x="210" y="82" font-family="system-ui, sans-serif" font-size="8" fill="#475569">1 GB</text>
+  <text x="390" y="82" font-family="system-ui, sans-serif" font-size="8" fill="#475569">2 GB</text>
+  <text x="570" y="82" font-family="system-ui, sans-serif" font-size="8" fill="#475569">3 GB</text>
+  <text x="730" y="82" font-family="system-ui, sans-serif" font-size="8" fill="#475569">4 GB</text>
+  
+  <!-- Load/Unload cycle -->
+  <text x="390" y="108" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#818cf8">ON-DEMAND LOAD/UNLOAD PROTOCOL</text>
+  
+  <rect x="60" y="120" width="160" height="30" rx="4" fill="#1e293b" stroke="#3b82f6" stroke-width="1"/>
+  <text x="140" y="140" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#60a5fa">1. Check VRAM free</text>
+  
+  <line x1="225" y1="135" x2="255" y2="135" stroke="#475569" stroke-width="1.5" stroke-dasharray="3,2">
+    <animate attributeName="stroke-dashoffset" values="0;-10" dur="1s" repeatCount="indefinite"/>
+  </line>
+  
+  <rect x="260" y="120" width="160" height="30" rx="4" fill="#1e293b" stroke="#f59e0b" stroke-width="1"/>
+  <text x="340" y="140" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#fbbf24">2. Load plate model</text>
+  
+  <line x1="425" y1="135" x2="455" y2="135" stroke="#475569" stroke-width="1.5" stroke-dasharray="3,2">
+    <animate attributeName="stroke-dashoffset" values="0;-10" dur="1s" repeatCount="indefinite"/>
+  </line>
+  
+  <rect x="460" y="120" width="140" height="30" rx="4" fill="#1e293b" stroke="#8b5cf6" stroke-width="1"/>
+  <text x="530" y="140" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#a78bfa">3. Infer + Unload</text>
+  
+  <line x1="605" y1="135" x2="635" y2="135" stroke="#475569" stroke-width="1.5" stroke-dasharray="3,2">
+    <animate attributeName="stroke-dashoffset" values="0;-10" dur="1s" repeatCount="indefinite"/>
+  </line>
+  
+  <rect x="640" y="120" width="110" height="30" rx="4" fill="#1e293b" stroke="#22c55e" stroke-width="1"/>
+  <text x="695" y="140" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#4ade80">4. gc + cache</text>
+  
+  <!-- Peak annotation -->
+  <text x="390" y="178" text-anchor="middle" font-family="system-ui, sans-serif" font-size="10" fill="#64748b">Peak VRAM: ~2.8 GB | Total Budget: 4.0 GB | Measured: 0.023 GB allocated</text>
+  <text x="390" y="194" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#475569">RapidOCR: CPU-only (OMP_NUM_THREADS=4) | No CUDA provider in ONNX Runtime</text>
+</svg>

@@ -1,0 +1,86 @@
+<svg width="780" height="220" viewBox="0 0 780 220" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="780" height="220" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  
+  <!-- Title -->
+  <text x="390" y="24" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="12" fill="#e2e8f0" letter-spacing="2">VIOLATION COVERAGE -- 7/7 PROBLEM STATEMENT TYPES</text>
+  
+  <!-- Row 1: Primary -->
+  <rect x="20" y="38" width="80" height="22" rx="3" fill="#22c55e" opacity="0.15" stroke="#22c55e" stroke-width="1"/>
+  <text x="60" y="54" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#4ade80">PRIMARY</text>
+  
+  <!-- Helmet -->
+  <rect x="110" y="38" width="200" height="50" rx="5" fill="#1e1b4b" stroke="#ef4444" stroke-width="1"/>
+  <circle cx="130" cy="56" r="8" fill="#ef4444" opacity="0.3">
+    <animate attributeName="r" values="7;9;7" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="130" cy="56" r="4" fill="#ef4444"/>
+  <text x="145" y="54" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#fca5a5">No Helmet</text>
+  <text x="145" y="68" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">S.129 | Rs.500 | Head-region IoU</text>
+  <rect x="270" y="42" width="30" height="16" rx="3" fill="#22c55e" opacity="0.2"/>
+  <text x="285" y="54" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="8" fill="#4ade80">HIGH</text>
+  
+  <!-- Triple Riding -->
+  <rect x="320" y="38" width="210" height="50" rx="5" fill="#1e1b4b" stroke="#f97316" stroke-width="1"/>
+  <circle cx="340" cy="56" r="8" fill="#f97316" opacity="0.3">
+    <animate attributeName="r" values="7;9;7" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="340" cy="56" r="4" fill="#f97316"/>
+  <text x="355" y="54" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#fdba74">Triple Riding</text>
+  <text x="355" y="68" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">S.184 | Rs.1,000 | 2D spatial constraints</text>
+  <rect x="490" y="42" width="30" height="16" rx="3" fill="#eab308" opacity="0.2"/>
+  <text x="505" y="54" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="8" fill="#fbbf24">MED</text>
+  
+  <!-- Plate OCR -->
+  <rect x="540" y="38" width="220" height="50" rx="5" fill="#1e1b4b" stroke="#eab308" stroke-width="1"/>
+  <circle cx="560" cy="56" r="8" fill="#eab308" opacity="0.3">
+    <animate attributeName="r" values="7;9;7" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="560" cy="56" r="4" fill="#eab308"/>
+  <text x="575" y="54" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#fde68a">Plate OCR</text>
+  <text x="575" y="68" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">S.177 | Rs.200 | RapidOCR + KA regex</text>
+  <rect x="720" y="42" width="30" height="16" rx="3" fill="#22c55e" opacity="0.2"/>
+  <text x="735" y="54" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="8" fill="#4ade80">HIGH</text>
+  
+  <!-- Row 2: Heuristic -->
+  <rect x="20" y="96" width="80" height="22" rx="3" fill="#3b82f6" opacity="0.15" stroke="#3b82f6" stroke-width="1"/>
+  <text x="60" y="112" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="8" fill="#60a5fa">HEURISTIC</text>
+  
+  <!-- Wrong Side -->
+  <rect x="110" y="96" width="155" height="45" rx="5" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1"/>
+  <circle cx="128" cy="112" r="4" fill="#8b5cf6"/>
+  <text x="140" y="112" font-family="system-ui, sans-serif" font-weight="600" font-size="9" fill="#c4b5fd">Wrong-Side</text>
+  <text x="140" y="126" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">S.184 | Rs.1,000</text>
+  
+  <!-- Illegal Parking -->
+  <rect x="275" y="96" width="155" height="45" rx="5" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1"/>
+  <circle cx="293" cy="112" r="4" fill="#8b5cf6"/>
+  <text x="305" y="112" font-family="system-ui, sans-serif" font-weight="600" font-size="9" fill="#c4b5fd">Illegal Parking</text>
+  <text x="305" y="126" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">S.122 | Rs.200</text>
+  
+  <!-- Stop Line -->
+  <rect x="440" y="96" width="155" height="45" rx="5" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1"/>
+  <circle cx="458" cy="112" r="4" fill="#8b5cf6"/>
+  <text x="470" y="112" font-family="system-ui, sans-serif" font-weight="600" font-size="9" fill="#c4b5fd">Stop-Line</text>
+  <text x="470" y="126" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">S.184 | Rs.1,000</text>
+  
+  <!-- Row 3: Best-effort -->
+  <rect x="20" y="150" width="80" height="22" rx="3" fill="#f59e0b" opacity="0.15" stroke="#f59e0b" stroke-width="1"/>
+  <text x="60" y="166" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="8" fill="#fbbf24">BEST-EFFORT</text>
+  
+  <!-- Seatbelt -->
+  <rect x="110" y="150" width="220" height="45" rx="5" fill="#1e1b4b" stroke="#ec4899" stroke-width="1"/>
+  <circle cx="128" cy="166" r="4" fill="#ec4899"/>
+  <text x="140" y="166" font-family="system-ui, sans-serif" font-weight="600" font-size="9" fill="#f9a8d4">Seatbelt</text>
+  <text x="140" y="180" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">S.194B | Rs.1,000 | YOLOv11s classifier, 0.7x discount</text>
+  
+  <!-- Red Light -->
+  <rect x="340" y="150" width="220" height="45" rx="5" fill="#1e1b4b" stroke="#ec4899" stroke-width="1"/>
+  <circle cx="358" cy="166" r="4" fill="#ec4899"/>
+  <text x="370" y="166" font-family="system-ui, sans-serif" font-weight="600" font-size="9" fill="#f9a8d4">Red-Light</text>
+  <text x="370" y="180" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">S.184 | Rs.1,000 | Operator signal toggle + stop-line zone</text>
+  
+  <!-- Compliance badge -->
+  <rect x="590" y="148" width="170" height="50" rx="6" fill="#0a2618" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="675" y="168" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="800" font-size="14" fill="#4ade80">7/7 TYPES</text>
+  <text x="675" y="186" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#64748b">Full PS compliance</text>
+</svg>
