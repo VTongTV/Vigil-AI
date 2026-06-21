@@ -154,6 +154,30 @@ RapidOCR runs exclusively on CPU with `OMP_NUM_THREADS=4` and `ONNX_NUM_THREADS=
 
 ---
 
+## Evidence Generation
+
+<div align="center">
+<img src="docs/assets/evidence-pipeline.svg" alt="Evidence pipeline: annotated image to chain-of-custody metadata to integrity verification" width="780" />
+</div>
+
+Every detected violation generates a **court-admissible evidence package** consisting of three components:
+
+1. **Annotated Evidence Image** -- The original frame overlaid with color-coded bounding boxes (red for violations, yellow for license plates), violation type labels, confidence scores, and a VigilAI watermark with timestamp.
+
+2. **Chain-of-Custody Metadata** -- Structured JSON containing violation ID, type, confidence tier, MV Act section, fine amount, junction coordinates, officer review status, and the license plate OCR result with its own confidence score.
+
+3. **SHA-256 Integrity Hash** -- Computed on the saved JPEG bytes of the annotated image. Any post-generation modification (crop, edit, recompression) changes the hash, detectable on re-read. This satisfies the **Indian Evidence Act** requirement for electronic record integrity under **Section 65B** and **Rule 166A** of the MV Rules.
+
+### Evidence Retrieval
+
+```
+GET /api/v1/evidence/{violation_id}           --> Annotated JPEG image
+GET /api/v1/evidence/{violation_id}/metadata  --> Chain-of-custody JSON
+GET /api/v1/challan/{violation_id}             --> FIR-style challan PDF
+```
+
+---
+
 ## Tech Stack
 
 | Layer | Technology | Justification |
