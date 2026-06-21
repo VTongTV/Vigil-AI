@@ -292,6 +292,34 @@ camera_id: <optional string>
 | `GET` | `/api/v1/cameras` | List registered camera feeds |
 | `GET` | `/health` | Health check |
 
+### Violation Status Flow
+
+```
+                       +-----------+
+                       |  PENDING  |  <-- AI detection inserts here
+                       +-----+-----+
+                             |
+                    Officer reviews evidence
+                        /           \
+                   APPROVE         REJECT
+                      /               \
+              +-------+-------+  +----+-----+
+              |  UNDER_REVIEW |  | REJECTED |
+              +-------+-------+  +----------+
+                      |               ^
+                  APPROVE            |
+                      |            REJECT
+              +-------+-------+  (any status
+              |   APPROVED    |   can transition
+              +-------+-------+   to REJECTED)
+                      |
+              +-------+-------+
+              |    ISSUED     |  <-- E-challan generated
+              +---------------+
+```
+
+Any violation can transition to `REJECTED` from any status except `REJECTED` itself. This ensures officers can correct errors at any stage of the review pipeline.
+
 ### Error Responses
 
 ```json
