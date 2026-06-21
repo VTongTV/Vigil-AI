@@ -554,8 +554,18 @@ All plates follow Karnataka RTO format: `KA##XX####` where `KA` is the state cod
 
 ## Testing
 
+### Test Suite Overview
+
+| Suite | Count | Scope | Runner |
+|-------|-------|-------|--------|
+| Backend Unit Tests | 211 | CV pipeline, violation logic, OCR, evidence gen, API routes | pytest |
+| Frontend Component Tests | 58 | Page renders, API integration, demo mode, state management | Vitest |
+| **Total** | **269** | | |
+
+### Running Tests
+
 ```bash
-# Backend tests (fast unit tests only)
+# Backend tests (fast unit tests only, no GPU required)
 python -m pytest backend/tests/ -v -m "not slow"
 
 # Backend tests (full suite including GPU inference)
@@ -564,8 +574,34 @@ python -m pytest backend/tests/ -v
 # Frontend tests
 cd frontend && npx vitest run
 
-# Full evaluation with metrics
+# Full evaluation with metrics (mAP, Precision, Recall, F1, OCR accuracy)
 python scripts/eval_metrics.py
+```
+
+### Test Architecture
+
+```
+backend/tests/
+  test_preprocessing.py    -- CLAHE, denoise, gamma validation
+  test_detector.py          -- Model loading, inference, bbox format
+  test_violations.py        -- Helmet, triple riding, spatial logic
+  test_ocr.py               -- RapidOCR, regex, O/0 I/1 confusion
+  test_evidence.py           -- SHA-256 hash, annotated image, metadata
+  test_routes_detect.py     -- POST /detect with various images
+  test_routes_violations.py -- GET /violations filtering, pagination
+  test_routes_evidence.py   -- Evidence retrieval, integrity check
+  test_routes_analytics.py  -- Statistics aggregation
+  test_schemas.py           -- Pydantic validation, enum constraints
+  test_config.py            -- Settings loading, defaults
+
+frontend/src/
+  __tests__/
+    Dashboard.test.tsx       -- Page renders, stats display
+    Upload.test.tsx          -- File upload, drag-and-drop
+    Violations.test.tsx      -- Table, filtering, approve/reject
+    Evidence.test.tsx        -- Annotated viewer, hash verification
+    Analytics.test.tsx       -- Charts, date range filtering
+    DemoMode.test.tsx        -- Toggle, hardcoded response flow
 ```
 
 ---
