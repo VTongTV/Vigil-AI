@@ -55,7 +55,7 @@ Bengaluru has 75 AI-enabled junctions covering approximately 87% contactless enf
 | Step | Component | Description |
 |------|-----------|-------------|
 | 1 | **Image Ingestion** | Upload via REST API or stream from CCTV capture. JPEG, PNG, WebP up to 10 MB. |
-| 2 | **Preprocessing** | CLAHE contrast enhancement, Gaussian denoise, gamma correction. Handles low-light and noisy feeds. |
+| 2 | **Preprocessing** | CLAHE contrast enhancement (clipLimit=2.0, tileGridSize=8x8), Gaussian denoise (sigma=1.0), gamma correction (gamma=0.8 for low-light). Handles low-light, fog, and noisy feeds common in Bengaluru traffic cameras. |
 | 3 | **Object Detection** | YOLOv8n on CUDA. Detects persons, two-wheelers, cars, buses, trucks, bicycles, helmets, no-helmets. |
 | 4 | **Violation Logic** | Head-region IoU (helmet), 2D spatial constraints (triple riding), zone polygons (parking, wrong-side, stop-line), windshield crop classifier (seatbelt), operator signal toggle (red-light). |
 | 5 | **Plate OCR** | On-demand plate model load. RapidOCR on CPU with Indian plate regex post-processing (KA##XX####). |
