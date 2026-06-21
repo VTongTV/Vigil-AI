@@ -1,0 +1,93 @@
+<svg width="780" height="200" viewBox="0 0 780 200" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="780" height="200" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="390" y="22" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#e2e8f0" letter-spacing="2">TECH STACK -- PRODUCTION-GRADE, DEMO-OPTIMIZED</text>
+  
+  <!-- Frontend Layer -->
+  <rect x="20" y="38" width="230" height="150" rx="6" fill="#1e1b4b" stroke="#6366f1" stroke-width="1" opacity="0.8"/>
+  <text x="135" y="55" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#818cf8">REACT COMMAND CENTER</text>
+  
+  <rect x="32" y="65" width="100" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="82" y="78" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#c084fc">React 19</text>
+  <text x="82" y="88" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">Concurrent features</text>
+  
+  <rect x="138" y="65" width="100" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="188" y="78" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#c084fc">Vite 6</text>
+  <text x="188" y="88" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">HMR + SWC</text>
+  
+  <rect x="32" y="100" width="100" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="82" y="113" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#c084fc">TailwindCSS v4</text>
+  <text x="82" y="123" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">Utility-first CSS</text>
+  
+  <rect x="138" y="100" width="100" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="188" y="113" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#c084fc">shadcn/ui</text>
+  <text x="188" y="123" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">Copy-paste components</text>
+  
+  <rect x="32" y="135" width="100" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="82" y="148" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#c084fc">Zustand</text>
+  <text x="82" y="158" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">Minimal state mgmt</text>
+  
+  <rect x="138" y="135" width="100" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="188" y="148" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#c084fc">React-Leaflet</text>
+  <text x="188" y="158" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">CartoDB Dark tiles</text>
+  
+  <rect x="32" y="170" width="206" height="14" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="135" y="180" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="7" fill="#f472b6">Recharts + Lucide Icons</text>
+  
+  <!-- Backend Layer -->
+  <rect x="265" y="38" width="230" height="150" rx="6" fill="#1e1b4b" stroke="#3b82f6" stroke-width="1" opacity="0.8"/>
+  <text x="380" y="55" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#60a5fa">FASTAPI BACKEND</text>
+  
+  <rect x="277" y="65" width="100" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="327" y="78" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#34d399">FastAPI</text>
+  <text x="327" y="88" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">Async + auto-docs</text>
+  
+  <rect x="383" y="65" width="100" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="433" y="78" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#34d399">SQLAlchemy 2.0</text>
+  <text x="433" y="88" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">Async ORM</text>
+  
+  <rect x="277" y="100" width="100" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="327" y="113" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#34d399">Pydantic v2</text>
+  <text x="327" y="123" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">Schema validation</text>
+  
+  <rect x="383" y="100" width="100" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="433" y="113" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#34d399">SQLite</text>
+  <text x="433" y="123" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">Zero-config DB</text>
+  
+  <rect x="277" y="135" width="206" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="380" y="148" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#34d399">Uvicorn + Lifespan Events</text>
+  <text x="380" y="158" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">Model pre-warm + graceful shutdown</text>
+  
+  <rect x="277" y="170" width="206" height="14" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="380" y="180" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="7" fill="#fbbf24">211 tests passing</text>
+  
+  <!-- CV Layer -->
+  <rect x="510" y="38" width="255" height="150" rx="6" fill="#1e1b4b" stroke="#f59e0b" stroke-width="1" opacity="0.8"/>
+  <text x="637" y="55" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#fbbf24">CV PIPELINE (CUDA + CPU)</text>
+  
+  <rect x="522" y="65" width="110" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="577" y="78" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#fb923c">YOLOv8n</text>
+  <text x="577" y="88" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">COCO+Helmet (CUDA)</text>
+  
+  <rect x="638" y="65" width="115" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="695" y="78" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#fb923c">YOLOv8n Plate</text>
+  <text x="695" y="88" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">On-demand (CUDA)</text>
+  
+  <rect x="522" y="100" width="110" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="577" y="113" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#fb923c">YOLOv11s Seatbelt</text>
+  <text x="577" y="123" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">On-demand (CUDA)</text>
+  
+  <rect x="638" y="100" width="115" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="695" y="113" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#fb923c">RapidOCR</text>
+  <text x="695" y="123" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">CPU-only ONNX</text>
+  
+  <rect x="522" y="135" width="110" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="577" y="148" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#fb923c">OpenCV</text>
+  <text x="577" y="158" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">CLAHE + Denoise</text>
+  
+  <rect x="638" y="135" width="115" height="28" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="695" y="148" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#fb923c">PyTorch 2.x</text>
+  <text x="695" y="158" text-anchor="middle" font-family="system-ui, sans-serif" font-size="6" fill="#64748b">CUDA 12.x runtime</text>
+  
+  <rect x="522" y="170" width="231" height="14" rx="3" fill="#1e293b" stroke="#334155" stroke-width="0.5"/>
+  <text x="637" y="180" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="7" fill="#f87171">4 GB VRAM budget | RTX 3050</text>
+</svg>
