@@ -36,9 +36,12 @@ export const TRANSITION_FRAMES = 15;
 export const COLORS = {
   bg:            "#0A0E1A",
   bgCard:        "#111827",
+  bgElevated:    "#1A2035",
   border:        "#1E293B",
+  borderActive:  "#2D3A52",
   primary:       "#06B6D4",
   primaryGlow:   "rgba(6, 182, 212, 0.4)",
+  primaryDim:    "rgba(6, 182, 212, 0.15)",
   secondary:     "#3B82F6",
   danger:        "#EF4444",
   warning:       "#F59E0B",
@@ -48,41 +51,70 @@ export const COLORS = {
   textSubtle:    "#64748B",
 } as const;
 
+/* ──────────────────────── Icon Types ──────────────────────── */
+
+export type IconName =
+  | "upload"
+  | "wrench"
+  | "eye"
+  | "shield"
+  | "scale"
+  | "plate"
+  | "text"
+  | "clipboard"
+  | "helmet"
+  | "motorcycle"
+  | "wrongway"
+  | "parking"
+  | "seatbelt"
+  | "stopline"
+  | "redlight"
+  | "camera"
+  | "document"
+  | "money"
+  | "alert"
+  | "lock"
+  | "image"
+  | "chain"
+  | "cpu"
+  | "gpu"
+  | "roi";
+
 /* ──────────────────────── Staged Data ──────────────────────── */
 
 export const PIPELINE_STAGES = [
-  { label: "Upload",           timing: "—",      icon: "📤", color: COLORS.secondary },
-  { label: "Preprocess",       timing: "12 ms",  icon: "🔧", color: "#8B5CF6" },
-  { label: "COCO Detect",     timing: "180 ms", icon: "👁️", color: COLORS.primary },
-  { label: "Helmet Detect",    timing: "95 ms",  icon: "🪖", color: COLORS.success },
-  { label: "Violation Logic", timing: "8 ms",   icon: "⚖️", color: COLORS.warning },
-  { label: "Plate Detect",     timing: "210 ms", icon: "🔢", color: "#EC4899" },
-  { label: "OCR + Regex",      timing: "150 ms", icon: "🔤", color: "#F97316" },
-  { label: "Evidence Gen",     timing: "45 ms",  icon: "📋", color: COLORS.danger },
+  { label: "Upload",           timing: "—",      icon: "upload" as IconName, color: COLORS.secondary },
+  { label: "Preprocess",       timing: "12 ms",  icon: "wrench" as IconName, color: "#8B5CF6" },
+  { label: "COCO Detect",     timing: "180 ms", icon: "eye" as IconName, color: COLORS.primary },
+  { label: "Helmet Detect",    timing: "95 ms",  icon: "helmet" as IconName, color: COLORS.success },
+  { label: "Violation Logic", timing: "8 ms",   icon: "scale" as IconName, color: COLORS.warning },
+  { label: "Plate Detect",     timing: "210 ms", icon: "plate" as IconName, color: "#EC4899" },
+  { label: "OCR + Regex",      timing: "150 ms", icon: "text" as IconName, color: "#F97316" },
+  { label: "Evidence Gen",     timing: "45 ms",  icon: "clipboard" as IconName, color: COLORS.danger },
 ] as const;
 
 export const VIOLATION_TYPES = [
-  { type: "No Helmet",          fine: "₹500",  section: "Sec 129",  icon: "🪖", color: COLORS.danger },
-  { type: "Triple Riding",     fine: "₹1,000", section: "Sec 184", icon: "🏍️", color: COLORS.warning },
-  { type: "Wrong Side",        fine: "₹1,000", section: "Sec 184", icon: "⛔", color: "#EC4899" },
-  { type: "Illegal Parking",   fine: "₹200",  section: "Sec 122",  icon: "🅿️", color: COLORS.secondary },
-  { type: "No Seatbelt",       fine: "₹1,000", section: "Sec 194B",icon: "💺", color: "#8B5CF6" },
-  { type: "Stop Line",         fine: "₹1,000", section: "Sec 184", icon: "🛑", color: "#F97316" },
-  { type: "Red Light",         fine: "₹1,000", section: "Sec 184", icon: "🔴", color: COLORS.danger },
+  { type: "No Helmet",          fine: "₹500",  section: "Sec 129",  icon: "helmet" as IconName, color: COLORS.danger },
+  { type: "Triple Riding",     fine: "₹1,000", section: "Sec 184", icon: "motorcycle" as IconName, color: COLORS.warning },
+  { type: "Wrong Side",        fine: "₹1,000", section: "Sec 184", icon: "wrongway" as IconName, color: "#EC4899" },
+  { type: "Illegal Parking",   fine: "₹200",  section: "Sec 122",  icon: "parking" as IconName, color: COLORS.secondary },
+  { type: "No Seatbelt",       fine: "₹1,000", section: "Sec 194B",icon: "seatbelt" as IconName, color: "#8B5CF6" },
+  { type: "Stop Line",         fine: "₹1,000", section: "Sec 184", icon: "stopline" as IconName, color: "#F97316" },
+  { type: "Red Light",         fine: "₹1,000", section: "Sec 184", icon: "redlight" as IconName, color: COLORS.danger },
 ] as const;
 
 export const IMPACT_METRICS = [
-  { label: "Cost per Junction", value: "₹25K", sub: "vs ₹50K+ competitors" },
-  { label: "End-to-End Latency", value: "1.2s", sub: "upload → evidence" },
-  { label: "VRAM Footprint", value: "4 GB", sub: "RTX 3050 consumer GPU" },
-  { label: "Annual ROI", value: "87×", sub: "₹438 Cr potential" },
+  { label: "Cost per Junction", value: "₹25K", sub: "vs ₹50K+ competitors", icon: "money" as IconName },
+  { label: "End-to-End Latency", value: "1.2s", sub: "upload → evidence", icon: "cpu" as IconName },
+  { label: "VRAM Footprint", value: "4 GB", sub: "RTX 3050 consumer GPU", icon: "gpu" as IconName },
+  { label: "Annual ROI", value: "87×", sub: "₹438 Cr potential", icon: "roi" as IconName },
 ] as const;
 
 export const PROBLEM_STATS = [
-  { value: "500+", label: "Unmonitored Junctions", icon: "📹" },
-  { value: "42%",  label: "Evidence Rejection Rate", icon: "📄" },
-  { value: "₹438 Cr", label: "Revenue Lost Annually", icon: "💸" },
-  { value: "75 L", label: "Violations per Year", icon: "⚠️" },
+  { value: "500+", label: "Unmonitored Junctions", icon: "camera" as IconName },
+  { value: "42%",  label: "Evidence Rejection Rate", icon: "document" as IconName },
+  { value: "₹438 Cr", label: "Revenue Lost Annually", icon: "money" as IconName },
+  { value: "75 L", label: "Violations per Year", icon: "alert" as IconName },
 ] as const;
 
 export const DASHBOARD_COUNTERS = [
