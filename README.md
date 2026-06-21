@@ -533,6 +533,8 @@ Computes mAP@50, Precision, Recall, F1 per violation type, OCR accuracy on label
 
 ### Bengaluru Junctions (10 locations)
 
+Seeded via `python scripts/seed_bengaluru_demo.py` -- generates 281 violations across 10 real Bengaluru junctions with geographically accurate coordinates, Karnataka-format license plates, and violation type distributions matching BTP enforcement patterns.
+
 | Junction | Coordinates | Avg Violations/Day | Primary Violations |
 |----------|------------|-------------------|-------------------|
 | MG Road - Trinity Circle | 12.9758, 77.6045 | 45 | No helmet (65%) |
