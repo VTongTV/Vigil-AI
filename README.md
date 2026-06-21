@@ -61,6 +61,14 @@ Bengaluru has 75 AI-enabled junctions covering approximately 87% contactless enf
 | 5 | **Plate OCR** | On-demand plate model load. RapidOCR on CPU with Indian plate regex post-processing (KA##XX####). |
 | 6 | **Evidence Generation** | Annotated image with bboxes, labels, timestamps. SHA-256 hash on saved JPEG bytes. Chain-of-custody metadata. |
 
+### Officer Review Workflow
+
+<div align="center">
+<img src="docs/assets/officer-workflow.svg" alt="Officer review workflow: pending to issued with audit trail" width="780" />
+</div>
+
+Every detection enters the system as `pending`. Officers review the annotated evidence, verify the license plate OCR, and either approve or reject. Approved violations proceed to `issued` status, triggering e-challan generation. Rejected violations are archived with a reason code for audit compliance. All state transitions are logged with officer ID and timestamp, satisfying **Rule 166A** requirements for admissible electronic evidence.
+
 ---
 
 ## System Architecture
