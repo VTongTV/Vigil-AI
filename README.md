@@ -180,6 +180,10 @@ GET /api/v1/challan/{violation_id}             --> FIR-style challan PDF
 
 ## Tech Stack
 
+<div align="center">
+<img src="docs/assets/tech-stack.svg" alt="Three-layer tech stack: React Frontend, FastAPI Backend, CV Pipeline" width="780" />
+</div>
+
 | Layer | Technology | Justification |
 |-------|-----------|---------------|
 | Object Detection | YOLOv8n (Ultralytics) | Smallest YOLOv8 variant, ~6 MB weights, < 1.5 GB VRAM |
