@@ -11,6 +11,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Wand2, Sparkles, Image, Type, ChevronRight, Loader2, Zap, Layers, Play } from "lucide-react";
 import { useAppStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -94,11 +95,6 @@ const PIPELINE_STEPS = [
   { key: "output", label: "Synthetic Training Image", icon: Image },
 ] as const;
 type PipelineStepKey = (typeof PIPELINE_STEPS)[number]["key"];
-
-/** Utility — merge conditional class names. */
-function cn(...classes: (string | false | null | undefined)[]): string {
-  return classes.filter(Boolean).join(" ");
-}
 
 /** Typing animation hook — reveals text character by character. */
 function useTypingAnimation(text: string, speed: number = 18, active: boolean): string {
@@ -293,6 +289,9 @@ export default function Generator() {
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
   };
+
+  /** Clean up timers on unmount. */
+  useEffect(() => () => clearTimers(), []);
 
   /** Run the full pipeline animation for the selected preset. */
   const runPipeline = () => {
