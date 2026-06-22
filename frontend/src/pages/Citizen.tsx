@@ -30,7 +30,7 @@ import {
   X,
 } from "lucide-react";
 import { citizenDetect } from "@/lib/api";
-import type { CitizenDetectResponse, DetectionSummary } from "@/types/violation";
+import type { CitizenDetectResponse } from "@/types/violation";
 import { VIOLATION_LABELS, VIOLATION_COLORS } from "@/types/violation";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";

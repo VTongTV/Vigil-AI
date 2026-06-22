@@ -675,7 +675,7 @@ function ViolationRow({
       </TableCell>
       <TableCell className="py-2.5">
         <span className="text-[12px] font-medium text-[var(--color-ink-muted)] capitalize">
-          {v.metadata?.vehicle_type ?? "Unknown"}
+          {(v.metadata?.vehicle_type as string) ?? "Unknown"}
         </span>
       </TableCell>
       <TableCell className="py-2.5">

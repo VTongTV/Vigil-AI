@@ -171,7 +171,7 @@ function PipelineBar({ activeStep, prefersReduced }: { activeStep: PipelineStepK
 
 /** Phase 1 panel — LLM prompt with typing animation. */
 function LlmPromptPanel({
-  preset, typingDone, onTypingDone, prefersReduced,
+  preset, typingDone, onTypingDone, prefersReduced: _prefersReduced,
 }: {
   preset: GeneratorPreset;
   typingDone: boolean;
@@ -342,7 +342,7 @@ export default function Generator() {
       {/* Preset Selector + Run Button */}
       <div className="flex items-center gap-3 mb-4">
         <div className="flex-1 max-w-sm">
-          <Select value={selectedId ?? ""} onValueChange={handlePresetChange}>
+          <Select value={selectedId ?? ""} onValueChange={(v) => { if (v) handlePresetChange(v); }}>
             <SelectTrigger className="h-9 text-[13px] bg-[var(--color-paper-1)]/70 ring-1 ring-[var(--color-paper-3)]/60">
               <SelectValue placeholder="Select an edge-case scenario..." />
             </SelectTrigger>

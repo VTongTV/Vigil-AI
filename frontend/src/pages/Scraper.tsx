@@ -234,7 +234,7 @@ export default function Scraper() {
           <motion.div key="feed" initial={prefersReduced ? {} : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredItems.map((item, idx) => (
-              <FeedCard key={item.id} item={item} index={idx} reduced={prefersReduced} />
+              <FeedCard key={item.id} item={item} index={idx} reduced={!!prefersReduced} />
             ))}
           </motion.div>
         )}

@@ -13,7 +13,6 @@ import {
   Video as VideoIcon,
   Upload as UploadIcon,
   Loader2,
-  CheckCircle2,
   AlertTriangle,
   Play,
   Film,
@@ -237,7 +236,7 @@ export default function Video() {
                   <label className="mb-1.5 block text-[11px] font-semibold tracking-wider text-[var(--color-ink-faint)] uppercase">
                     Frame Rate
                   </label>
-                  <Select value={fps} onValueChange={setFps}>
+                  <Select value={fps} onValueChange={(v) => { if (v) setFps(v); }}>
                     <SelectTrigger className="h-8 border-[var(--color-paper-3)] bg-[var(--color-paper-2)]/50 text-[12px]">
                       <SelectValue />
                     </SelectTrigger>
