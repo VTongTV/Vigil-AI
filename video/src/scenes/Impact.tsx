@@ -93,7 +93,7 @@ export const Impact: React.FC = () => {
         <div
           style={{
             fontFamily,
-            fontSize: 14,
+            fontSize: 18,
             fontWeight: 600,
             color: COLORS.primary,
             letterSpacing: "0.25em",
@@ -160,7 +160,7 @@ export const Impact: React.FC = () => {
           <div
             style={{
               fontFamily,
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: 700,
               color: COLORS.bg,
               backgroundColor: COLORS.primary,
@@ -188,7 +188,7 @@ export const Impact: React.FC = () => {
           <span
             style={{
               fontFamily,
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: 700,
               color: COLORS.textMuted,
               letterSpacing: "0.02em",
@@ -200,8 +200,8 @@ export const Impact: React.FC = () => {
           <span
             style={{
               fontFamily,
-              fontSize: 13,
-              color: COLORS.textSubtle,
+              fontSize: 16,
+              color: COLORS.textMuted,
               marginLeft: 12,
             }}
           >
@@ -303,7 +303,7 @@ const MetricCard: React.FC<{
         {displayValue}
         <span
           style={{
-            fontSize: 20,
+            fontSize: 24,
             fontWeight: 600,
             color: COLORS.primary,
           }}
@@ -316,8 +316,8 @@ const MetricCard: React.FC<{
       <div
         style={{
           fontFamily,
-          fontSize: 12,
-          color: COLORS.textSubtle,
+          fontSize: 16,
+          color: COLORS.textMuted,
           letterSpacing: "0.04em",
         }}
       >

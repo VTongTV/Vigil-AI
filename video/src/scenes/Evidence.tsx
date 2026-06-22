@@ -96,7 +96,7 @@ export const Evidence: React.FC = () => {
         <div
           style={{
             fontFamily,
-            fontSize: 14,
+            fontSize: 18,
             fontWeight: 600,
             color: COLORS.warning,
             letterSpacing: "0.25em",
@@ -208,7 +208,7 @@ export const Evidence: React.FC = () => {
                   top: -22,
                   left: 0,
                   fontFamily,
-                  fontSize: 10,
+                  fontSize: 13,
                   fontWeight: 600,
                   color: COLORS.danger,
                   backgroundColor: `${COLORS.bg}dd`,
@@ -240,7 +240,7 @@ export const Evidence: React.FC = () => {
               <span
                 style={{
                   fontFamily,
-                  fontSize: 14,
+                  fontSize: 17,
                   fontWeight: 700,
                   color: COLORS.warning,
                   letterSpacing: "0.12em",
@@ -257,9 +257,9 @@ export const Evidence: React.FC = () => {
                 top: 10,
                 right: 12,
                 fontFamily,
-                fontSize: 10,
-                color: COLORS.textSubtle,
-                opacity: 0.8,
+                fontSize: 13,
+                color: COLORS.textMuted,
+                opacity: 0.85,
               }}
             >
               2026-06-21 14:32:07 IST
@@ -281,9 +281,9 @@ export const Evidence: React.FC = () => {
           <div
             style={{
               fontFamily,
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: 400,
-              color: COLORS.textSubtle,
+              color: COLORS.textMuted,
               backgroundColor: COLORS.bgElevated,
               border: `1px solid ${COLORS.border}`,
               borderRadius: 6,
@@ -296,7 +296,7 @@ export const Evidence: React.FC = () => {
           <div
             style={{
               fontFamily,
-              fontSize: 11,
+              fontSize: 13,
               fontWeight: 600,
               color: COLORS.success,
               backgroundColor: `${COLORS.success}15`,
@@ -367,7 +367,7 @@ const ChainNode: React.FC<{
       <span
         style={{
           fontFamily,
-          fontSize: 14,
+          fontSize: 18,
           fontWeight: isActive ? 600 : 400,
           color: isActive ? COLORS.text : COLORS.textMuted,
         }}

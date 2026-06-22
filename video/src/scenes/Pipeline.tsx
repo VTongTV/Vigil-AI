@@ -80,7 +80,7 @@ export const Pipeline: React.FC = () => {
         <div
           style={{
             fontFamily,
-            fontSize: 14,
+            fontSize: 18,
             fontWeight: 600,
             color: COLORS.secondary,
             letterSpacing: "0.25em",
@@ -118,8 +118,8 @@ export const Pipeline: React.FC = () => {
         <div
           style={{
             fontFamily,
-            fontSize: 18,
-            fontWeight: 300,
+            fontSize: 24,
+            fontWeight: 400,
             color: COLORS.textMuted,
             opacity: subOp,
             marginBottom: 60,
@@ -262,10 +262,10 @@ const PipelineStep: React.FC<{
         <div
           style={{
             fontFamily,
-            fontSize: 11,
+            fontSize: 16,
             fontWeight: 600,
-            color: COLORS.textSubtle,
-            opacity: 0.6,
+            color: COLORS.textMuted,
+            opacity: 0.85,
             letterSpacing: "0.1em",
           }}
         >
@@ -277,7 +277,7 @@ const PipelineStep: React.FC<{
       <div
         style={{
           fontFamily,
-          fontSize: 13,
+          fontSize: 16,
           fontWeight: 500,
           color: COLORS.textMuted,
           marginTop: 12,

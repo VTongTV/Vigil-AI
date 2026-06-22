@@ -78,7 +78,7 @@ export const Problem: React.FC = () => {
         <div
           style={{
             fontFamily,
-            fontSize: 14,
+            fontSize: 18,
             fontWeight: 600,
             color: COLORS.danger,
             letterSpacing: "0.25em",
@@ -255,7 +255,7 @@ const StatCard: React.FC<{
       <div
         style={{
           fontFamily,
-          fontSize: 15,
+          fontSize: 18,
           color: COLORS.textMuted,
           lineHeight: 1.5,
         }}

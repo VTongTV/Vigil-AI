@@ -190,7 +190,7 @@ export const ColdOpen: React.FC = () => {
           <div
             style={{
               fontFamily,
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: 400,
               color: COLORS.textSubtle,
               opacity: subtitleOp,

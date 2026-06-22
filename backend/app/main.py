@@ -98,6 +98,7 @@ from backend.app.routes.evidence import router as evidence_router  # noqa: E402
 from backend.app.routes.analytics import router as analytics_router  # noqa: E402
 from backend.app.routes.cameras import router as cameras_router  # noqa: E402
 from backend.app.routes.challan_pdf import router as challan_pdf_router  # noqa: E402
+from backend.app.routes.video import router as video_router  # noqa: E402
 
 app.include_router(detect_router, prefix="/api/v1", tags=["detect"])
 app.include_router(violations_router, prefix="/api/v1", tags=["violations"])
@@ -105,6 +106,7 @@ app.include_router(evidence_router, prefix="/api/v1", tags=["evidence"])
 app.include_router(analytics_router, prefix="/api/v1", tags=["analytics"])
 app.include_router(cameras_router, prefix="/api/v1", tags=["cameras"])
 app.include_router(challan_pdf_router, prefix="/api/v1", tags=["evidence"])
+app.include_router(video_router, prefix="/api/v1", tags=["video"])
 
 
 @app.get("/health")

@@ -105,7 +105,7 @@ export const LiveDetection: React.FC = () => {
           <span
             style={{
               fontFamily,
-              fontSize: 14,
+              fontSize: 18,
               fontWeight: 600,
               color: COLORS.danger,
               letterSpacing: "0.25em",
@@ -236,11 +236,11 @@ export const LiveDetection: React.FC = () => {
                       top: -24,
                       left: 0,
                       fontFamily,
-                      fontSize: 11,
+                      fontSize: 13,
                       fontWeight: 600,
                       color: box.color,
                       backgroundColor: `${COLORS.bg}cc`,
-                      padding: "2px 8px",
+                      padding: "2px 6px",
                       borderRadius: 3,
                       letterSpacing: "0.06em",
                       whiteSpace: "nowrap" as const,
@@ -276,7 +276,7 @@ export const LiveDetection: React.FC = () => {
               <span
                 style={{
                   fontFamily,
-                  fontSize: 11,
+                  fontSize: 13,
                   fontWeight: 700,
                   color: COLORS.danger,
                   letterSpacing: "0.15em",
@@ -293,10 +293,10 @@ export const LiveDetection: React.FC = () => {
                 bottom: 12,
                 right: 14,
                 fontFamily,
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: 500,
-                color: COLORS.textSubtle,
-                opacity: 0.7,
+                color: COLORS.textMuted,
+                opacity: 0.85,
                 letterSpacing: "0.05em",
               }}
             >
@@ -327,9 +327,9 @@ export const LiveDetection: React.FC = () => {
               <div
                 style={{
                   fontFamily,
-                  fontSize: 11,
+                  fontSize: 14,
                   fontWeight: 600,
-                  color: COLORS.textSubtle,
+                  color: COLORS.textMuted,
                   letterSpacing: "0.15em",
                   textTransform: "uppercase" as const,
                   marginBottom: 12,
@@ -352,13 +352,13 @@ export const LiveDetection: React.FC = () => {
                     marginBottom: i < 2 ? 8 : 0,
                   }}
                 >
-                  <span style={{ fontFamily, fontSize: 13, color: COLORS.textMuted }}>
+                  <span style={{ fontFamily, fontSize: 15, color: COLORS.textMuted }}>
                     {item.label}
                   </span>
                   <span
                     style={{
                       fontFamily,
-                      fontSize: 12,
+                      fontSize: 14,
                       fontWeight: 600,
                       color: item.color,
                     }}
@@ -381,9 +381,9 @@ export const LiveDetection: React.FC = () => {
               <div
                 style={{
                   fontFamily,
-                  fontSize: 11,
+                  fontSize: 14,
                   fontWeight: 600,
-                  color: COLORS.textSubtle,
+                  color: COLORS.textMuted,
                   letterSpacing: "0.15em",
                   textTransform: "uppercase" as const,
                   marginBottom: 8,
@@ -416,9 +416,9 @@ export const LiveDetection: React.FC = () => {
               <div
                 style={{
                   fontFamily,
-                  fontSize: 11,
+                  fontSize: 14,
                   fontWeight: 600,
-                  color: COLORS.textSubtle,
+                  color: COLORS.textMuted,
                   letterSpacing: "0.15em",
                   textTransform: "uppercase" as const,
                   marginBottom: 8,
@@ -440,9 +440,9 @@ export const LiveDetection: React.FC = () => {
                 </span>
                 <span
                   style={{
-                    fontFamily,
-                    fontSize: 14,
-                    color: COLORS.textSubtle,
+                  fontFamily,
+                  fontSize: 16,
+                  color: COLORS.textSubtle,
                   }}
                 >
                   seconds

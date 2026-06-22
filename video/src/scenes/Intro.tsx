@@ -192,8 +192,8 @@ export const Intro: React.FC = () => {
         <div
           style={{
             fontFamily,
-            fontSize: 22,
-            fontWeight: 300,
+            fontSize: 26,
+            fontWeight: 400,
             color: COLORS.textMuted,
             letterSpacing: "0.12em",
             opacity: tagOp,
@@ -228,9 +228,9 @@ export const Intro: React.FC = () => {
                 key={i}
                 style={{
                   fontFamily,
-                  fontSize: 13,
+                  fontSize: 16,
                   fontWeight: 500,
-                  color: COLORS.textSubtle,
+                  color: COLORS.textMuted,
                   backgroundColor: COLORS.bgElevated,
                   border: `1px solid ${COLORS.border}`,
                   borderRadius: 20,

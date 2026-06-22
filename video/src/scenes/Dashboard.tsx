@@ -92,7 +92,7 @@ export const Dashboard: React.FC = () => {
         <div
           style={{
             fontFamily,
-            fontSize: 14,
+            fontSize: 18,
             fontWeight: 600,
             color: COLORS.success,
             letterSpacing: "0.25em",
@@ -155,8 +155,8 @@ export const Dashboard: React.FC = () => {
             <span
               style={{
                 fontFamily,
-                fontSize: 12,
-                color: COLORS.textSubtle,
+                fontSize: 14,
+                color: COLORS.textMuted,
                 marginLeft: 12,
               }}
             >
@@ -177,9 +177,9 @@ export const Dashboard: React.FC = () => {
               <div
                 style={{
                   fontFamily,
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: 600,
-                  color: COLORS.textSubtle,
+                  color: COLORS.textMuted,
                   letterSpacing: "0.15em",
                   textTransform: "uppercase" as const,
                   marginBottom: 14,
@@ -280,8 +280,8 @@ const KpiCard: React.FC<{
         <div
           style={{
             fontFamily,
-            fontSize: 11,
-            color: COLORS.textSubtle,
+            fontSize: 14,
+            color: COLORS.textMuted,
             marginBottom: 2,
           }}
         >
@@ -291,7 +291,7 @@ const KpiCard: React.FC<{
           <span
             style={{
               fontFamily,
-              fontSize: 22,
+              fontSize: 26,
               fontWeight: 700,
               color: COLORS.text,
               letterSpacing: "-0.02em",
@@ -303,7 +303,7 @@ const KpiCard: React.FC<{
             <span
               style={{
                 fontFamily,
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: 600,
                 color: kpi.delta.startsWith("+") || kpi.delta.startsWith("-0")
                   ? COLORS.success
@@ -371,8 +371,8 @@ const FeedItem: React.FC<{
       <span
         style={{
           fontFamily,
-          fontSize: 11,
-          color: COLORS.textSubtle,
+          fontSize: 13,
+          color: COLORS.textMuted,
           width: 40,
           flexShrink: 0,
         }}
@@ -384,7 +384,7 @@ const FeedItem: React.FC<{
       <span
         style={{
           fontFamily,
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 600,
           color: COLORS.text,
           flex: 1,
@@ -397,7 +397,7 @@ const FeedItem: React.FC<{
       <span
         style={{
           fontFamily,
-          fontSize: 11,
+          fontSize: 13,
           color: COLORS.textMuted,
           overflow: "hidden",
           textOverflow: "ellipsis",

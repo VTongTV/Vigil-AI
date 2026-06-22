@@ -77,7 +77,7 @@ export const ViolationTypes: React.FC = () => {
         <div
           style={{
             fontFamily,
-            fontSize: 14,
+            fontSize: 18,
             fontWeight: 600,
             color: COLORS.primary,
             letterSpacing: "0.25em",
@@ -171,7 +171,7 @@ const ViolationCard: React.FC<{
         backgroundColor: COLORS.bgCard,
         border: `1px solid rgba(6,182,212,${glow * 0.3})`,
         borderRadius: 14,
-        padding: "22px 18px",
+        padding: "12px 16px",
         opacity,
         transform: transforms(
           `translateY(${translateY + cardFloat}px)`,
@@ -221,7 +221,7 @@ const ViolationCard: React.FC<{
         <div
           style={{
             fontFamily,
-            fontSize: 14,
+            fontSize: 18,
             fontWeight: 600,
             color: COLORS.text,
           }}
@@ -242,8 +242,8 @@ const ViolationCard: React.FC<{
         <div
           style={{
             fontFamily,
-            fontSize: 11,
-            color: COLORS.textSubtle,
+            fontSize: 14,
+            color: COLORS.textMuted,
           }}
         >
           {violation.section}
@@ -251,7 +251,7 @@ const ViolationCard: React.FC<{
         <div
           style={{
             fontFamily,
-            fontSize: 13,
+            fontSize: 16,
             fontWeight: 700,
             color: severityColor,
           }}
@@ -270,9 +270,9 @@ const ViolationCard: React.FC<{
         <span
           style={{
             fontFamily,
-            fontSize: 10,
+            fontSize: 14,
             fontWeight: 600,
-            color: COLORS.textSubtle,
+            color: COLORS.textMuted,
             backgroundColor: COLORS.bgElevated,
             padding: "3px 8px",
             borderRadius: 4,
