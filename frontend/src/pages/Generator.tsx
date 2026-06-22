@@ -234,31 +234,42 @@ function ImageOutputPanel({
           )}
         </div>
         <div className="relative flex-1 rounded-lg overflow-hidden bg-[#0d1117] ring-1 ring-[var(--color-paper-3)]/40">
-          {!imgError ? (
-            <motion.div initial={prefersReduced ? {} : { opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }} className="relative">
-              <img src={preset.outputImage} alt={`Synthetic ${VIOLATION_LABELS[preset.violationType]} scenario`}
-                className="w-full h-auto max-h-[360px] object-contain" onError={() => setImgError(true)} />
-              {/* Detection overlay badge */}
-              <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-md bg-black/70 backdrop-blur-sm px-2.5 py-1.5 ring-1 ring-white/10">
-                <div className="h-2 w-2 rounded-full bg-[var(--color-danger)] animate-pulse" />
-                <span className="text-[11px] font-semibold text-white">{VIOLATION_LABELS[preset.violationType]} Detected</span>
+          {isActive ? (
+            !imgError ? (
+              <motion.div initial={prefersReduced ? {} : { opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }} className="relative">
+                <img src={preset.outputImage} alt={`Synthetic ${VIOLATION_LABELS[preset.violationType]} scenario`}
+                  className="w-full h-auto max-h-[360px] object-contain" onError={() => setImgError(true)} />
+                {/* Detection overlay badge */}
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-md bg-black/70 backdrop-blur-sm px-2.5 py-1.5 ring-1 ring-white/10">
+                  <div className="h-2 w-2 rounded-full bg-[var(--color-danger)] animate-pulse" />
+                  <span className="text-[11px] font-semibold text-white">{VIOLATION_LABELS[preset.violationType]} Detected</span>
+                </div>
+                {/* Verification badge */}
+                <div className="absolute bottom-3 right-3 rounded-md bg-black/70 backdrop-blur-sm px-2 py-1 ring-1 ring-white/10">
+                  <span className="text-[10px] font-mono tabular-nums text-[var(--color-success)]">synthetic · verified</span>
+                </div>
+                {/* Corner brackets */}
+                <div className="absolute top-2 left-2 h-5 w-5 border-t-2 border-l-2 border-[var(--color-success)]/60 rounded-tl" />
+                <div className="absolute top-2 right-2 h-5 w-5 border-t-2 border-r-2 border-[var(--color-success)]/60 rounded-tr" />
+                <div className="absolute bottom-2 left-2 h-5 w-5 border-b-2 border-l-2 border-[var(--color-success)]/60 rounded-bl" />
+                <div className="absolute bottom-2 right-2 h-5 w-5 border-b-2 border-r-2 border-[var(--color-success)]/60 rounded-br" />
+              </motion.div>
+            ) : (
+              <div className="flex h-[240px] items-center justify-center flex-col gap-2">
+                <Sparkles className="h-8 w-8 text-[var(--color-ink-faint)]" />
+                <p className="text-[12px] text-[var(--color-ink-faint)]">Demo image not available for this scenario</p>
+                <p className="text-[10px] text-[var(--color-ink-faint)] font-mono">{preset.outputImage}</p>
               </div>
-              {/* Verification badge */}
-              <div className="absolute bottom-3 right-3 rounded-md bg-black/70 backdrop-blur-sm px-2 py-1 ring-1 ring-white/10">
-                <span className="text-[10px] font-mono tabular-nums text-[var(--color-success)]">synthetic · verified</span>
-              </div>
-              {/* Corner brackets */}
-              <div className="absolute top-2 left-2 h-5 w-5 border-t-2 border-l-2 border-[var(--color-success)]/60 rounded-tl" />
-              <div className="absolute top-2 right-2 h-5 w-5 border-t-2 border-r-2 border-[var(--color-success)]/60 rounded-tr" />
-              <div className="absolute bottom-2 left-2 h-5 w-5 border-b-2 border-l-2 border-[var(--color-success)]/60 rounded-bl" />
-              <div className="absolute bottom-2 right-2 h-5 w-5 border-b-2 border-r-2 border-[var(--color-success)]/60 rounded-br" />
-            </motion.div>
+            )
           ) : (
-            <div className="flex h-[240px] items-center justify-center flex-col gap-2">
-              <Sparkles className="h-8 w-8 text-[var(--color-ink-faint)]" />
-              <p className="text-[12px] text-[var(--color-ink-faint)]">Demo image not available for this scenario</p>
-              <p className="text-[10px] text-[var(--color-ink-faint)] font-mono">{preset.outputImage}</p>
+            <div className="flex h-[240px] items-center justify-center flex-col gap-3">
+              <div className="relative">
+                <Layers className="h-8 w-8 text-[var(--color-ink-faint)]" />
+                <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-[var(--color-accent)]/60 animate-ping" />
+              </div>
+              <p className="text-[12px] text-[var(--color-ink-faint)]">Run pipeline to generate synthetic image</p>
+              <p className="text-[10px] text-[var(--color-ink-faint)]/60 italic">Diffusion model output will appear here</p>
             </div>
           )}
         </div>
