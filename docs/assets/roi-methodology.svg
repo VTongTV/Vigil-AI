@@ -1,0 +1,53 @@
+<svg width="780" height="260" viewBox="0 0 780 260" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="780" height="260" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="390" y="24" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#e2e8f0" letter-spacing="2">ROI METHODOLOGY -- CALCULATION BREAKDOWN</text>
+
+  <!-- Conservative column -->
+  <rect x="25" y="45" width="230" height="195" rx="8" fill="#1e1b4b" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="140" y="68" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#4ade80">CONSERVATIVE</text>
+  <text x="140" y="84" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">50% detection effectiveness</text>
+
+  <text x="40" y="108" font-family="monospace" font-size="8" fill="#94a3b8">500 junctions</text>
+  <text x="40" y="124" font-family="monospace" font-size="8" fill="#94a3b8">x 80 violations/day</text>
+  <text x="40" y="140" font-family="monospace" font-size="8" fill="#94a3b8">x 0.50 detection rate</text>
+  <text x="40" y="156" font-family="monospace" font-size="8" fill="#94a3b8">x Rs.500 avg fine</text>
+  <text x="40" y="172" font-family="monospace" font-size="8" fill="#94a3b8">x 30% compliance rate</text>
+  <text x="40" y="188" font-family="monospace" font-size="8" fill="#94a3b8">x 365 days</text>
+  <line x1="40" y1="198" x2="230" y2="198" stroke="#334155" stroke-width="1"/>
+  <text x="40" y="218" font-family="system-ui, sans-serif" font-weight="700" font-size="12" fill="#4ade80">Rs.219 Cr/year</text>
+  <text x="40" y="235" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">87x ROI (Year 1)</text>
+
+  <!-- Aggressive column -->
+  <rect x="275" y="45" width="230" height="195" rx="8" fill="#1e1b4b" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="390" y="68" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#fbbf24">AGGRESSIVE</text>
+  <text x="390" y="84" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">100% detection parity</text>
+
+  <text x="290" y="108" font-family="monospace" font-size="8" fill="#94a3b8">500 junctions</text>
+  <text x="290" y="124" font-family="monospace" font-size="8" fill="#94a3b8">x 80 violations/day</text>
+  <text x="290" y="140" font-family="monospace" font-size="8" fill="#94a3b8">x 1.00 detection rate</text>
+  <text x="290" y="156" font-family="monospace" font-size="8" fill="#94a3b8">x Rs.500 avg fine</text>
+  <text x="290" y="172" font-family="monospace" font-size="8" fill="#94a3b8">x 30% compliance rate</text>
+  <text x="290" y="188" font-family="monospace" font-size="8" fill="#94a3b8">x 365 days</text>
+  <line x1="290" y1="198" x2="480" y2="198" stroke="#334155" stroke-width="1"/>
+  <text x="290" y="218" font-family="system-ui, sans-serif" font-weight="700" font-size="12" fill="#fbbf24">Rs.438 Cr/year</text>
+  <text x="290" y="235" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">175x ROI (Year 1)</text>
+
+  <!-- Investment + Assumptions -->
+  <rect x="525" y="45" width="235" height="195" rx="8" fill="#1e1b4b" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="642" y="68" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#60a5fa">INVESTMENT</text>
+
+  <text x="540" y="96" font-family="system-ui, sans-serif" font-weight="600" font-size="9" fill="#94a3b8">Per Junction</text>
+  <text x="540" y="114" font-family="monospace" font-size="10" fill="#e2e8f0">Rs.50,000</text>
+  <text x="540" y="128" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Software + edge compute</text>
+
+  <text x="540" y="150" font-family="system-ui, sans-serif" font-weight="600" font-size="9" fill="#94a3b8">Total Investment</text>
+  <text x="540" y="168" font-family="monospace" font-size="10" fill="#e2e8f0">Rs.2.5 Cr</text>
+  <text x="540" y="182" font-family="system-ui, sans-serif" font-size="7" fill="#475569">500 junctions</text>
+
+  <line x1="540" y1="192" x2="740" y2="192" stroke="#334155" stroke-width="1"/>
+  <text x="540" y="210" font-family="system-ui, sans-serif" font-weight="600" font-size="9" fill="#94a3b8">Payback Period</text>
+  <text x="540" y="228" font-family="monospace" font-size="10" fill="#22c55e">&lt; 1 week</text>
+
+  <!-- Assumptions note -->
+  <text x="390" y="256" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Based on 30% fine compliance rate (BTP published data) and average Rs.500/violation | Silk Board: 200+ violations/peak hour</text>
+</svg>
