@@ -149,7 +149,14 @@ def main() -> None:
         elapsed = time.time() - t0
 
         vtypes = [v["type"] for v in violations]
-        detected = exp in vtypes
+        # When signal=red, red_light_violation is an acceptable match for
+        # stop_line_violation (they are the same infraction, dedup removes
+        # stop_line in favor of red_light).
+        signal_state = rl_cfg.get("signal_state", "unknown")
+        if exp == "stop_line_violation" and signal_state == "red" and "red_light_violation" in vtypes:
+            detected = True
+        else:
+            detected = exp in vtypes
         status = "PASS" if detected else "FAIL"
 
         if detected:
