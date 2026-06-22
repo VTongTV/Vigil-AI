@@ -38,7 +38,8 @@ function platformLabel(p: string): string { return p.charAt(0).toUpperCase() + p
 // ---------------------------------------------------------------------------
 // FeedCard sub-component
 // ---------------------------------------------------------------------------
-function FeedCard({ item, index, reduced }: { item: ScrapedFeedItem; index: number; reduced: boolean }) {
+function FeedCard({ item, index, reduced, onAnalyze }: { item: ScrapedFeedItem; index: number; reduced: boolean; onAnalyze: (id: string) => void }) {
+  const [analyzing, setAnalyzing] = useState(false);
   const platColor = PLATFORM_COLORS[item.platform] ?? "var(--color-accent)";
   const statusStyle = STATUS_STYLES[item.analysis_status] ?? STATUS_STYLES.pending;
   const isPending = item.analysis_status === "pending";
@@ -73,12 +74,16 @@ function FeedCard({ item, index, reduced }: { item: ScrapedFeedItem; index: numb
           </div>
           <div className="flex items-center gap-2 pt-1">
             {isPending ? (
-              <Button size="sm" className="flex-1 h-7 text-[11px] font-semibold bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent)]/90">
-                <Search className="mr-1.5 h-3 w-3" />Analyze
+              <Button size="sm" disabled={analyzing}
+                onClick={() => { setAnalyzing(true); onAnalyze(item.id); }}
+                className="flex-1 h-7 text-[11px] font-semibold bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent)]/90">
+                {analyzing ? <Loader2 className="mr-1.5 h-3 w-3 animate-spin" /> : <Search className="mr-1.5 h-3 w-3" />}
+                {analyzing ? "Analyzing..." : "Analyze"}
               </Button>
             ) : (
-              <Button size="sm" variant="outline" className="flex-1 h-7 text-[11px] font-semibold border-[var(--color-success)]/30 text-[var(--color-success)] hover:bg-[var(--color-success)]/10">
-                <CheckCircle2 className="mr-1.5 h-3 w-3" />View Results
+              <Button size="sm" variant="outline" asChild
+                className="flex-1 h-7 text-[11px] font-semibold border-[var(--color-success)]/30 text-[var(--color-success)] hover:bg-[var(--color-success)]/10">
+                <a href="/dashboard/violations"><CheckCircle2 className="mr-1.5 h-3 w-3" />View Results</a>
               </Button>
             )}
             <a href={item.source_url} target="_blank" rel="noopener noreferrer"
@@ -105,6 +110,16 @@ export default function Scraper() {
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "analyzed">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  /** Mark a scraped item as analyzed (simulated). */
+  const handleAnalyze = useCallback((id: string) => {
+    setTimeout(() => {
+      setFeed((prev) => {
+        if (!prev) return prev;
+        return { ...prev, items: prev.items.map((it) => it.id === id ? { ...it, analysis_status: "analyzed" as const } : it) };
+      });
+    }, 2000);
+  }, []);
 
   const fetchFeed = useCallback(async () => {
     try { const data = await getScraperFeed(); setFeed(data); setError(null); }
@@ -234,7 +249,7 @@ export default function Scraper() {
           <motion.div key="feed" initial={prefersReduced ? {} : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredItems.map((item, idx) => (
-              <FeedCard key={item.id} item={item} index={idx} reduced={!!prefersReduced} />
+              <FeedCard key={item.id} item={item} index={idx} reduced={!!prefersReduced} onAnalyze={handleAnalyze} />
             ))}
           </motion.div>
         )}
