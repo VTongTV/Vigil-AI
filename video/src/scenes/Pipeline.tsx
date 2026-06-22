@@ -153,7 +153,7 @@ export const Pipeline: React.FC = () => {
           }}
         >
           {PIPELINE_STAGES.map((step: typeof PIPELINE_STAGES[number], i: number) => {
-            const delay = stagger(i, 12) + 30;
+            const delay = stagger(i, 10) + 30;
 
             return (
               <React.Fragment key={i}>
@@ -171,7 +171,7 @@ export const Pipeline: React.FC = () => {
                     frame={frame}
                     fps={fps}
                     flowProgress={flowProgress}
-                    delay={delay + 10}
+                    delay={delay + 8}
                   />
                 )}
               </React.Fragment>
@@ -229,7 +229,7 @@ const PipelineStep: React.FC<{
   return (
     <div
       style={{
-        width: 140,
+        width: 120,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -243,8 +243,8 @@ const PipelineStep: React.FC<{
       {/* Card */}
       <div
         style={{
-          width: 120,
-          height: 120,
+          width: 105,
+          height: 105,
           backgroundColor: COLORS.bgCard,
           border: `1px solid rgba(6,182,212,${glow * 0.4})`,
           borderRadius: 16,
@@ -270,7 +270,7 @@ const PipelineStep: React.FC<{
 
         {/* Icon */}
         <div style={{ transform: `scale(${iconPulse})` }}>
-          <Icon name={step.icon} size={28} color={COLORS.primary} />
+          <Icon name={step.icon} size={24} color={COLORS.primary} />
         </div>
 
         {/* Step number */}
@@ -292,10 +292,10 @@ const PipelineStep: React.FC<{
       <div
         style={{
           fontFamily,
-          fontSize: 16,
+          fontSize: 14,
           fontWeight: 500,
           color: COLORS.textMuted,
-          marginTop: 12,
+          marginTop: 10,
           textAlign: "center",
           lineHeight: 1.3,
         }}
@@ -329,12 +329,12 @@ const ConnectorArrow: React.FC<{
         display: "flex",
         alignItems: "center",
         opacity,
-        margin: "0 4px",
+        margin: "0 2px",
       }}
     >
       <div
         style={{
-          width: 32,
+          width: 24,
           height: 2,
           backgroundColor: isActive ? COLORS.primary : COLORS.border,
           borderRadius: 1,
