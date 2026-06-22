@@ -358,3 +358,156 @@ export function springProgress(
 ): number {
   return spring({ frame, fps, delay, config });
 }
+
+/* ═══════════════════════════ Idle Motion (Always Alive) ═══════════════════════════ */
+
+/**
+ * Idle float — sine-wave vertical drift that keeps elements alive
+ * after their spring entrance settles.
+ *
+ * Apply by adding to the element's translateY:
+ *   const y = interpolate(springProgress, [0, 1], [30, 0]) + idleFloat(frame, phase);
+ *
+ * Args:
+ *   frame: Current frame from useCurrentFrame().
+ *   speed: Oscillation speed. 0.05 = ~2s period at 60fps. Default 0.05.
+ *   amplitude: Max pixels of drift. 3-5px is subtle, 8+px is noticeable. Default 3.
+ *   phase: Phase offset — use elementIndex * 0.5 to desync. Default 0.
+ */
+export function idleFloat(
+  frame: number,
+  speed: number = 0.05,
+  amplitude: number = 3,
+  phase: number = 0,
+): number {
+  return Math.sin(frame * speed + phase) * amplitude;
+}
+
+/**
+ * Idle breathe — subtle scale oscillation that creates a "breathing" effect.
+ * Returns a multiplier centered around 1.0.
+ *
+ * Apply as a scale multiplier:
+ *   const scale = entranceScale * idleBreathe(frame);
+ *
+ * Args:
+ *   frame: Current frame from useCurrentFrame().
+ *   speed: Oscillation speed. Default 0.04.
+ *   amplitude: Scale deviation. 0.005 = ±0.5%, barely visible. 0.01 = ±1%. Default 0.006.
+ */
+export function idleBreathe(
+  frame: number,
+  speed: number = 0.04,
+  amplitude: number = 0.006,
+): number {
+  return 1 + Math.sin(frame * speed) * amplitude;
+}
+
+/**
+ * Idle horizontal drift — slow sine-wave X movement.
+ * Use alongside idleFloat for 2D wandering motion.
+ */
+export function idleDrift(
+  frame: number,
+  speed: number = 0.03,
+  amplitude: number = 2,
+  phase: number = 0,
+): number {
+  return Math.cos(frame * speed + phase) * amplitude;
+}
+
+/* ═══════════════════════════ Ken Burns (Image Zoom) ═══════════════════════════ */
+
+/**
+ * Ken Burns effect — slow, imperceptible zoom + pan for images.
+ * Apple never zooms more than 3%; this defaults to 2%.
+ *
+ * Usage on an image wrapper div:
+ *   const kb = kenBurns(frame, TOTAL_FRAMES);
+ *   style={{ transform: `scale(${kb.scale}) translate(${kb.x}px, ${kb.y}px)` }}
+ *
+ * Args:
+ *   frame: Current frame.
+ *   totalFrames: Scene duration in frames.
+ *   zoomTarget: Final scale. 1.02 = 2% zoom. Max 1.03. Default 1.02.
+ *   panX: Max horizontal pan in px. Default 6.
+ *   panY: Max vertical pan in px. Default 3.
+ */
+export function kenBurns(
+  frame: number,
+  totalFrames: number,
+  zoomTarget: number = 1.02,
+  panX: number = 6,
+  panY: number = 3,
+): { scale: number; x: number; y: number } {
+  const t = interpolate(frame, [0, totalFrames], [0, 1], {
+    extrapolateRight: "clamp",
+  });
+  return {
+    scale: interpolate(t, [0, 1], [1, zoomTarget]),
+    x: interpolate(t, [0, 1], [0, -panX]),
+    y: interpolate(t, [0, 1], [0, -panY]),
+  };
+}
+
+/* ═══════════════════════════ Scene Exit ═══════════════════════════ */
+
+/**
+ * Scene exit animation — fade + slide-up in the last N frames.
+ *
+ * Wrap the scene's content in a div with:
+ *   const exit = sceneExit(frame, TOTAL_FRAMES, 18);
+ *   style={{ opacity: exit.opacity, transform: `translateY(${exit.translateY}px)` }}
+ *
+ * Args:
+ *   frame: Current frame.
+ *   totalFrames: Scene duration in frames.
+ *   exitDuration: Frames before end to start exit. Default 18.
+ */
+export function sceneExit(
+  frame: number,
+  totalFrames: number,
+  exitDuration: number = 18,
+): { opacity: number; translateY: number } {
+  const exitStart = totalFrames - exitDuration;
+  if (frame < exitStart) return { opacity: 1, translateY: 0 };
+  const progress = interpolate(frame, [exitStart, totalFrames], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return {
+    opacity: interpolate(progress, [0, 1], [1, 0]),
+    translateY: interpolate(progress, [0, 1], [0, -15]),
+  };
+}
+
+/* ═══════════════════════════ Parallax Drift ═══════════════════════════ */
+
+/**
+ * Parallax drift — slow orbital movement for background layers.
+ * Different layers with different speeds create depth illusion.
+ *
+ * Usage:
+ *   const bg1 = parallaxDrift(frame, TOTAL_FRAMES, 1, 15, 10);
+ *   const bg2 = parallaxDrift(frame, TOTAL_FRAMES, 0.5, 8, 5);
+ *
+ * Args:
+ *   frame: Current frame.
+ *   totalFrames: Scene duration.
+ *   speed: Multiplier for orbit speed. Default 1.
+ *   amplitudeX: Max horizontal drift in px. Default 15.
+ *   amplitudeY: Max vertical drift in px. Default 10.
+ */
+export function parallaxDrift(
+  frame: number,
+  totalFrames: number,
+  speed: number = 1,
+  amplitudeX: number = 15,
+  amplitudeY: number = 10,
+): { x: number; y: number } {
+  const t = (frame / totalFrames) * Math.PI * 2 * speed;
+  return {
+    x: Math.sin(t) * amplitudeX,
+    y: Math.cos(t * 0.7) * amplitudeY,
+  };
+}

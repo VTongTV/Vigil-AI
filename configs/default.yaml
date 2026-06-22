@@ -54,6 +54,7 @@ violations:
   helmet:
     head_fraction: 0.3
     iou_threshold: 0.3
+    helmet_min_confidence: 0.35
   triple_riding:
     max_riders: 2
     horizontal_center_threshold: 0.25
@@ -118,16 +119,16 @@ violations:
     - id: park_mgroad
       camera_id: MGROAD-01
       name: No Parking - Bus Stop
-      # Center-right curb parking zone
+      # Right-side curb area only (narrow strip at edge of road)
       polygon:
-      - - 0.35
-        - 0.45
-      - - 0.7
-        - 0.45
-      - - 0.7
-        - 0.75
-      - - 0.35
-        - 0.75
+      - - 0.70
+        - 0.35
+      - - 0.95
+        - 0.35
+      - - 0.95
+        - 0.70
+      - - 0.70
+        - 0.70
     - id: park_silkboard
       camera_id: SILKBOARD-01
       name: No Parking - Service Road
@@ -167,12 +168,60 @@ violations:
         - 0.70
     - id: stop_krpuram
       camera_id: KRPURAM-01
-      # Band across intersection — vehicles past stop line at y≈0.15-0.50
+      # Narrow band at intersection stop line (y 0.25–0.38 only)
       polygon:
       - - 0.1
-        - 0.1
+        - 0.25
       - - 0.9
-        - 0.1
+        - 0.25
+      - - 0.9
+        - 0.38
+      - - 0.1
+        - 0.38
+    - id: stop_yelahanka
+      camera_id: YELAHANKA-01
+      # Narrow band at intersection stop line (y 0.40–0.52 only)
+      polygon:
+      - - 0.1
+        - 0.40
+      - - 0.95
+        - 0.40
+      - - 0.95
+        - 0.52
+      - - 0.1
+        - 0.52
+    - id: stop_hebbal
+      camera_id: HEBBAL-01
+      # Narrow band at intersection stop line (y 0.55–0.65 only)
+      polygon:
+      - - 0.1
+        - 0.55
+      - - 0.9
+        - 0.55
+      - - 0.9
+        - 0.65
+      - - 0.1
+        - 0.65
+    - id: stop_mgroad
+      camera_id: MGROAD-01
+      # Narrow band at intersection stop line (y 0.50–0.60 only)
+      polygon:
+      - - 0.1
+        - 0.50
+      - - 0.9
+        - 0.50
+      - - 0.9
+        - 0.60
+      - - 0.1
+        - 0.60
+    - id: stop_silkboard
+      camera_id: SILKBOARD-01
+      # Narrow band at intersection stop line (y 0.45–0.55 only)
+      polygon:
+      - - 0.1
+        - 0.45
+      - - 0.9
+        - 0.45
       - - 0.9
         - 0.55
       - - 0.1
@@ -181,7 +230,7 @@ violations:
     confidence_discount: 0.75
   red_light:
     enabled: true
-    signal_state: unknown
+    signal_state: red
     confidence_discount: 0.8
 ocr:
   engine: rapidocr

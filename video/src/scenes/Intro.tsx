@@ -19,6 +19,10 @@ import {
   CONFIG_BOUNCY,
   CONFIG_SMOOTH,
   CONFIG_GENTLE,
+  idleFloat,
+  idleBreathe,
+  idleDrift,
+  sceneExit,
 } from "../animations";
 import { AnimatedBackground } from "../AnimatedBackground";
 import { Icon } from "../Icon";
@@ -44,6 +48,9 @@ export const Intro: React.FC = () => {
   // Camera slow drift
   const zoom = cameraZoom(frame, TOTAL_FRAMES, 1.03);
 
+  // Scene exit
+  const exit = sceneExit(frame, TOTAL_FRAMES, 18);
+
   // Logo spring entrance
   const logoProgress = spring({ frame, fps, delay: 10, config: CONFIG_BOUNCY });
   const logoScale = interpolate(logoProgress, [0, 1], [0.3, 1]);
@@ -66,6 +73,11 @@ export const Intro: React.FC = () => {
   const tagOp = interpolate(tagProgress, [0, 1], [0, 1]);
   const tagY = interpolate(tagProgress, [0, 1], [12, 0]);
 
+  // Idle motions
+  const titleIdle = idleFloat(frame, 0.045, 3, 0);
+  const tagIdle = idleFloat(frame, 0.04, 2, 1.0);
+  const logoBreathe = idleBreathe(frame, 0.03, 0.005);
+
   // Features entrance (staggered)
   const featureLabels = ["AI-Powered Detection", "Real-Time Evidence", "Court-Admissible"];
 
@@ -86,11 +98,12 @@ export const Intro: React.FC = () => {
         style={{
           position: "absolute",
           inset: 0,
-          transform: `scale(${zoom})`,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
+          opacity: exit.opacity,
+          transform: `scale(${zoom}) translateY(${exit.translateY}px)`,
         }}
       >
         {/* Rotating particle ring */}
@@ -135,7 +148,7 @@ export const Intro: React.FC = () => {
         <div
           style={{
             opacity: logoOp,
-            transform: `scale(${logoScale})`,
+            transform: `scale(${logoScale * logoBreathe})`,
             position: "relative",
             zIndex: 2,
           }}
@@ -180,7 +193,7 @@ export const Intro: React.FC = () => {
             color: COLORS.text,
             letterSpacing: "-0.03em",
             opacity: titleOp,
-            transform: `translateY(${titleY}px)`,
+            transform: `translateY(${titleY + titleIdle}px)`,
             marginTop: 28,
           }}
         >
@@ -197,7 +210,7 @@ export const Intro: React.FC = () => {
             color: COLORS.textMuted,
             letterSpacing: "0.12em",
             opacity: tagOp,
-            transform: `translateY(${tagY}px)`,
+            transform: `translateY(${tagY + tagIdle}px)`,
             marginTop: 12,
             textTransform: "uppercase" as const,
           }}
@@ -222,6 +235,7 @@ export const Intro: React.FC = () => {
             });
             const fop = interpolate(fp, [0, 1], [0, 1]);
             const fy = interpolate(fp, [0, 1], [15, 0]);
+            const pillIdle = idleFloat(frame, 0.04, 1.5, i * 0.7);
 
             return (
               <div
@@ -236,7 +250,7 @@ export const Intro: React.FC = () => {
                   borderRadius: 20,
                   padding: "8px 20px",
                   opacity: fop,
-                  transform: `translateY(${fy}px)`,
+                  transform: `translateY(${fy + pillIdle}px)`,
                   letterSpacing: "0.04em",
                 }}
               >

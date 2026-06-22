@@ -5,6 +5,7 @@
  */
 
 import { Routes, Route } from "react-router-dom";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Upload from "./pages/Upload";
@@ -22,25 +23,27 @@ import LandingPage from "./landing/LandingPage";
 
 export default function App() {
   return (
-    <Routes>
-      {/* Landing page at root */}
-      <Route path="/" element={<LandingPage />} />
+    <ErrorBoundary>
+      <Routes>
+        {/* Landing page at root */}
+        <Route path="/" element={<LandingPage />} />
 
-      {/* App pages nested under shared Layout, all under /dashboard prefix */}
-      <Route path="/dashboard" element={<Layout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="upload" element={<Upload />} />
-        <Route path="violations" element={<Violations />} />
-        <Route path="evidence" element={<Evidence />} />
-        <Route path="analytics" element={<Analytics />} />
-        <Route path="map" element={<Map />} />
-        <Route path="video" element={<Video />} />
-        <Route path="citizen" element={<Citizen />} />
-        <Route path="tracking" element={<Tracking />} />
-        <Route path="deepfake" element={<Deepfake />} />
-        <Route path="generator" element={<Generator />} />
-        <Route path="scraper" element={<Scraper />} />
-      </Route>
-    </Routes>
+        {/* App pages nested under shared Layout, all under /dashboard prefix */}
+        <Route path="/dashboard" element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="upload" element={<Upload />} />
+          <Route path="violations" element={<Violations />} />
+          <Route path="evidence" element={<Evidence />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="map" element={<Map />} />
+          <Route path="video" element={<Video />} />
+          <Route path="citizen" element={<Citizen />} />
+          <Route path="tracking" element={<Tracking />} />
+          <Route path="deepfake" element={<Deepfake />} />
+          <Route path="generator" element={<Generator />} />
+          <Route path="scraper" element={<Scraper />} />
+        </Route>
+      </Routes>
+    </ErrorBoundary>
   );
 }

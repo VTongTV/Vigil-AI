@@ -19,6 +19,9 @@ import {
   slowRotate,
   linearProgress,
   transforms,
+  idleFloat,
+  idleBreathe,
+  sceneExit,
   CONFIG_SNAPPY,
   CONFIG_SMOOTH,
   CONFIG_BOUNCY,
@@ -73,6 +76,16 @@ export const Impact: React.FC = () => {
   const brandProgress = spring({ frame, fps, delay: Math.round(7 * fps), config: CONFIG_SMOOTH });
   const brandOp = interpolate(brandProgress, [0, 1], [0, 1]);
 
+  // Scene exit
+  const exit = sceneExit(frame, TOTAL_FRAMES, 18);
+
+  // Idle motion
+  const labelIdle = idleFloat(frame, 0.035, 1.5, 0);
+  const titleIdle = idleFloat(frame, 0.04, 2.5, 0.5);
+  const ctaIdle = idleFloat(frame, 0.04, 1.5, 2.0);
+  const brandIdle = idleFloat(frame, 0.03, 1, 3.0);
+  const accentShimmer = idleFloat(frame, 0.02, 0.15, 0);
+
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
       {/* Animated background — more particles for closing */}
@@ -87,6 +100,8 @@ export const Impact: React.FC = () => {
           alignItems: "center",
           justifyContent: "center",
           padding: "50px 60px",
+          opacity: exit.opacity,
+          transform: `translateY(${exit.translateY}px)`,
         }}
       >
         {/* Section label */}
@@ -103,6 +118,7 @@ export const Impact: React.FC = () => {
             display: "flex",
             alignItems: "center",
             gap: 10,
+            transform: `translateY(${labelIdle}px)`,
           }}
         >
           <div style={{ width: 20, height: 1, backgroundColor: COLORS.primary }} />
@@ -119,7 +135,7 @@ export const Impact: React.FC = () => {
             color: COLORS.text,
             textAlign: "center",
             opacity: titleOp,
-            transform: `translateY(${titleY}px)`,
+            transform: `translateY(${titleY + titleIdle}px)`,
             marginBottom: 60,
           }}
         >
@@ -153,6 +169,7 @@ export const Impact: React.FC = () => {
           style={{
             opacity: ctaOp,
             transform: transforms(
+              `translateY(${ctaIdle}px)`,
               `scale(${ctaScale * ctaPulse})`,
             ),
           }}
@@ -177,11 +194,12 @@ export const Impact: React.FC = () => {
         {/* Brand */}
         <div
           style={{
-            marginTop: 30,
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            opacity: brandOp,
+          marginTop: 30,
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          opacity: brandOp,
+          transform: `translateY(${brandIdle}px)`,
           }}
         >
           <Icon name="shield" size={20} color={COLORS.primary} />
@@ -224,7 +242,7 @@ export const Impact: React.FC = () => {
           style={{
             height: "100%",
             background: `linear-gradient(90deg, ${COLORS.primary}, ${COLORS.secondary}, ${COLORS.primary})`,
-            opacity: 0.6,
+            opacity: 0.6 + accentShimmer,
           }}
         />
       </div>
@@ -250,6 +268,7 @@ const MetricCard: React.FC<{
   const shimmerPos = shimmerPosition(frame, 200, delay + 30);
   const glow = borderGlow(frame, 0.02 + index * 0.003);
   const iconPulse = pulse(frame, 0.03, 0.05, 1);
+  const cardBreathe = idleBreathe(frame, 0.03 + index * 0.003, 0.004);
 
   // Counter animation
   const counterProgress = linearProgress(frame, delay, delay + 80);
@@ -269,6 +288,7 @@ const MetricCard: React.FC<{
         opacity,
         transform: transforms(
           `translateY(${translateY + cardFloat}px)`,
+          `scale(${cardBreathe})`,
         ),
         position: "relative",
         overflow: "hidden",

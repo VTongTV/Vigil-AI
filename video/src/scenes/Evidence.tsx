@@ -20,6 +20,10 @@ import {
   linearProgress,
   glowOp,
   transforms,
+  idleFloat,
+  idleBreathe,
+  kenBurns,
+  sceneExit,
   CONFIG_SNAPPY,
   CONFIG_SMOOTH,
   CONFIG_BOUNCY,
@@ -76,6 +80,17 @@ export const Evidence: React.FC = () => {
   const imgOp = interpolate(imgProgress, [0, 1], [0, 1]);
   const imgScale = interpolate(imgProgress, [0.3, 1], [0.9, 1]);
 
+  // Scene exit
+  const exit = sceneExit(frame, TOTAL_FRAMES, 18);
+
+  // Idle motion
+  const labelIdle = idleFloat(frame, 0.035, 1.5, 0);
+  const titleIdle = idleFloat(frame, 0.04, 2, 0.5);
+  const hashIdle = idleFloat(frame, 0.035, 1.5, 2.0);
+
+  // Ken Burns for evidence image
+  const kb = kenBurns(frame, TOTAL_FRAMES, 1.02, 4, 2);
+
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
       {/* Animated background */}
@@ -90,6 +105,8 @@ export const Evidence: React.FC = () => {
           alignItems: "center",
           justifyContent: "center",
           padding: "50px 60px",
+          opacity: exit.opacity,
+          transform: `translateY(${exit.translateY}px)`,
         }}
       >
         {/* Section label */}
@@ -106,6 +123,7 @@ export const Evidence: React.FC = () => {
             display: "flex",
             alignItems: "center",
             gap: 10,
+            transform: `translateY(${labelIdle}px)`,
           }}
         >
           <div style={{ width: 20, height: 1, backgroundColor: COLORS.warning }} />
@@ -122,7 +140,7 @@ export const Evidence: React.FC = () => {
             color: COLORS.text,
             textAlign: "center",
             opacity: titleOp,
-            transform: `translateY(${titleY}px)`,
+            transform: `translateY(${titleY + titleIdle}px)`,
             marginBottom: 40,
           }}
         >
@@ -170,15 +188,22 @@ export const Evidence: React.FC = () => {
             }}
           >
             {/* Demo image */}
-            <Img
-              src={staticFile("demo/demo_triple_riding_whitefield-01.jpg")}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                filter: "brightness(0.8) contrast(1.05)",
-              }}
-            />
+            <div style={{
+              position: "absolute",
+              inset: 0,
+              transform: `scale(${kb.scale}) translate(${kb.x}px, ${kb.y}px)`,
+              transformOrigin: "center center",
+            }}>
+              <Img
+                src={staticFile("demo/demo_triple_riding_whitefield-01.jpg")}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  filter: "brightness(0.8) contrast(1.05)",
+                }}
+              />
+            </div>
 
             {/* Overlay with violation annotations */}
             <div
@@ -275,6 +300,7 @@ export const Evidence: React.FC = () => {
             alignItems: "center",
             gap: 12,
             opacity: hashOp,
+            transform: `translateY(${hashIdle}px)`,
           }}
         >
           <Icon name="hash" size={16} color={COLORS.textSubtle} />
@@ -330,6 +356,7 @@ const ChainNode: React.FC<{
 
   const nodePulse = isActive ? pulse(frame, 0.04, 0.06, 1) : 1;
   const nodeFloat = floatY(frame, 0.012 + index * 0.002, 1.5, index * 0.5);
+  const nodeBreathe = idleBreathe(frame, 0.03 + index * 0.005, 0.005);
 
   return (
     <div
@@ -355,7 +382,7 @@ const ChainNode: React.FC<{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          transform: `scale(${nodePulse})`,
+          transform: `scale(${nodePulse * nodeBreathe})`,
           boxShadow: isActive ? `0 0 12px ${COLORS.primaryGlow}` : "none",
           transition: "none",
         }}

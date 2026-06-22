@@ -19,6 +19,10 @@ import {
   transforms,
   CONFIG_SMOOTH,
   CONFIG_BOUNCY,
+  idleFloat,
+  idleBreathe,
+  idleDrift,
+  sceneExit,
 } from "../animations";
 import { AnimatedBackground } from "../AnimatedBackground";
 import { loadFont } from "@remotion/google-fonts/Inter";
@@ -41,6 +45,9 @@ export const ColdOpen: React.FC = () => {
 
   // Camera slow zoom
   const zoom = cameraZoom(frame, TOTAL_FRAMES, 1.06);
+
+  // Scene exit
+  const exit = sceneExit(frame, TOTAL_FRAMES, 18);
 
   // Line 1 typewriter
   const line1Full = "Every 4 minutes,";
@@ -76,6 +83,9 @@ export const ColdOpen: React.FC = () => {
   const subtitleOp = interpolate(subtitleProgress, [0, 1], [0, 1]);
   const subtitleY = interpolate(subtitleProgress, [0, 1], [12, 0]);
 
+  // Subtitle idle float
+  const subtitleIdle = idleFloat(frame, 0.04, 2, 1.5);
+
   // Counter highlight line — draws across bottom
   const accentProgress = interpolate(frame, [Math.round(0.5 * fps), Math.round(2.5 * fps)], [0, 1], {
     extrapolateLeft: "clamp",
@@ -92,6 +102,12 @@ export const ColdOpen: React.FC = () => {
   const bracketProgress = spring({ frame, fps, delay: Math.round(0.3 * fps), config: CONFIG_SMOOTH });
   const bracketOp = interpolate(bracketProgress, [0, 1], [0, 0.25]);
 
+  // Idle motion for brackets
+  const bracketIdle = idleFloat(frame, 0.03, 2, 0.5);
+
+  // Idle breathe for text content
+  const textBreathe = idleBreathe(frame, 0.03, 0.004);
+
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
       {/* Animated background */}
@@ -102,10 +118,11 @@ export const ColdOpen: React.FC = () => {
         style={{
           position: "absolute",
           inset: 0,
-          transform: `scale(${zoom})`,
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          opacity: exit.opacity,
+          transform: `scale(${zoom}) translateY(${exit.translateY}px)`,
         }}
       >
         {/* Large floating "4" in background */}
@@ -130,7 +147,7 @@ export const ColdOpen: React.FC = () => {
         </div>
 
         {/* Text content */}
-        <div style={{ position: "relative", zIndex: 2, textAlign: "center" }}>
+        <div style={{ position: "relative", zIndex: 2, textAlign: "center", transform: `scale(${textBreathe})` }}>
           {/* Line 1 */}
           <div
             style={{
@@ -194,7 +211,7 @@ export const ColdOpen: React.FC = () => {
               fontWeight: 400,
               color: COLORS.textSubtle,
               opacity: subtitleOp,
-              transform: `translateY(${subtitleY}px)`,
+              transform: `translateY(${subtitleY + subtitleIdle}px)`,
               marginTop: 36,
               letterSpacing: "0.14em",
               textTransform: "uppercase" as const,
@@ -207,14 +224,14 @@ export const ColdOpen: React.FC = () => {
 
       {/* Decorative corner brackets */}
       {/* Top-left */}
-      <div style={{ position: "absolute", top: 40, left: 40, opacity: bracketOp }}>
+      <div style={{ position: "absolute", top: 40, left: 40, opacity: bracketOp, transform: `translateY(${bracketIdle}px)` }}>
         <svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke={COLORS.primary} strokeWidth="1.5">
           <line x1="0" y1="30" x2="0" y2="0" />
           <line x1="0" y1="0" x2="30" y2="0" />
         </svg>
       </div>
       {/* Bottom-right */}
-      <div style={{ position: "absolute", bottom: 40, right: 40, opacity: bracketOp }}>
+      <div style={{ position: "absolute", bottom: 40, right: 40, opacity: bracketOp, transform: `translateY(${bracketIdle}px)` }}>
         <svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke={COLORS.primary} strokeWidth="1.5">
           <line x1="30" y1="0" x2="30" y2="30" />
           <line x1="30" y1="30" x2="0" y2="30" />

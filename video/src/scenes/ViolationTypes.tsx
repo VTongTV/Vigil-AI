@@ -19,6 +19,9 @@ import {
   CONFIG_SNAPPY,
   CONFIG_SMOOTH,
   CONFIG_BOUNCY,
+  idleFloat,
+  idleBreathe,
+  sceneExit,
 } from "../animations";
 import { AnimatedBackground } from "../AnimatedBackground";
 import { Icon } from "../Icon";
@@ -57,6 +60,13 @@ export const ViolationTypes: React.FC = () => {
   const titleOp = interpolate(titleProgress, [0, 1], [0, 1]);
   const titleY = interpolate(titleProgress, [0, 1], [20, 0]);
 
+  // Idle motion
+  const labelIdle = idleFloat(frame, 0.035, 1.5, 0);
+  const titleIdle = idleFloat(frame, 0.04, 2, 0.5);
+
+  // Scene exit
+  const exit = sceneExit(frame, TOTAL_FRAMES, 18);
+
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
       {/* Animated background */}
@@ -71,6 +81,8 @@ export const ViolationTypes: React.FC = () => {
           alignItems: "center",
           justifyContent: "center",
           padding: "50px 60px",
+          opacity: exit.opacity,
+          transform: `translateY(${exit.translateY}px)`,
         }}
       >
         {/* Section label */}
@@ -83,6 +95,7 @@ export const ViolationTypes: React.FC = () => {
             letterSpacing: "0.25em",
             textTransform: "uppercase" as const,
             opacity: labelOp,
+            transform: `translateY(${labelIdle}px)`,
             marginBottom: 16,
             display: "flex",
             alignItems: "center",
@@ -103,7 +116,7 @@ export const ViolationTypes: React.FC = () => {
             color: COLORS.text,
             textAlign: "center",
             opacity: titleOp,
-            transform: `translateY(${titleY}px)`,
+            transform: `translateY(${titleY + titleIdle}px)`,
             marginBottom: 50,
           }}
         >
@@ -155,6 +168,7 @@ const ViolationCard: React.FC<{
   const shimmerPos = shimmerPosition(frame, 200, delay + 30);
   const glow = borderGlow(frame, 0.02 + index * 0.003);
   const iconPulse = pulse(frame, 0.03 + index * 0.003, 0.05, 1);
+  const cardBreathe = idleBreathe(frame, 0.03 + index * 0.003, 0.004);
 
   // Severity color based on fine string
   const severityColor =
@@ -175,7 +189,7 @@ const ViolationCard: React.FC<{
         opacity,
         transform: transforms(
           `translateY(${translateY + cardFloat}px)`,
-          `scale(${scale})`,
+          `scale(${scale * cardBreathe})`,
         ),
         position: "relative",
         overflow: "hidden",

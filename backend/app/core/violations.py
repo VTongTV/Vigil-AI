@@ -266,6 +266,8 @@ def detect_helmet_violations(
         # Check helmet overlap with head region
         has_no_helmet = False
         no_helmet_conf = 0.0
+        has_helmet = False
+        helmet_min_conf = cfg.get("helmet_min_confidence", 0.35)
 
         for h_det in helmet_boxes:
             h_bbox = h_det["bbox"]
@@ -279,8 +281,15 @@ def detect_helmet_violations(
                 if "no helmet" in h_class or "without" in h_class:
                     has_no_helmet = True
                     no_helmet_conf = max(no_helmet_conf, h_conf)
+                elif ("helmet" in h_class or "with" in h_class) and h_conf >= helmet_min_conf:
+                    # Only trust "With Helmet" above minimum confidence.
+                    # A low-confidence "With Helmet" (e.g. 0.23) is likely noise.
+                    has_helmet = True
 
-        # Determine violation (Positive-Only Flag)
+        # Determine violation using three-state logic:
+        # 1. Explicit no-helmet detection → high-confidence violation
+        # 2. No detection of ANY class overlapping head → inference-based violation
+        # 3. Valid "with helmet" detection → no violation
         if has_no_helmet:
             violations.append({
                 "type": "no_helmet",
@@ -289,6 +298,17 @@ def detect_helmet_violations(
                 "person_bbox": [p_bbox[0] / img_w, p_bbox[1] / img_h,
                                 p_bbox[2] / img_w, p_bbox[3] / img_h],
                 "confidence": no_helmet_conf,
+            })
+        elif not has_helmet:
+            # No helmet model output overlaps this person's head.
+            # Absence of helmet evidence → flag as violation with reduced confidence.
+            violations.append({
+                "type": "no_helmet",
+                "bbox": [p_bbox[0] / img_w, p_bbox[1] / img_h,
+                         p_bbox[2] / img_w, p_bbox[3] / img_h],
+                "person_bbox": [p_bbox[0] / img_w, p_bbox[1] / img_h,
+                                p_bbox[2] / img_w, p_bbox[3] / img_h],
+                "confidence": p_conf * 0.8,
             })
 
     return violations
@@ -430,6 +450,7 @@ def detect_illegal_parking(
     zone_polygons: list[dict],
     img_w: int,
     img_h: int,
+    stop_line_zones: Optional[list[dict]] = None,
 ) -> list[dict]:
     """Detect vehicles parked in no-parking zones.
 
@@ -438,6 +459,7 @@ def detect_illegal_parking(
         zone_polygons: Configured no-parking zone polygons.
         img_w: Image width in pixels.
         img_h: Image height in pixels.
+        stop_line_zones: Stop-line zones used to exclude vehicles queued at signals.
 
     Returns:
         List of violation dicts.
@@ -456,6 +478,19 @@ def detect_illegal_parking(
         bbox = vehicle["bbox"]
         cx_norm = ((bbox[0] + bbox[2]) / 2) / img_w
         cy_norm = ((bbox[1] + bbox[3]) / 2) / img_h
+
+        # Skip vehicles that are also in a stop-line zone — likely queued at signal
+        if stop_line_zones:
+            in_stop_zone = False
+            for sz in stop_line_zones:
+                sz_poly = sz.get("polygon", [])
+                front_cx = ((bbox[0] + bbox[2]) / 2) / img_w
+                front_cy = bbox[3] / img_h
+                if point_in_polygon(front_cx, front_cy, sz_poly):
+                    in_stop_zone = True
+                    break
+            if in_stop_zone:
+                continue
 
         for zone in zone_polygons:
             polygon = zone.get("polygon", [])
@@ -832,9 +867,11 @@ def detect_all_violations(
         all_violations.extend(wrong_side_violations)
 
     # P2: Illegal parking (if zone polygons configured)
+    # Pass stop_line_zones so vehicles queued at signals are excluded
     if no_parking_zones:
         parking_violations = detect_illegal_parking(
-            all_vehicles, no_parking_zones, img_w, img_h
+            all_vehicles, no_parking_zones, img_w, img_h,
+            stop_line_zones=stop_line_zones,
         )
         all_violations.extend(parking_violations)
 
@@ -846,18 +883,53 @@ def detect_all_violations(
         all_violations.extend(seatbelt_violations)
 
     # Heuristic: Stop-line violation (if zones configured)
+    stop_line_violations = []
     if stop_line_zones:
         stop_line_violations = detect_stop_line_violations(
             all_vehicles, stop_line_zones, img_w, img_h
         )
-        all_violations.extend(stop_line_violations)
 
     # Best-effort: Red-light violation (if signal is red and zones configured)
+    red_light_violations = []
     if stop_line_zones and signal_state == "red":
         red_light_violations = detect_red_light_violations(
             all_vehicles, stop_line_zones, signal_state, img_w, img_h
         )
-        all_violations.extend(red_light_violations)
+
+    # Dedup: When signal is red, red_light_violation supersedes stop_line_violation
+    # for the same vehicle — they represent the same infraction.
+    if red_light_violations:
+        rl_bboxes = set()
+        for rl in red_light_violations:
+            rl_bboxes.add(tuple(round(c, 3) for c in rl["bbox"]))
+        deduped_stop = []
+        for sl in stop_line_violations:
+            sl_key = tuple(round(c, 3) for c in sl["bbox"])
+            if sl_key not in rl_bboxes:
+                deduped_stop.append(sl)
+        stop_line_violations = deduped_stop
+
+    all_violations.extend(stop_line_violations)
+    all_violations.extend(red_light_violations)
+
+    # Cap violations per type per image to avoid unrealistic FP floods.
+    # When signal=red many vehicles may be in zone, but we only show the
+    # most confident ones.
+    max_per_type = 3
+    from collections import Counter
+    type_counts = Counter(v["type"] for v in all_violations)
+    capped = []
+    type_added = Counter()
+    for v in all_violations:
+        if type_added[v["type"]] < max_per_type:
+            capped.append(v)
+            type_added[v["type"]] += 1
+        else:
+            logger.debug(
+                "Capping violation type %s at %d (dropping conf=%.2f)",
+                v["type"], max_per_type, v.get("confidence", 0),
+            )
+    all_violations = capped
 
     logger.info(
         "Detected %d violations: %s",

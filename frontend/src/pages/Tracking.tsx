@@ -40,20 +40,29 @@ const cardVariants = {
 export default function Tracking() {
   const [data, setData] = useState<TrackingOverviewResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [countdown, setCountdown] = useState(REFRESH_MS / 1000);
   const demoMode = useAppStore((s) => s.demoMode);
   const prefersReduced = useReducedMotion() ?? false;
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const hasLoadedRef = useRef(false);
 
   const fetchOverview = useCallback(async () => {
     try {
+      setError(null);
       const result = await getTrackingOverview();
       setData(result);
+      hasLoadedRef.current = true;
       setLastRefresh(new Date());
       setCountdown(REFRESH_MS / 1000);
-    } catch { /* keep previous data */ }
+    } catch (err) {
+      if (!hasLoadedRef.current) {
+        setError(err instanceof Error ? err.message : "Failed to connect to tracking feed");
+      }
+      /* keep previous data on refresh failure */
+    }
     finally { setLoading(false); }
   }, [demoMode]);
 
@@ -74,6 +83,30 @@ export default function Tracking() {
         <div className="space-y-3 text-center">
           <div className="mx-auto h-8 w-8 rounded-full border-2 border-t-transparent border-[var(--color-accent)] animate-spin" />
           <p className="text-xs tracking-wider text-[var(--color-ink-faint)] uppercase">Connecting to tracking feed</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !data) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="space-y-4 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10">
+            <AlertTriangle className="h-6 w-6 text-red-400" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-[var(--color-ink)]">Connection Failed</p>
+            <p className="max-w-xs text-xs text-[var(--color-ink-faint)]">{error}</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { setLoading(true); setError(null); fetchOverview(); }}
+            className="gap-1.5"
+          >
+            <Radio className="h-3.5 w-3.5" />Retry Connection
+          </Button>
         </div>
       </div>
     );

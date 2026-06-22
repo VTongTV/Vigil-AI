@@ -17,6 +17,10 @@ import {
   pulse,
   glowOp,
   transforms,
+  idleFloat,
+  idleBreathe,
+  idleDrift,
+  sceneExit,
   CONFIG_SNAPPY,
   CONFIG_SMOOTH,
   CONFIG_BOUNCY,
@@ -72,6 +76,14 @@ export const Dashboard: React.FC = () => {
   const dashOp = interpolate(dashProgress, [0, 1], [0, 1]);
   const dashScale = interpolate(dashProgress, [0.5, 1], [0.97, 1]);
 
+  // Scene exit
+  const exit = sceneExit(frame, TOTAL_FRAMES, 18);
+
+  // Idle motion
+  const labelIdle = idleFloat(frame, 0.035, 1.5, 0);
+  const titleIdle = idleFloat(frame, 0.04, 2, 0.5);
+  const dashBreathe = idleBreathe(frame, 0.02, 0.002);
+
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
       {/* Animated background */}
@@ -86,6 +98,8 @@ export const Dashboard: React.FC = () => {
           alignItems: "center",
           justifyContent: "center",
           padding: "40px 50px",
+          opacity: exit.opacity,
+          transform: `translateY(${exit.translateY}px)`,
         }}
       >
         {/* Section label */}
@@ -102,6 +116,7 @@ export const Dashboard: React.FC = () => {
             display: "flex",
             alignItems: "center",
             gap: 10,
+            transform: `translateY(${labelIdle}px)`,
           }}
         >
           <div style={{ width: 20, height: 1, backgroundColor: COLORS.success }} />
@@ -117,7 +132,7 @@ export const Dashboard: React.FC = () => {
             fontWeight: 700,
             color: COLORS.text,
             opacity: titleOp,
-            transform: `translateY(${titleY}px)`,
+            transform: `translateY(${titleY + titleIdle}px)`,
             marginBottom: 30,
           }}
         >
@@ -133,7 +148,7 @@ export const Dashboard: React.FC = () => {
             borderRadius: 16,
             overflow: "hidden",
             opacity: dashOp,
-            transform: `scale(${dashScale})`,
+            transform: `scale(${dashScale * dashBreathe})`,
             boxShadow: `0 8px 40px rgba(0,0,0,0.4), 0 0 80px rgba(6,182,212,0.04)`,
           }}
         >
@@ -229,6 +244,7 @@ const KpiCard: React.FC<{
   const shimmerPos = shimmerPosition(frame, 180, delay + 20);
   const cardFloat = floatY(frame, 0.015 + index * 0.003, 1.5, index * 0.6);
   const iconPulse = pulse(frame, 0.03 + index * 0.004, 0.04, 1);
+  const cardBreathe = idleBreathe(frame, 0.03 + index * 0.004, 0.003);
 
   return (
     <div
@@ -244,6 +260,7 @@ const KpiCard: React.FC<{
         transform: transforms(
           `translateX(${translateX}px)`,
           `translateY(${cardFloat}px)`,
+          `scale(${cardBreathe})`,
         ),
         position: "relative",
         overflow: "hidden",
@@ -335,6 +352,8 @@ const FeedItem: React.FC<{
   const opacity = interpolate(progress, [0, 1], [0, 1]);
   const translateY = interpolate(progress, [0, 1], [10, 0]);
 
+  const feedIdle = idleFloat(frame, 0.035, 1, index * 0.4);
+
   const severityColor =
     item.severity === "high"
       ? COLORS.danger
@@ -352,7 +371,7 @@ const FeedItem: React.FC<{
         borderRadius: 6,
         backgroundColor: index % 2 === 0 ? "transparent" : `${COLORS.bgElevated}`,
         opacity,
-        transform: `translateY(${translateY}px)`,
+        transform: `translateY(${translateY + feedIdle}px)`,
         marginBottom: 2,
       }}
     >

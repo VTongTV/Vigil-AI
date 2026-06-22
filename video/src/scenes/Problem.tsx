@@ -21,6 +21,10 @@ import {
   CONFIG_SNAPPY,
   CONFIG_SMOOTH,
   CONFIG_BOUNCY,
+  idleFloat,
+  idleBreathe,
+  idleDrift,
+  sceneExit,
 } from "../animations";
 import { AnimatedBackground } from "../AnimatedBackground";
 import { Icon } from "../Icon";
@@ -45,16 +49,25 @@ export const Problem: React.FC = () => {
   // Camera drift
   const zoom = cameraZoom(frame, TOTAL_FRAMES, 1.04);
 
+  // Scene exit
+  const exit = sceneExit(frame, TOTAL_FRAMES, 18);
+
   // Title entrance
   const titleProgress = spring({ frame, fps, delay: 5, config: CONFIG_BOUNCY });
   const titleOp = interpolate(titleProgress, [0, 1], [0, 1]);
   const titleY = interpolate(titleProgress, [0, 1], [25, 0]);
   const titleScale = interpolate(titleProgress, [0.4, 1], [0.95, 1]);
 
+  // Title idle float
+  const titleIdle = idleFloat(frame, 0.04, 2.5, 0);
+
   // Section label — slides in from left
   const labelProgress = spring({ frame, fps, delay: 0, config: CONFIG_SMOOTH });
   const labelOp = interpolate(labelProgress, [0, 1], [0, 1]);
   const labelX = interpolate(labelProgress, [0, 1], [-20, 0]);
+
+  // Label idle float
+  const labelIdle = idleFloat(frame, 0.035, 1.5, 0.3);
 
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
@@ -66,12 +79,13 @@ export const Problem: React.FC = () => {
         style={{
           position: "absolute",
           inset: 0,
-          transform: `scale(${zoom})`,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           padding: "80px 80px",
+          opacity: exit.opacity,
+          transform: `scale(${zoom}) translateY(${exit.translateY}px)`,
         }}
       >
         {/* Section label */}
@@ -84,7 +98,7 @@ export const Problem: React.FC = () => {
             letterSpacing: "0.25em",
             textTransform: "uppercase" as const,
             opacity: labelOp,
-            transform: `translateX(${labelX}px)`,
+            transform: `translateX(${labelX}px) translateY(${labelIdle}px)`,
             marginBottom: 16,
             display: "flex",
             alignItems: "center",
@@ -120,7 +134,7 @@ export const Problem: React.FC = () => {
             textAlign: "center",
             opacity: titleOp,
             transform: transforms(
-              `translateY(${titleY}px)`,
+              `translateY(${titleY + titleIdle}px)`,
               `scale(${titleScale})`,
             ),
             marginBottom: 70,
@@ -186,6 +200,9 @@ const StatCard: React.FC<{
   // Icon pulse
   const iconPulse = pulse(frame, 0.04 + index * 0.005, 0.05, 1);
 
+  // Card idle breathe
+  const cardBreathe = idleBreathe(frame, 0.03 + index * 0.004, 0.004);
+
   return (
     <div
       style={{
@@ -198,7 +215,7 @@ const StatCard: React.FC<{
         opacity,
         transform: transforms(
           `translateY(${translateY + cardFloat}px)`,
-          `scale(${scale})`,
+          `scale(${scale * cardBreathe})`,
         ),
         position: "relative",
         overflow: "hidden",

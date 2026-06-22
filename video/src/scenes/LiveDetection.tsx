@@ -22,6 +22,11 @@ import {
   CONFIG_SNAPPY,
   CONFIG_SMOOTH,
   CONFIG_BOUNCY,
+  idleFloat,
+  idleBreathe,
+  idleDrift,
+  kenBurns,
+  sceneExit,
 } from "../animations";
 import { AnimatedBackground } from "../AnimatedBackground";
 import { Icon } from "../Icon";
@@ -70,6 +75,19 @@ export const LiveDetection: React.FC = () => {
   const statsOp = interpolate(statsProgress, [0, 1], [0, 1]);
   const statsX = interpolate(statsProgress, [0, 1], [30, 0]);
 
+  // Idle motion
+  const labelIdle = idleFloat(frame, 0.035, 1.5, 0);
+  const titleIdle = idleFloat(frame, 0.04, 2, 0.5);
+  const kb = kenBurns(frame, TOTAL_FRAMES, 1.02, 6, 3);
+  const sidebarBreathe = idleBreathe(frame, 0.03, 0.003);
+  const sidebarFloat = idleFloat(frame, 0.025, 1.5, 0);
+  const sidebarFloat2 = idleFloat(frame, 0.03, 1.5, 1.5);
+  const sidebarFloat3 = idleFloat(frame, 0.028, 1.5, 3.0);
+  const bboxFloat = idleFloat(frame, 0.06, 1, 0);
+
+  // Scene exit
+  const exit = sceneExit(frame, TOTAL_FRAMES, 18);
+
   // Detection counter
   const detectionCount = Math.min(
     3,
@@ -89,6 +107,8 @@ export const LiveDetection: React.FC = () => {
           flexDirection: "column",
           alignItems: "center",
           padding: "50px 60px",
+          opacity: exit.opacity,
+          transform: `translateY(${exit.translateY}px)`,
         }}
       >
         {/* Header row */}
@@ -99,6 +119,7 @@ export const LiveDetection: React.FC = () => {
             gap: 16,
             marginBottom: 24,
             opacity: labelOp,
+            transform: `translateY(${labelIdle}px)`,
           }}
         >
           <div style={{ width: 20, height: 1, backgroundColor: COLORS.danger }} />
@@ -125,7 +146,7 @@ export const LiveDetection: React.FC = () => {
             fontWeight: 700,
             color: COLORS.text,
             opacity: titleOp,
-            transform: `translateY(${titleY}px)`,
+            transform: `translateY(${titleY + titleIdle}px)`,
             marginBottom: 30,
           }}
         >
@@ -147,15 +168,24 @@ export const LiveDetection: React.FC = () => {
             }}
           >
             {/* Demo image */}
-            <Img
-              src={staticFile("demo/demo_no_helmet_silkboard-01.jpg")}
+            <div
               style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                filter: "brightness(0.7) contrast(1.1) saturate(0.8)",
+                position: "absolute",
+                inset: 0,
+                transform: `scale(${kb.scale}) translate(${kb.x}px, ${kb.y}px)`,
+                transformOrigin: "center center",
               }}
-            />
+            >
+              <Img
+                src={staticFile("demo/demo_no_helmet_silkboard-01.jpg")}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  filter: "brightness(0.7) contrast(1.1) saturate(0.8)",
+                }}
+              />
+            </div>
 
             {/* CRT scan line */}
             <div
@@ -244,6 +274,7 @@ export const LiveDetection: React.FC = () => {
                       borderRadius: 3,
                       letterSpacing: "0.06em",
                       whiteSpace: "nowrap" as const,
+                      transform: `translateY(${bboxFloat}px)`,
                     }}
                   >
                     {box.label}
@@ -316,14 +347,15 @@ export const LiveDetection: React.FC = () => {
             }}
           >
             {/* Processing status */}
-            <div
-              style={{
-                backgroundColor: COLORS.bgCard,
-                border: `1px solid ${COLORS.border}`,
-                borderRadius: 12,
-                padding: "20px 18px",
-              }}
-            >
+            <div style={{ transform: `translateY(${sidebarFloat}px) scale(${sidebarBreathe})` }}>
+              <div
+                style={{
+                  backgroundColor: COLORS.bgCard,
+                  border: `1px solid ${COLORS.border}`,
+                  borderRadius: 12,
+                  padding: "20px 18px",
+                }}
+              >
               <div
                 style={{
                   fontFamily,
@@ -367,17 +399,19 @@ export const LiveDetection: React.FC = () => {
                   </span>
                 </div>
               ))}
+              </div>
             </div>
 
             {/* Detection count */}
-            <div
-              style={{
-                backgroundColor: COLORS.bgCard,
-                border: `1px solid ${COLORS.border}`,
-                borderRadius: 12,
-                padding: "20px 18px",
-              }}
-            >
+            <div style={{ transform: `translateY(${sidebarFloat2}px) scale(${sidebarBreathe})` }}>
+              <div
+                style={{
+                  backgroundColor: COLORS.bgCard,
+                  border: `1px solid ${COLORS.border}`,
+                  borderRadius: 12,
+                  padding: "20px 18px",
+                }}
+              >
               <div
                 style={{
                   fontFamily,
@@ -402,17 +436,19 @@ export const LiveDetection: React.FC = () => {
               >
                 {detectionCount}
               </div>
+              </div>
             </div>
 
             {/* Latency */}
-            <div
-              style={{
-                backgroundColor: COLORS.bgCard,
-                border: `1px solid ${COLORS.border}`,
-                borderRadius: 12,
-                padding: "20px 18px",
-              }}
-            >
+            <div style={{ transform: `translateY(${sidebarFloat3}px) scale(${sidebarBreathe})` }}>
+              <div
+                style={{
+                  backgroundColor: COLORS.bgCard,
+                  border: `1px solid ${COLORS.border}`,
+                  borderRadius: 12,
+                  padding: "20px 18px",
+                }}
+              >
               <div
                 style={{
                   fontFamily,
@@ -447,6 +483,7 @@ export const LiveDetection: React.FC = () => {
                 >
                   seconds
                 </span>
+              </div>
               </div>
             </div>
           </div>

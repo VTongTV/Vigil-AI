@@ -1,6 +1,6 @@
 import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
-import { COLORS } from "./constants";
+import { COLORS, FPS } from "./constants";
 import {
   generateParticles,
   particleY,
@@ -8,6 +8,7 @@ import {
   driftX,
   floatY,
   glowOp,
+  parallaxDrift,
 } from "./animations";
 
 /**
@@ -44,7 +45,11 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
   seed = 42,
 }) => {
   const frame = useCurrentFrame();
-  const { width, height } = useVideoConfig();
+  const { width, height, fps } = useVideoConfig();
+
+  // Approximate scene length — backgrounds don't know exact duration,
+  // so use a long cycle. The sin/cos functions are cyclic anyway.
+  const approxDuration = 12 * FPS;
 
   const particles = React.useMemo(
     () => generateParticles(particleCount, width, height, seed),
@@ -52,6 +57,13 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
   );
 
   const gridOp = gridBreath(frame);
+
+  // Parallax drift for grid layer — slow, barely perceptible
+  const gridDrift = parallaxDrift(frame, approxDuration, 0.3, 6, 4);
+
+  // Glow orbs orbit — different speeds for depth
+  const orb1Drift = parallaxDrift(frame, approxDuration, 0.4, 40, 30);
+  const orb2Drift = parallaxDrift(frame, approxDuration, 0.25, 30, 25);
 
   return (
     <>
@@ -64,7 +76,7 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
         }}
       />
 
-      {/* Layer 2: Animated grid */}
+      {/* Layer 2: Animated grid with parallax drift */}
       {showGrid && (
         <div
           style={{
@@ -76,6 +88,7 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
               linear-gradient(90deg, rgba(6,182,212,0.08) 1px, transparent 1px)
             `,
             backgroundSize: `${gridSize}px ${gridSize}px`,
+            transform: `translate(${gridDrift.x}px, ${gridDrift.y}px)`,
           }}
         />
       )}
@@ -104,7 +117,7 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
         );
       })}
 
-      {/* Layer 4: Ambient glow orbs */}
+      {/* Layer 4: Ambient glow orbs — orbiting for cinematic depth */}
       {glowCount >= 1 && (
         <div
           style={{
@@ -114,8 +127,8 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
             borderRadius: "50%",
             background: `radial-gradient(ellipse, rgba(6,182,212,${glowOp(frame, 0.02, 0.04, 0.12)}), transparent 70%)`,
             filter: "blur(80px)",
-            left: "15%",
-            top: "25%",
+            left: `calc(15% + ${orb1Drift.x}px)`,
+            top: `calc(25% + ${orb1Drift.y}px)`,
           }}
         />
       )}
@@ -128,8 +141,8 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
             borderRadius: "50%",
             background: `radial-gradient(ellipse, rgba(59,130,246,${glowOp(frame, 0.025, 0.03, 0.08)}), transparent 70%)`,
             filter: "blur(100px)",
-            right: "10%",
-            bottom: "20%",
+            right: `calc(10% - ${orb2Drift.x}px)`,
+            bottom: `calc(20% - ${orb2Drift.y}px)`,
           }}
         />
       )}
