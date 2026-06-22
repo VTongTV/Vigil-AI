@@ -99,6 +99,10 @@ from backend.app.routes.analytics import router as analytics_router  # noqa: E40
 from backend.app.routes.cameras import router as cameras_router  # noqa: E402
 from backend.app.routes.challan_pdf import router as challan_pdf_router  # noqa: E402
 from backend.app.routes.video import router as video_router  # noqa: E402
+from backend.app.routes.citizen import router as citizen_router  # noqa: E402
+from backend.app.routes.tracking import router as tracking_router  # noqa: E402
+from backend.app.routes.deepfake import router as deepfake_router  # noqa: E402
+from backend.app.routes.scraper import router as scraper_router  # noqa: E402
 
 app.include_router(detect_router, prefix="/api/v1", tags=["detect"])
 app.include_router(violations_router, prefix="/api/v1", tags=["violations"])
@@ -107,6 +111,10 @@ app.include_router(analytics_router, prefix="/api/v1", tags=["analytics"])
 app.include_router(cameras_router, prefix="/api/v1", tags=["cameras"])
 app.include_router(challan_pdf_router, prefix="/api/v1", tags=["evidence"])
 app.include_router(video_router, prefix="/api/v1", tags=["video"])
+app.include_router(citizen_router, prefix="/api/v1", tags=["citizen"])
+app.include_router(tracking_router, prefix="/api/v1", tags=["tracking"])
+app.include_router(deepfake_router, prefix="/api/v1", tags=["deepfake"])
+app.include_router(scraper_router, prefix="/api/v1", tags=["scraper"])
 
 
 @app.get("/health")
