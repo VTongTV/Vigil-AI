@@ -2,7 +2,12 @@
 
 import type {
   CameraListResponse,
+  CitizenDetectResponse,
+  DeepfakeResponse,
   DetectResponse,
+  ScraperFeedResponse,
+  TrackingOverviewResponse,
+  VideoDetectResponse,
   ViolationListResponse,
   ViolationRecord,
   AnalyticsOverview,
@@ -206,4 +211,307 @@ export async function generateChallanPdf(violationId: string): Promise<Blob> {
     throw new Error(`Failed to generate Challan PDF: ${res.status}`);
   }
   return res.blob();
+}
+
+// ---------------------------------------------------------------------------
+// Feature 1: Citizen Reporting
+// ---------------------------------------------------------------------------
+
+export async function citizenDetect(
+  image: File,
+  cameraId?: string,
+): Promise<CitizenDetectResponse> {
+  if (useAppStore.getState().demoMode) {
+    await new Promise((r) => setTimeout(r, 300));
+    return {
+      success: true,
+      processing_time_ms: 847,
+      violations_found: 1,
+      violation_types: ["no_helmet"],
+      image_dimensions: { width: 1280, height: 720 },
+      detection_summary: {
+        persons: 3,
+        riders: 2,
+        pedestrians: 1,
+        cars: 1,
+        motorcycles: 2,
+        buses: 0,
+        trucks: 0,
+        bicycles: 0,
+        total_objects: 9,
+        vehicle_categories: ["car", "motorcycle"],
+      },
+      message:
+        "Your report has been processed. Thank you for helping keep Bengaluru's roads safe.",
+    };
+  }
+
+  const form = new FormData();
+  form.append("image", image);
+  if (cameraId) form.append("camera_id", cameraId);
+
+  return fetchJSON<CitizenDetectResponse>("/citizen/detect", {
+    method: "POST",
+    body: form,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Feature 3: Deepfake Detection
+// ---------------------------------------------------------------------------
+
+export async function analyzeDeepfake(
+  image: File,
+): Promise<DeepfakeResponse> {
+  if (useAppStore.getState().demoMode) {
+    await new Promise((r) => setTimeout(r, 500));
+    return {
+      is_likely_ai: true,
+      confidence: 0.87,
+      artifacts_detected: [
+        "uncanny_face_symmetry",
+        "idealized_license_plate",
+        "diffusion_texture_artifacts",
+        "anatomical_hand_oddities",
+      ],
+      explanation:
+        "This image exhibits multiple AI-generation artifacts consistent with diffusion-model output: perfectly symmetric facial features, unnaturally clean license plate text, texture bleeding at object boundaries, and anatomical inconsistencies in hand/finger rendering.",
+      analysis_details: {
+        is_likely_ai: true,
+        confidence: 0.87,
+        artifacts_detected: [
+          "uncanny_face_symmetry",
+          "idealized_license_plate",
+          "diffusion_texture_artifacts",
+          "anatomical_hand_oddities",
+        ],
+        explanation:
+          "Multiple diffusion-model generation artifacts detected with high confidence.",
+      },
+    };
+  }
+
+  const form = new FormData();
+  form.append("image", image);
+
+  return fetchJSON<DeepfakeResponse>("/deepfake/analyze", {
+    method: "POST",
+    body: form,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Feature 4: Web Scraper
+// ---------------------------------------------------------------------------
+
+export async function getScraperFeed(): Promise<ScraperFeedResponse> {
+  if (useAppStore.getState().demoMode) {
+    return {
+      total: 5,
+      items: [
+        {
+          id: "sc-001",
+          platform: "twitter",
+          source_url: "https://twitter.com/btp_traffic/status/123",
+          thumbnail_url: "/demo/demo_no_helmet_mgroad-01.jpg",
+          caption: "No helmet rider near MG Road signal. #BengaluruTraffic",
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          location: "MG Road, Bengaluru",
+          analysis_status: "pending",
+        },
+        {
+          id: "sc-002",
+          platform: "reddit",
+          source_url: "https://reddit.com/r/bangalore/comments/abc",
+          thumbnail_url: "/demo/demo_triple_riding_whitefield-01.jpg",
+          caption: "Triple riding on ITPL road, Whitefield. Daily sight.",
+          timestamp: new Date(Date.now() - 7200000).toISOString(),
+          location: "Whitefield, Bengaluru",
+          analysis_status: "pending",
+        },
+        {
+          id: "sc-003",
+          platform: "instagram",
+          source_url: "https://instagram.com/p/xyz",
+          thumbnail_url: "/demo/demo_wrong_side_driving_bannerghatta-01.jpg",
+          caption: "Wrong side driving on Bannerghatta Road 😡",
+          timestamp: new Date(Date.now() - 10800000).toISOString(),
+          location: "Bannerghatta Road, Bengaluru",
+          analysis_status: "analyzed",
+        },
+        {
+          id: "sc-004",
+          platform: "twitter",
+          source_url: "https://twitter.com/btp_traffic/status/456",
+          thumbnail_url: "/demo/demo_illegal_parking_kormangala-01.jpg",
+          caption: "Car parked on no-parking zone near Koramangala 100ft Rd",
+          timestamp: new Date(Date.now() - 14400000).toISOString(),
+          location: "Koramangala, Bengaluru",
+          analysis_status: "pending",
+        },
+        {
+          id: "sc-005",
+          platform: "facebook",
+          source_url: "https://facebook.com/groups/bengalurutraffic/posts/789",
+          thumbnail_url: "/demo/demo_red_light_violation_silkboard-01.jpg",
+          caption: "Red light jump at Silk Board. When will this stop?",
+          timestamp: new Date(Date.now() - 18000000).toISOString(),
+          location: "Silk Board, Bengaluru",
+          analysis_status: "analyzed",
+        },
+      ],
+      last_scraped: new Date(Date.now() - 300000).toISOString(),
+    };
+  }
+
+  return fetchJSON<ScraperFeedResponse>("/scraper/feed");
+}
+
+// ---------------------------------------------------------------------------
+// Feature 5: Video Processing
+// ---------------------------------------------------------------------------
+
+export async function detectVideo(
+  video: File,
+  cameraId?: string,
+  fps?: number,
+): Promise<VideoDetectResponse> {
+  if (useAppStore.getState().demoMode) {
+    await new Promise((r) => setTimeout(r, 1500));
+    return {
+      success: true,
+      total_frames: 30,
+      frames_processed: 30,
+      total_violations: 3,
+      processing_time_ms: 4521,
+      frame_results: [
+        {
+          frame_index: 5,
+          timestamp_ms: 5000,
+          violations_count: 1,
+          violation_types: ["no_helmet"],
+          evidence_url: null,
+        },
+        {
+          frame_index: 12,
+          timestamp_ms: 12000,
+          violations_count: 1,
+          violation_types: ["triple_riding"],
+          evidence_url: null,
+        },
+        {
+          frame_index: 24,
+          timestamp_ms: 24000,
+          violations_count: 1,
+          violation_types: ["wrong_side_driving"],
+          evidence_url: null,
+        },
+      ],
+      summary: {
+        violation_counts: { no_helmet: 1, triple_riding: 1, wrong_side_driving: 1 },
+        frames_with_violations: 3,
+        total_frames_processed: 30,
+      },
+    };
+  }
+
+  const form = new FormData();
+  form.append("video", video);
+  if (cameraId) form.append("camera_id", cameraId);
+  if (fps) form.append("fps", String(fps));
+
+  return fetchJSON<VideoDetectResponse>("/video/detect", {
+    method: "POST",
+    body: form,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Feature 6: Tracking Dashboard
+// ---------------------------------------------------------------------------
+
+export async function getTrackingOverview(): Promise<TrackingOverviewResponse> {
+  if (useAppStore.getState().demoMode) {
+    return {
+      active_cameras: 8,
+      total_violations_last_hour: 23,
+      alerts_active: 3,
+      cameras: [
+        {
+          camera_id: "MGROAD-01",
+          junction_name: "MG Road — Trinity Circle",
+          status: "active",
+          violations_last_hour: 5,
+          last_violation_type: "no_helmet",
+          last_violation_time: new Date(Date.now() - 120000).toISOString(),
+          feed_url: null,
+        },
+        {
+          camera_id: "SILKBOARD-01",
+          junction_name: "Silk Board Junction",
+          status: "active",
+          violations_last_hour: 4,
+          last_violation_type: "red_light_violation",
+          last_violation_time: new Date(Date.now() - 300000).toISOString(),
+          feed_url: null,
+        },
+        {
+          camera_id: "HEBBAL-01",
+          junction_name: "Hebbal Flyover",
+          status: "active",
+          violations_last_hour: 3,
+          last_violation_type: "no_helmet",
+          last_violation_time: new Date(Date.now() - 600000).toISOString(),
+          feed_url: null,
+        },
+        {
+          camera_id: "WHITEFIELD-01",
+          junction_name: "Whitefield Main Road",
+          status: "active",
+          violations_last_hour: 3,
+          last_violation_type: "triple_riding",
+          last_violation_time: new Date(Date.now() - 900000).toISOString(),
+          feed_url: null,
+        },
+        {
+          camera_id: "ELECTRONIC-01",
+          junction_name: "Electronic City Phase 1",
+          status: "idle",
+          violations_last_hour: 2,
+          last_violation_type: "no_seatbelt",
+          last_violation_time: new Date(Date.now() - 1500000).toISOString(),
+          feed_url: null,
+        },
+        {
+          camera_id: "MARATHAHALLI-01",
+          junction_name: "Marathahalli Bridge",
+          status: "active",
+          violations_last_hour: 3,
+          last_violation_type: "triple_riding",
+          last_violation_time: new Date(Date.now() - 600000).toISOString(),
+          feed_url: null,
+        },
+        {
+          camera_id: "KRPURAM-01",
+          junction_name: "KR Puram Railway Junction",
+          status: "offline",
+          violations_last_hour: 0,
+          last_violation_type: null,
+          last_violation_time: null,
+          feed_url: null,
+        },
+        {
+          camera_id: "KORMANGALA-01",
+          junction_name: "Koramangala 100ft Road",
+          status: "active",
+          violations_last_hour: 3,
+          last_violation_type: "illegal_parking",
+          last_violation_time: new Date(Date.now() - 420000).toISOString(),
+          feed_url: null,
+        },
+      ],
+    };
+  }
+
+  return fetchJSON<TrackingOverviewResponse>("/tracking/overview");
 }
