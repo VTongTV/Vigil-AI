@@ -81,10 +81,10 @@ function FeedCard({ item, index, reduced, onAnalyze }: { item: ScrapedFeedItem; 
                 {analyzing ? "Analyzing..." : "Analyze"}
               </Button>
             ) : (
-              <Button size="sm" variant="outline" asChild
-                className="flex-1 h-7 text-[11px] font-semibold border-[var(--color-success)]/30 text-[var(--color-success)] hover:bg-[var(--color-success)]/10">
-                <a href="/dashboard/violations"><CheckCircle2 className="mr-1.5 h-3 w-3" />View Results</a>
-              </Button>
+              <a href="/dashboard/violations"
+                className="flex h-7 flex-1 items-center justify-center gap-1.5 rounded-md border border-[var(--color-success)]/30 text-[11px] font-semibold text-[var(--color-success)] transition-colors hover:bg-[var(--color-success)]/10">
+                <CheckCircle2 className="h-3 w-3" />View Results
+              </a>
             )}
             <a href={item.source_url} target="_blank" rel="noopener noreferrer"
               className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[var(--color-paper-3)] text-[var(--color-ink-faint)] transition-colors hover:border-[var(--color-accent)]/30 hover:text-[var(--color-accent)]">

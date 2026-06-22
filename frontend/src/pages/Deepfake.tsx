@@ -13,7 +13,7 @@
  *   L5 Aux → text-[10px] tabular-nums text-faint
  */
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ScanFace, ShieldAlert, ShieldCheck, AlertTriangle, CheckCircle2, Eye, Fingerprint, Upload } from "lucide-react";
 import { analyzeDeepfake } from "@/lib/api";

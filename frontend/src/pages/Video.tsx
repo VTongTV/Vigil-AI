@@ -7,7 +7,7 @@
  * Design: matches Upload page glass-morphic style with pipeline visualization.
  */
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Video as VideoIcon,

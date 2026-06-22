@@ -16,7 +16,7 @@
  *   L5 Aux      → text-[10px] tabular-nums text-faint (processing time)
  */
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Users,
