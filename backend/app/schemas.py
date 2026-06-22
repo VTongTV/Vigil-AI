@@ -252,3 +252,128 @@ class HealthResponse(BaseModel):
     version: str = "1.0.0"
     models_loaded: bool = False
     demo_mode: bool = False
+
+
+# ---------------------------------------------------------------------------
+# Feature 1: Citizen Reporting
+# ---------------------------------------------------------------------------
+
+
+class CitizenDetectResponse(BaseModel):
+    """Response from POST /api/v1/citizen/detect.
+
+    Mirrors DetectResponse but redacts sensitive fields (plate text,
+    fine amount, MV Act section, evidence hash, danger score) to keep
+    citizen-facing information appropriate.
+    """
+
+    success: bool
+    processing_time_ms: int
+    violations_found: int
+    violation_types: list[str]
+    image_dimensions: ImageDimensions
+    detection_summary: DetectionSummary = Field(default_factory=DetectionSummary)
+    message: str = "Your report has been processed. Thank you for helping keep Bengaluru's roads safe."
+
+
+# ---------------------------------------------------------------------------
+# Feature 3: Deepfake Detection
+# ---------------------------------------------------------------------------
+
+
+class DeepfakeAnalysis(BaseModel):
+    """Deepfake analysis result for a single image."""
+
+    is_likely_ai: bool
+    confidence: float = Field(..., ge=0.0, le=1.0)
+    artifacts_detected: list[str] = Field(default_factory=list)
+    explanation: str = ""
+
+
+class DeepfakeResponse(BaseModel):
+    """Response from POST /api/v1/deepfake/analyze."""
+
+    is_likely_ai: bool
+    confidence: float
+    artifacts_detected: list[str]
+    explanation: str
+    analysis_details: DeepfakeAnalysis
+
+
+# ---------------------------------------------------------------------------
+# Feature 4: Web Scraper
+# ---------------------------------------------------------------------------
+
+
+class ScrapedFeedItem(BaseModel):
+    """A single item from a scraped social media feed."""
+
+    id: str
+    platform: str
+    source_url: str
+    thumbnail_url: str | None = None
+    caption: str | None = None
+    timestamp: str
+    location: str | None = None
+    analysis_status: str = "pending"
+
+
+class ScraperFeedResponse(BaseModel):
+    """Response from GET /api/v1/scraper/feed."""
+
+    total: int
+    items: list[ScrapedFeedItem]
+    last_scraped: str | None = None
+
+
+# ---------------------------------------------------------------------------
+# Feature 5: Video Processing
+# ---------------------------------------------------------------------------
+
+
+class VideoFrameResult(BaseModel):
+    """Detection result for a single video frame."""
+
+    frame_index: int
+    timestamp_ms: int
+    violations_count: int
+    violation_types: list[str]
+    evidence_url: str | None = None
+
+
+class VideoDetectResponse(BaseModel):
+    """Response from POST /api/v1/video/detect."""
+
+    success: bool
+    total_frames: int
+    frames_processed: int
+    total_violations: int
+    processing_time_ms: int
+    frame_results: list[VideoFrameResult]
+    summary: dict = Field(default_factory=dict)
+
+
+# ---------------------------------------------------------------------------
+# Feature 6: Tracking Dashboard
+# ---------------------------------------------------------------------------
+
+
+class TrackingCamera(BaseModel):
+    """A camera being tracked in real-time."""
+
+    camera_id: str
+    junction_name: str
+    status: CameraStatus
+    violations_last_hour: int
+    last_violation_type: str | None = None
+    last_violation_time: str | None = None
+    feed_url: str | None = None
+
+
+class TrackingOverviewResponse(BaseModel):
+    """Response from GET /api/v1/tracking/overview."""
+
+    active_cameras: int
+    total_violations_last_hour: int
+    alerts_active: int
+    cameras: list[TrackingCamera]
