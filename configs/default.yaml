@@ -156,76 +156,76 @@ violations:
     stop_line_zones:
     - id: stop_electronic
       camera_id: ELECTRONIC-01
-      # Band across road at intersection (vehicles past stop line)
+      # Band across road at intersection (y 0.25–0.55)
       polygon:
       - - 0.15
-        - 0.45
+        - 0.25
       - - 0.85
-        - 0.45
+        - 0.25
       - - 0.85
-        - 0.70
+        - 0.55
       - - 0.15
-        - 0.70
+        - 0.55
     - id: stop_krpuram
       camera_id: KRPURAM-01
-      # Narrow band at intersection stop line (y 0.25–0.38 only)
+      # Band at intersection (y 0.10–0.30)
       polygon:
       - - 0.1
-        - 0.25
+        - 0.10
       - - 0.9
-        - 0.25
+        - 0.10
       - - 0.9
-        - 0.38
+        - 0.30
       - - 0.1
-        - 0.38
+        - 0.30
     - id: stop_yelahanka
       camera_id: YELAHANKA-01
-      # Narrow band at intersection stop line (y 0.40–0.52 only)
+      # Band at intersection (y 0.20–0.45)
       polygon:
       - - 0.1
-        - 0.40
+        - 0.20
       - - 0.95
-        - 0.40
+        - 0.20
       - - 0.95
-        - 0.52
+        - 0.45
       - - 0.1
-        - 0.52
+        - 0.45
     - id: stop_hebbal
       camera_id: HEBBAL-01
-      # Narrow band at intersection stop line (y 0.55–0.65 only)
+      # Band at intersection (y 0.45–0.70)
       polygon:
       - - 0.1
-        - 0.55
+        - 0.45
       - - 0.9
-        - 0.55
+        - 0.45
       - - 0.9
-        - 0.65
+        - 0.70
       - - 0.1
-        - 0.65
+        - 0.70
     - id: stop_mgroad
       camera_id: MGROAD-01
-      # Narrow band at intersection stop line (y 0.50–0.60 only)
+      # Band at intersection — vehicles past stop line (y 0.25–0.50)
       polygon:
-      - - 0.1
+      - - 0.05
+        - 0.25
+      - - 0.95
+        - 0.25
+      - - 0.95
         - 0.50
-      - - 0.9
+      - - 0.05
         - 0.50
-      - - 0.9
-        - 0.60
-      - - 0.1
-        - 0.60
     - id: stop_silkboard
       camera_id: SILKBOARD-01
-      # Narrow band at intersection stop line (y 0.45–0.55 only)
+      # Band at intersection — vehicles past stop line (y 0.15–0.40)
       polygon:
       - - 0.1
-        - 0.45
+        - 0.15
       - - 0.9
-        - 0.45
+        - 0.15
       - - 0.9
-        - 0.55
+        - 0.40
       - - 0.1
-        - 0.55
+        - 0.40
     min_confidence: 0.3
     confidence_discount: 0.75
   red_light:

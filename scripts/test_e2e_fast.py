@@ -87,6 +87,12 @@ def main() -> None:
         path = os.path.join(demo_dir, fname)
 
         img = Image.open(path).convert("RGB")
+        # Cap max dimension to 1920 to avoid OOM on 4800x3584 images
+        MAX_DIM = 1920
+        if max(img.size) > MAX_DIM:
+            ratio = MAX_DIM / max(img.size)
+            new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
+            img = img.resize(new_size, Image.Resampling.LANCZOS)
         img_np = np.array(img)
         img_h, img_w = img_np.shape[:2]
 
