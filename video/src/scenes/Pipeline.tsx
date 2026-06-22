@@ -21,8 +21,10 @@ import {
   CONFIG_SNAPPY,
   CONFIG_SMOOTH,
   CONFIG_BOUNCY,
-  idleFloat,
-  idleBreathe,
+  visibleFloat,
+  visibleBreathe,
+  travelingActivation,
+  countUpEased,
   sceneExit,
 } from "../animations";
 import { AnimatedBackground } from "../AnimatedBackground";
@@ -34,13 +36,16 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
-const TOTAL_FRAMES = 14 * FPS;
+const TOTAL_FRAMES = 20 * FPS;
 const STEP_COUNT = PIPELINE_STAGES.length;
+
+/** Total processing time across all pipeline stages (ms). */
+const TOTAL_PROCESSING_MS = 750;
 
 /**
  * Scene 4: AI Pipeline
- * Animated flow diagram with connectors that draw in,
- * cards that shimmer and float, and SVG icons.
+ * Animated flow diagram with traveling activation dot,
+ * sequential timing reveals, and total time counter.
  */
 export const Pipeline: React.FC = () => {
   const frame = useCurrentFrame();
@@ -60,16 +65,32 @@ export const Pipeline: React.FC = () => {
   const subProgress = spring({ frame, fps, delay: 20, config: CONFIG_SMOOTH });
   const subOp = interpolate(subProgress, [0, 1], [0, 1]);
 
-  // Idle motion
-  const labelIdle = idleFloat(frame, 0.035, 1.5, 0);
-  const titleIdle = idleFloat(frame, 0.04, 2, 0.5);
-  const subIdle = idleFloat(frame, 0.04, 1.5, 1.2);
+  // Visible idle motion (10-12px drift)
+  const labelIdle = visibleFloat(frame, 0.035, 10, 0);
+  const titleIdle = visibleFloat(frame, 0.04, 10, 0.5);
+  const subIdle = visibleFloat(frame, 0.04, 10, 1.2);
 
-  // Scene exit
+  // Scene exit — triggers at frame 1182 (1200-18)
   const exit = sceneExit(frame, TOTAL_FRAMES, 18);
 
   // Data flow line progress — draws across the full pipeline
   const flowProgress = linearProgress(frame, 30, 180);
+
+  // Traveling activation — "data packet" flows through pipeline
+  // Starts at frame 60, takes 420 frames (7s) to traverse 9 cards
+  const activations = Array.from({ length: STEP_COUNT }, (_, i) =>
+    travelingActivation(frame, 60, 420, i, STEP_COUNT),
+  );
+
+  // Total processing time counter — appears after all cards activated (~frame 480)
+  const totalTime = countUpEased(frame, 500, 120, 0, TOTAL_PROCESSING_MS);
+  const totalTimeOp = interpolate(frame, [490, 510], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  // Flow progress bar pulse
+  const barPulse = pulse(frame, 0.03, 0.05, 1);
 
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
@@ -163,6 +184,7 @@ export const Pipeline: React.FC = () => {
                   frame={frame}
                   fps={fps}
                   delay={delay}
+                  activation={activations[i]}
                 />
                 {/* Connector arrow between steps */}
                 {i < STEP_COUNT - 1 && (
@@ -171,6 +193,7 @@ export const Pipeline: React.FC = () => {
                     frame={frame}
                     fps={fps}
                     flowProgress={flowProgress}
+                    activation={activations[i]}
                     delay={delay + 8}
                   />
                 )}
@@ -179,16 +202,32 @@ export const Pipeline: React.FC = () => {
           })}
         </div>
 
-        {/* Data flow highlight line */}
+        {/* Processing time counter */}
         <div
           style={{
-            marginTop: 40,
+            fontFamily,
+            fontSize: 28,
+            fontWeight: 700,
+            color: COLORS.primary,
+            marginTop: 30,
+            opacity: totalTimeOp,
+            letterSpacing: "0.05em",
+            textShadow: `0 0 20px ${COLORS.primaryGlow}`,
+          }}
+        >
+          Total: {Math.round(totalTime)} ms
+        </div>
+
+        {/* Data flow highlight line with pulse */}
+        <div
+          style={{
+            marginTop: 20,
             width: "80%",
             height: 2,
             backgroundColor: COLORS.border,
             borderRadius: 1,
             overflow: "hidden",
-            opacity: subOp,
+            opacity: subOp * barPulse,
           }}
         >
           <div
@@ -214,7 +253,8 @@ const PipelineStep: React.FC<{
   frame: number;
   fps: number;
   delay: number;
-}> = ({ step, index, frame, fps, delay }) => {
+  activation: number;
+}> = ({ step, index, frame, fps, delay, activation }) => {
   const progress = spring({ frame, fps, delay, config: CONFIG_SNAPPY });
   const opacity = interpolate(progress, [0, 1], [0, 1]);
   const translateY = interpolate(progress, [0, 1], [40, 0]);
@@ -224,7 +264,33 @@ const PipelineStep: React.FC<{
   const shimmerPos = shimmerPosition(frame, 160, delay + 20);
   const glow = borderGlow(frame, 0.025 + index * 0.003);
   const iconPulse = pulse(frame, 0.035, 0.06, 1);
-  const cardBreathe = idleBreathe(frame, 0.03 + index * 0.004, 0.004);
+  const cardBreathe = visibleBreathe(frame, 0.035, 0.02);
+
+  // Activation-driven styles — card brightens when traveling dot reaches it
+  const isActive = activation > 0;
+  const activationIntensity = activation;
+
+  // Border color shifts from default to card's accent color when activated
+  const borderOpacity = interpolate(activationIntensity, [0, 1], [glow * 0.4, 0.8], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  // Icon glow intensity increases with activation
+  const iconGlow = interpolate(activationIntensity, [0, 1], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  // Timing text spring reveal — hidden until activated
+  const timingOpacity = interpolate(activationIntensity, [0.6, 1], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const timingY = interpolate(activationIntensity, [0.6, 1], [6, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
 
   return (
     <div
@@ -246,7 +312,7 @@ const PipelineStep: React.FC<{
           width: 105,
           height: 105,
           backgroundColor: COLORS.bgCard,
-          border: `1px solid rgba(6,182,212,${glow * 0.4})`,
+          border: `1px solid ${step.color}${Math.round(borderOpacity * 255).toString(16).padStart(2, "0")}`,
           borderRadius: 16,
           display: "flex",
           flexDirection: "column",
@@ -255,7 +321,9 @@ const PipelineStep: React.FC<{
           gap: 10,
           position: "relative",
           overflow: "hidden",
-          boxShadow: `0 4px 20px rgba(0,0,0,0.3)`,
+          boxShadow: isActive
+            ? `0 4px 20px rgba(0,0,0,0.3), 0 0 20px ${step.color}40`
+            : `0 4px 20px rgba(0,0,0,0.3)`,
         }}
       >
         {/* Shimmer sweep */}
@@ -268,9 +336,26 @@ const PipelineStep: React.FC<{
           }}
         />
 
+        {/* Activation glow overlay */}
+        {isActive && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: `radial-gradient(circle at center, ${step.color}${Math.round(iconGlow * 30).toString(16).padStart(2, "0")}, transparent 70%)`,
+              pointerEvents: "none",
+            }}
+          />
+        )}
+
         {/* Icon */}
-        <div style={{ transform: `scale(${iconPulse})` }}>
-          <Icon name={step.icon} size={24} color={COLORS.primary} />
+        <div
+          style={{
+            transform: `scale(${iconPulse + iconGlow * 0.1})`,
+            filter: isActive ? `drop-shadow(0 0 6px ${step.color})` : "none",
+          }}
+        >
+          <Icon name={step.icon} size={24} color={isActive ? step.color : COLORS.primary} />
         </div>
 
         {/* Step number */}
@@ -302,6 +387,22 @@ const PipelineStep: React.FC<{
       >
         {step.label}
       </div>
+
+      {/* Timing — revealed when traveling dot reaches this card */}
+      <div
+        style={{
+          fontFamily,
+          fontSize: 12,
+          fontWeight: 600,
+          color: step.color,
+          marginTop: 4,
+          opacity: timingOpacity,
+          transform: `translateY(${timingY}px)`,
+          letterSpacing: "0.05em",
+        }}
+      >
+        {step.timing}
+      </div>
     </div>
   );
 };
@@ -313,15 +414,21 @@ const ConnectorArrow: React.FC<{
   frame: number;
   fps: number;
   flowProgress: number;
+  activation: number;
   delay: number;
-}> = ({ index, frame, fps, flowProgress, delay }) => {
+}> = ({ index, frame, fps, flowProgress, activation, delay }) => {
   const progress = spring({ frame, fps, delay, config: CONFIG_SMOOTH });
   const opacity = interpolate(progress, [0, 1], [0, 1]);
 
   // Determine if the flow has reached this connector
   const connectorStart = index / (STEP_COUNT - 1);
-  const connectorEnd = (index + 1) / (STEP_COUNT - 1);
-  const isActive = flowProgress >= connectorStart;
+  const isActive = flowProgress >= connectorStart || activation > 0;
+
+  // Glowing dot on connector when the preceding card is activated
+  const dotOp = interpolate(activation, [0.8, 1], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
 
   return (
     <div
@@ -339,22 +446,38 @@ const ConnectorArrow: React.FC<{
           backgroundColor: isActive ? COLORS.primary : COLORS.border,
           borderRadius: 1,
           position: "relative",
-          transition: "none",
           boxShadow: isActive ? `0 0 8px ${COLORS.primaryGlow}` : "none",
         }}
       >
-        {/* Flow dot */}
+        {/* Flow dot from linear progress */}
         {isActive && (
           <div
             style={{
               position: "absolute",
               top: -2,
-              left: `${Math.min(1, (flowProgress - connectorStart) / (connectorEnd - connectorStart)) * 100}%`,
+              left: `${Math.min(1, (flowProgress - connectorStart) / (1 / (STEP_COUNT - 1))) * 100}%`,
               width: 6,
               height: 6,
               borderRadius: "50%",
               backgroundColor: COLORS.primary,
               boxShadow: `0 0 8px ${COLORS.primary}`,
+            }}
+          />
+        )}
+
+        {/* Activation dot — glowing dot on connector when card activates */}
+        {dotOp > 0 && (
+          <div
+            style={{
+              position: "absolute",
+              top: -3,
+              right: -2,
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              backgroundColor: COLORS.primary,
+              opacity: dotOp,
+              boxShadow: `0 0 12px ${COLORS.primary}, 0 0 24px ${COLORS.primaryGlow}`,
             }}
           />
         )}

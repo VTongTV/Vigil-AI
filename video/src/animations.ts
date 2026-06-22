@@ -511,3 +511,177 @@ export function parallaxDrift(
     y: Math.cos(t * 0.7) * amplitudeY,
   };
 }
+
+/* ═══════════════════════════ Visible Ambient Motion ═══════════════════════════ */
+
+/**
+ * Visible float — stronger version of idleFloat.
+ * 10-15px drift instead of 2-3px. Actually noticeable on screen.
+ *
+ * Usage: same as idleFloat but with visible amplitude.
+ */
+export function visibleFloat(
+  frame: number,
+  speed: number = 0.04,
+  amplitude: number = 12,
+  phase: number = 0,
+): number {
+  return Math.sin(frame * speed + phase) * amplitude;
+}
+
+/**
+ * Visible breathe — stronger version of idleBreathe.
+ * ±2% scale instead of ±0.4%. Noticeable size oscillation.
+ *
+ * Usage: same as idleBreathe but with visible amplitude.
+ */
+export function visibleBreathe(
+  frame: number,
+  speed: number = 0.035,
+  amplitude: number = 0.02,
+): number {
+  return 1 + Math.sin(frame * speed) * amplitude;
+}
+
+/* ═══════════════════════════ Narrative Progression ═══════════════════════════ */
+
+/**
+ * Sequential highlight sweep — returns 0–1 intensity for item at index.
+ * Items light up one after another, each active for holdFrames.
+ * After the sweep, intensity settles to a dimmed state (0.3).
+ *
+ * Usage:
+ *   const intensity = highlightSweep(frame, 80, 50, i, totalItems);
+ *   // Apply as: border opacity, scale boost, glow intensity
+ *
+ * Args:
+ *   frame: Current frame.
+ *   startFrame: When the sweep begins.
+ *   holdFrames: How many frames each item stays highlighted.
+ *   index: This item's position in the sequence.
+ *   total: Total number of items.
+ */
+export function highlightSweep(
+  frame: number,
+  startFrame: number,
+  holdFrames: number,
+  index: number,
+  total: number,
+): number {
+  const gap = Math.floor(holdFrames * 0.65);
+  const itemStart = startFrame + index * gap;
+  const itemPeak = itemStart + 8;
+  const itemEnd = itemStart + holdFrames;
+  const sweepEnd = startFrame + (total - 1) * gap + holdFrames;
+
+  if (frame < itemStart) return 0;
+  if (frame < itemPeak) {
+    return interpolate(frame, [itemStart, itemPeak], [0, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+  }
+  if (frame < itemEnd) return 1;
+  // After peak, dim to 0.3 (still subtly active)
+  if (frame < sweepEnd + 30) {
+    return interpolate(frame, [itemEnd, itemEnd + 15], [1, 0.3], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+  }
+  return 0.3;
+}
+
+/**
+ * Traveling activation — for pipeline/data flow animations.
+ * Returns 0–1 activation intensity for item at index as a
+ * "traveling dot" moves through the sequence.
+ *
+ * Usage:
+ *   const activation = travelingActivation(frame, 60, 300, i, totalItems);
+ *   // Card is "lit up" when activation > 0
+ *
+ * Args:
+ *   frame: Current frame.
+ *   startFrame: When the traveling dot starts.
+ *   duration: How long the dot takes to traverse all items.
+ *   index: This item's position.
+ *   total: Total number of items.
+ */
+export function travelingActivation(
+  frame: number,
+  startFrame: number,
+  duration: number,
+  index: number,
+  total: number,
+): number {
+  const progress = interpolate(frame, [startFrame, startFrame + duration], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.quad),
+  });
+  const itemStart = index / total;
+  const itemEnd = (index + 1) / total;
+  if (progress < itemStart) return 0;
+  if (progress < itemEnd) {
+    return interpolate(progress, [itemStart, itemEnd], [0, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+  }
+  return 1;
+}
+
+/**
+ * Pulse ring — expanding circle for logo reveals and emphasis.
+ * Returns { scale, opacity } for a ring that expands outward and fades.
+ *
+ * Usage:
+ *   const ring = pulseRing(frame, 60, 45, 3.5);
+ *   <div style={{ transform: `scale(${ring.scale})`, opacity: ring.opacity }} />
+ *
+ * Args:
+ *   frame: Current frame.
+ *   triggerFrame: When the ring starts expanding.
+ *   duration: How many frames the ring takes to expand and fade.
+ *   maxScale: How large the ring gets. Default 3.5.
+ */
+export function pulseRing(
+  frame: number,
+  triggerFrame: number,
+  duration: number = 45,
+  maxScale: number = 3.5,
+): { scale: number; opacity: number } {
+  if (frame < triggerFrame) return { scale: 0, opacity: 0 };
+  const t = interpolate(frame, [triggerFrame, triggerFrame + duration], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return {
+    scale: interpolate(t, [0, 1], [1, maxScale]),
+    opacity: interpolate(t, [0, 0.15, 0.6, 1], [0.7, 0.5, 0.25, 0]),
+  };
+}
+
+/**
+ * Count-up with easing — animated number from `from` to `to`.
+ * Unlike the basic countUp, this takes a duration in frames.
+ *
+ * Usage:
+ *   const val = countUpEased(frame, 60, 120, 0, 500);
+ *   <span>{Math.round(val)}</span>
+ */
+export function countUpEased(
+  frame: number,
+  startFrame: number,
+  duration: number,
+  from: number,
+  to: number,
+): number {
+  const progress = interpolate(frame, [startFrame, startFrame + duration], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.quad),
+  });
+  return from + (to - from) * progress;
+}

@@ -6,7 +6,7 @@ import {
   interpolate,
   spring,
 } from "remotion";
-import { COLORS, FPS } from "../constants";
+import { COLORS, FPS, IMPACT_METRICS } from "../constants";
 import {
   fadeIn,
   fadeInEased,
@@ -19,8 +19,10 @@ import {
   slowRotate,
   linearProgress,
   transforms,
-  idleFloat,
-  idleBreathe,
+  visibleFloat,
+  visibleBreathe,
+  countUpEased,
+  highlightSweep,
   sceneExit,
   CONFIG_SNAPPY,
   CONFIG_SMOOTH,
@@ -36,59 +38,103 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
+/** 10 seconds at 60 fps = 600 frames. */
 const TOTAL_FRAMES = 10 * FPS;
 
-// Impact metrics
+/**
+ * Metric definitions with numeric count targets for countUpEased.
+ * Each metric maps to an IMPACT_METRICS entry for labels and subtexts.
+ */
 const METRICS = [
-  { label: "Violations Detected", value: 12847, suffix: "", icon: "alert" as const },
-  { label: "Evidence Generated", value: 11203, suffix: "", icon: "shield" as const },
-  { label: "Cameras Deployed", value: 142, suffix: "+", icon: "camera" as const },
-  { label: "Avg Response Time", value: 2.4, suffix: "s", icon: "clock" as const, isDecimal: true },
+  {
+    label: "Cost per Junction",
+    countTarget: 25,
+    prefix: "₹",
+    suffix: "K",
+    sub: "vs ₹50K+ competitors",
+    icon: "money" as const,
+    countStart: 40,
+    countDur: 100,
+  },
+  {
+    label: "End-to-End Latency",
+    countTarget: 1.2,
+    prefix: "",
+    suffix: "s",
+    sub: "upload → evidence",
+    icon: "cpu" as const,
+    isDecimal: true,
+    countStart: 55,
+    countDur: 90,
+  },
+  {
+    label: "VRAM Footprint",
+    countTarget: 4,
+    prefix: "",
+    suffix: " GB",
+    sub: "RTX 3050 consumer GPU",
+    icon: "gpu" as const,
+    countStart: 70,
+    countDur: 70,
+  },
+  {
+    label: "Annual ROI",
+    countTarget: 87,
+    prefix: "",
+    suffix: "×",
+    sub: "₹438 Cr potential",
+    icon: "roi" as const,
+    countStart: 85,
+    countDur: 80,
+  },
 ];
 
 /**
- * Scene 9: Impact / Closing
- * Animated counters, particle atmosphere,
- * CTA, and VigilAI branding.
+ * Scene 10: Impact / Closing (10 seconds)
+ *
+ * Narrative progression:
+ * - Numbers count up dramatically from 0 to target
+ * - Metric cards highlight in sequence via highlightSweep
+ * - CTA and branding entrance with spring bounce
+ * - Continuous visible ambient motion on all elements
  */
 export const Impact: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps, width, height } = useVideoConfig();
+  const { fps } = useVideoConfig();
 
-  // Section label
+  /* ── Section label ── */
   const labelProgress = spring({ frame, fps, delay: 0, config: CONFIG_SMOOTH });
   const labelOp = interpolate(labelProgress, [0, 1], [0, 1]);
 
-  // Title
+  /* ── Title ── */
   const titleProgress = spring({ frame, fps, delay: 10, config: CONFIG_BOUNCY });
   const titleOp = interpolate(titleProgress, [0, 1], [0, 1]);
   const titleY = interpolate(titleProgress, [0, 1], [20, 0]);
 
-  // CTA entrance
+  /* ── CTA entrance ── */
   const ctaProgress = spring({ frame, fps, delay: Math.round(6 * fps), config: CONFIG_BOUNCY });
   const ctaOp = interpolate(ctaProgress, [0, 1], [0, 1]);
   const ctaScale = interpolate(ctaProgress, [0.3, 1], [0.9, 1]);
 
-  // CTA pulse
+  /* ── CTA pulse ── */
   const ctaPulse = pulse(frame, 0.03, 0.02, 1);
 
-  // Brand entrance
+  /* ── Brand entrance ── */
   const brandProgress = spring({ frame, fps, delay: Math.round(7 * fps), config: CONFIG_SMOOTH });
   const brandOp = interpolate(brandProgress, [0, 1], [0, 1]);
 
-  // Scene exit
+  /* ── Scene exit ── */
   const exit = sceneExit(frame, TOTAL_FRAMES, 18);
 
-  // Idle motion
-  const labelIdle = idleFloat(frame, 0.035, 1.5, 0);
-  const titleIdle = idleFloat(frame, 0.04, 2.5, 0.5);
-  const ctaIdle = idleFloat(frame, 0.04, 1.5, 2.0);
-  const brandIdle = idleFloat(frame, 0.03, 1, 3.0);
-  const accentShimmer = idleFloat(frame, 0.02, 0.15, 0);
+  /* ── Visible ambient motion (8-10px drift, ±2% breathe) ── */
+  const labelIdle = visibleFloat(frame, 0.04, 10, 0);
+  const titleIdle = visibleFloat(frame, 0.045, 12, 0.5);
+  const ctaIdle = visibleFloat(frame, 0.04, 10, 2.0);
+  const brandIdle = visibleFloat(frame, 0.035, 8, 3.0);
+  const accentShimmer = visibleFloat(frame, 0.025, 0.15, 0);
 
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
-      {/* Animated background — more particles for closing */}
       <AnimatedBackground particleCount={35} seed={99} />
 
       <div
@@ -151,7 +197,7 @@ export const Impact: React.FC = () => {
           </span>
         </div>
 
-        {/* Metrics grid */}
+        {/* Metrics grid — with highlightSweep and countUpEased */}
         <div
           style={{
             display: "flex",
@@ -194,12 +240,12 @@ export const Impact: React.FC = () => {
         {/* Brand */}
         <div
           style={{
-          marginTop: 30,
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          opacity: brandOp,
-          transform: `translateY(${brandIdle}px)`,
+            marginTop: 30,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            opacity: brandOp,
+            transform: `translateY(${brandIdle}px)`,
           }}
         >
           <Icon name="shield" size={20} color={COLORS.primary} />
@@ -264,34 +310,48 @@ const MetricCard: React.FC<{
   const opacity = interpolate(progress, [0, 1], [0, 1]);
   const translateY = interpolate(progress, [0, 1], [30, 0]);
 
-  const cardFloat = floatY(frame, 0.015 + index * 0.003, 2, index * 0.6);
+  /* ── Visible ambient motion ── */
+  const cardFloat = visibleFloat(frame, 0.03 + index * 0.004, 10, index * 0.6);
   const shimmerPos = shimmerPosition(frame, 200, delay + 30);
   const glow = borderGlow(frame, 0.02 + index * 0.003);
-  const iconPulse = pulse(frame, 0.03, 0.05, 1);
-  const cardBreathe = idleBreathe(frame, 0.03 + index * 0.003, 0.004);
+  const iconPulse = pulse(frame, 0.03, 0.06, 1);
+  const cardBreathe = visibleBreathe(frame, 0.03 + index * 0.003, 0.018);
 
-  // Counter animation
-  const counterProgress = linearProgress(frame, delay, delay + 80);
+  /* ── CountUpEased: numbers count from 0 → target ── */
+  const counted = countUpEased(frame, metric.countStart, metric.countDur, 0, metric.countTarget);
+  const countDone = frame >= metric.countStart + metric.countDur;
   const displayValue = metric.isDecimal
-    ? (metric.value * counterProgress).toFixed(1)
-    : Math.floor(metric.value * counterProgress).toLocaleString();
+    ? counted.toFixed(1)
+    : Math.round(counted).toLocaleString();
+
+  /* ── Highlight sweep: cards light up in sequence ── */
+  const sweepIntensity = highlightSweep(frame, 100, 60, index, 4);
+  const isSweepActive = sweepIntensity > 0.5;
+  const sweepScale = interpolate(sweepIntensity, [0, 1], [1, 1.05]);
+  const sweepBorderOpacity = interpolate(sweepIntensity, [0, 1], [0.15, 0.8], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
 
   return (
     <div
       style={{
         width: 220,
         backgroundColor: COLORS.bgCard,
-        border: `1px solid rgba(6,182,212,${glow * 0.3})`,
+        border: `1px solid rgba(6,182,212,${isSweepActive ? sweepBorderOpacity : glow * 0.3})`,
         borderRadius: 14,
         padding: "28px 22px",
         textAlign: "center",
         opacity,
         transform: transforms(
           `translateY(${translateY + cardFloat}px)`,
-          `scale(${cardBreathe})`,
+          `scale(${cardBreathe * sweepScale})`,
         ),
         position: "relative",
         overflow: "hidden",
+        boxShadow: isSweepActive
+          ? `0 0 24px rgba(6,182,212,${sweepIntensity * 0.2}), inset 0 0 30px rgba(6,182,212,${sweepIntensity * 0.05})`
+          : "none",
       }}
     >
       {/* Shimmer */}
@@ -304,28 +364,36 @@ const MetricCard: React.FC<{
         }}
       />
 
-      {/* Icon */}
-      <div style={{ transform: `scale(${iconPulse})`, marginBottom: 14 }}>
+      {/* Icon with glow when sweep active */}
+      <div
+        style={{
+          transform: `scale(${iconPulse * (1 + sweepIntensity * 0.1)})`,
+          marginBottom: 14,
+          filter: isSweepActive ? `drop-shadow(0 0 8px ${COLORS.primary})` : "none",
+        }}
+      >
         <Icon name={metric.icon} size={24} color={COLORS.primary} />
       </div>
 
-      {/* Value */}
+      {/* Value — countUpEased display */}
       <div
         style={{
           fontFamily,
           fontSize: 36,
           fontWeight: 800,
-          color: COLORS.text,
+          color: isSweepActive ? COLORS.primary : COLORS.text,
           letterSpacing: "-0.03em",
           marginBottom: 6,
+          transition: "none",
         }}
       >
-        {displayValue}
+        {metric.prefix}{displayValue}
         <span
           style={{
             fontSize: 24,
             fontWeight: 600,
             color: COLORS.primary,
+            opacity: countDone ? 1 : 0.5,
           }}
         >
           {metric.suffix}
@@ -339,9 +407,25 @@ const MetricCard: React.FC<{
           fontSize: 16,
           color: COLORS.textMuted,
           letterSpacing: "0.04em",
+          marginBottom: 4,
         }}
       >
         {metric.label}
+      </div>
+
+      {/* Sub-text — fades in with sweep */}
+      <div
+        style={{
+          fontFamily,
+          fontSize: 13,
+          color: COLORS.textSubtle,
+          opacity: interpolate(sweepIntensity, [0, 0.5, 1], [0.3, 0.6, 1], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          }),
+        }}
+      >
+        {metric.sub}
       </div>
     </div>
   );

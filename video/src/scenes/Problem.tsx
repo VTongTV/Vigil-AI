@@ -21,9 +21,9 @@ import {
   CONFIG_SNAPPY,
   CONFIG_SMOOTH,
   CONFIG_BOUNCY,
-  idleFloat,
-  idleBreathe,
-  idleDrift,
+  visibleFloat,
+  visibleBreathe,
+  highlightSweep,
   sceneExit,
 } from "../animations";
 import { AnimatedBackground } from "../AnimatedBackground";
@@ -40,7 +40,7 @@ const TOTAL_FRAMES = 10 * FPS;
 /**
  * Scene 2: The Problem
  * Stats fly in with severity bars, shimmer effects,
- * and continuous motion. SVG icons replace emojis.
+ * highlight sweep, and continuous motion. SVG icons replace emojis.
  */
 export const Problem: React.FC = () => {
   const frame = useCurrentFrame();
@@ -58,16 +58,16 @@ export const Problem: React.FC = () => {
   const titleY = interpolate(titleProgress, [0, 1], [25, 0]);
   const titleScale = interpolate(titleProgress, [0.4, 1], [0.95, 1]);
 
-  // Title idle float
-  const titleIdle = idleFloat(frame, 0.04, 2.5, 0);
+  // Title idle float — visible amplitude
+  const titleIdle = visibleFloat(frame, 0.04, 12, 0);
 
   // Section label — slides in from left
   const labelProgress = spring({ frame, fps, delay: 0, config: CONFIG_SMOOTH });
   const labelOp = interpolate(labelProgress, [0, 1], [0, 1]);
   const labelX = interpolate(labelProgress, [0, 1], [-20, 0]);
 
-  // Label idle float
-  const labelIdle = idleFloat(frame, 0.035, 1.5, 0.3);
+  // Label idle float — visible amplitude
+  const labelIdle = visibleFloat(frame, 0.035, 10, 0.3);
 
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
@@ -180,6 +180,11 @@ const StatCard: React.FC<{
   const translateY = interpolate(progress, [0, 1], [50, 0]);
   const scale = interpolate(progress, [0.3, 1], [0.92, 1]);
 
+  // Highlight sweep — sequential attention across cards
+  const sweep = highlightSweep(frame, 80, 120, index, 4);
+  const sweepBorderOpacity = interpolate(sweep, [0, 1], [0.3, 0.8]);
+  const sweepScale = interpolate(sweep, [0, 1], [1, 1.04]);
+
   // Severity bar fill
   const barProgress = interpolate(
     frame,
@@ -188,20 +193,37 @@ const StatCard: React.FC<{
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
 
+  // Severity bar glow pulse after filling
+  const barFilled = barProgress >= 0.99;
+  const barShadowIntensity = barFilled
+    ? 0.3 + Math.sin(frame * 0.06) * 0.2
+    : barProgress * 0.3;
+  const barShadowSpread = barFilled
+    ? 8 + Math.sin(frame * 0.06) * 6
+    : 8;
+
   // Shimmer sweep
   const shimmerPos = shimmerPosition(frame, 180, delay + 60);
 
-  // Continuous floating
-  const cardFloat = floatY(frame, 0.02 + index * 0.003, 2.5, index * 1.2);
+  // Continuous floating — visible amplitude (10-12px instead of 2-3px)
+  const cardFloat = visibleFloat(frame, 0.02 + index * 0.003, 10, index * 1.2);
 
   // Border glow
   const glow = borderGlow(frame, 0.03 + index * 0.005);
 
   // Icon pulse
   const iconPulse = pulse(frame, 0.04 + index * 0.005, 0.05, 1);
+  // Icon brightness boost during sweep highlight
+  const iconBrightness = interpolate(sweep, [0, 1], [1, 1.3]);
 
-  // Card idle breathe
-  const cardBreathe = idleBreathe(frame, 0.03 + index * 0.004, 0.004);
+  // Card breathe — visible amplitude (±2% instead of ±0.4%)
+  const cardBreathe = visibleBreathe(frame, 0.03 + index * 0.004, 0.02);
+
+  // Value dramatic spring entrance — staggered per card
+  const valueDelay = delay + 20;
+  const valueProgress = spring({ frame, fps, delay: valueDelay, config: CONFIG_BOUNCY });
+  const valueScale = interpolate(valueProgress, [0, 1], [0.6, 1]);
+  const valueOp = interpolate(valueProgress, [0, 1], [0, 1]);
 
   return (
     <div
@@ -209,13 +231,13 @@ const StatCard: React.FC<{
         flex: 1,
         maxWidth: 360,
         backgroundColor: COLORS.bgCard,
-        border: `1px solid rgba(239,68,68,${glow * 0.3})`,
+        border: `1px solid rgba(239,68,68,${sweepBorderOpacity * (glow * 0.5 + 0.5)})`,
         borderRadius: 16,
         padding: "36px 28px",
         opacity,
         transform: transforms(
           `translateY(${translateY + cardFloat}px)`,
-          `scale(${scale * cardBreathe})`,
+          `scale(${scale * sweepScale * cardBreathe})`,
         ),
         position: "relative",
         overflow: "hidden",
@@ -244,17 +266,18 @@ const StatCard: React.FC<{
         }}
       />
 
-      {/* Icon */}
+      {/* Icon — brightens during sweep highlight */}
       <div
         style={{
           marginBottom: 16,
-          transform: `scale(${iconPulse})`,
+          transform: `scale(${iconPulse * sweepScale})`,
+          filter: `brightness(${iconBrightness})`,
         }}
       >
         <Icon name={stat.icon} size={32} color={COLORS.danger} />
       </div>
 
-      {/* Value */}
+      {/* Value — dramatic spring entrance */}
       <div
         style={{
           fontFamily,
@@ -263,6 +286,9 @@ const StatCard: React.FC<{
           color: COLORS.text,
           letterSpacing: "-0.03em",
           marginBottom: 8,
+          opacity: valueOp,
+          transform: `scale(${valueScale})`,
+          transformOrigin: "left center",
         }}
       >
         {stat.value}
@@ -296,7 +322,7 @@ const StatCard: React.FC<{
             width: `${barProgress * 100}%`,
             background: `linear-gradient(90deg, ${COLORS.danger}, ${COLORS.warning})`,
             borderRadius: 2,
-            boxShadow: `0 0 8px rgba(239,68,68,${barProgress * 0.3})`,
+            boxShadow: `0 0 ${barShadowSpread}px rgba(239,68,68,${barShadowIntensity})`,
           }}
         />
       </div>

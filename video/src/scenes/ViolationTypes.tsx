@@ -8,10 +8,7 @@ import {
 } from "remotion";
 import { COLORS, VIOLATION_TYPES, FPS } from "../constants";
 import {
-  fadeIn,
-  fadeInEased,
   stagger,
-  floatY,
   shimmerPosition,
   borderGlow,
   pulse,
@@ -19,8 +16,9 @@ import {
   CONFIG_SNAPPY,
   CONFIG_SMOOTH,
   CONFIG_BOUNCY,
-  idleFloat,
-  idleBreathe,
+  visibleFloat,
+  visibleBreathe,
+  highlightSweep,
   sceneExit,
 } from "../animations";
 import { AnimatedBackground } from "../AnimatedBackground";
@@ -32,7 +30,7 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
-const TOTAL_FRAMES = 12 * FPS;
+const TOTAL_FRAMES = 10 * FPS;
 
 // Bento layout — 2 rows of 4 cards each
 const LAYOUT = [
@@ -45,7 +43,7 @@ const LAYOUT = [
 /**
  * Scene 6: Violation Types
  * Bento grid with animated cards, shimmer effects,
- * SVG icons, severity indicators, and continuous motion.
+ * SVG icons, severity indicators, highlight sweep, and continuous motion.
  */
 export const ViolationTypes: React.FC = () => {
   const frame = useCurrentFrame();
@@ -60,9 +58,16 @@ export const ViolationTypes: React.FC = () => {
   const titleOp = interpolate(titleProgress, [0, 1], [0, 1]);
   const titleY = interpolate(titleProgress, [0, 1], [20, 0]);
 
-  // Idle motion
-  const labelIdle = idleFloat(frame, 0.035, 1.5, 0);
-  const titleIdle = idleFloat(frame, 0.04, 2, 0.5);
+  // Visible continuous motion (8-10px amplitude)
+  const labelFloat = visibleFloat(frame, 0.035, 8, 0);
+  const titleFloat = visibleFloat(frame, 0.04, 10, 0.5);
+
+  // Title pulse after entrance
+  const titlePulse = interpolate(
+    Math.sin(frame * 0.025),
+    [-1, 1],
+    [0.98, 1.02],
+  );
 
   // Scene exit
   const exit = sceneExit(frame, TOTAL_FRAMES, 18);
@@ -95,7 +100,7 @@ export const ViolationTypes: React.FC = () => {
             letterSpacing: "0.25em",
             textTransform: "uppercase" as const,
             opacity: labelOp,
-            transform: `translateY(${labelIdle}px)`,
+            transform: `translateY(${labelFloat}px)`,
             marginBottom: 16,
             display: "flex",
             alignItems: "center",
@@ -107,7 +112,7 @@ export const ViolationTypes: React.FC = () => {
           <div style={{ width: 20, height: 1, backgroundColor: COLORS.primary }} />
         </div>
 
-        {/* Title */}
+        {/* Title — with subtle pulse */}
         <div
           style={{
             fontFamily,
@@ -116,7 +121,7 @@ export const ViolationTypes: React.FC = () => {
             color: COLORS.text,
             textAlign: "center",
             opacity: titleOp,
-            transform: `translateY(${titleY + titleIdle}px)`,
+            transform: `translateY(${titleY + titleFloat}px) scale(${titlePulse})`,
             marginBottom: 50,
           }}
         >
@@ -138,6 +143,7 @@ export const ViolationTypes: React.FC = () => {
                     index={violationIdx}
                     frame={frame}
                     fps={fps}
+                    totalCards={VIOLATION_TYPES.length}
                   />
                 );
               })}
@@ -156,7 +162,8 @@ const ViolationCard: React.FC<{
   index: number;
   frame: number;
   fps: number;
-}> = ({ violation, index, frame, fps }) => {
+  totalCards: number;
+}> = ({ violation, index, frame, fps, totalCards }) => {
   const delay = stagger(index, 8) + 25;
 
   const progress = spring({ frame, fps, delay, config: CONFIG_SNAPPY });
@@ -164,11 +171,28 @@ const ViolationCard: React.FC<{
   const translateY = interpolate(progress, [0, 1], [35, 0]);
   const scale = interpolate(progress, [0.3, 1], [0.92, 1]);
 
-  const cardFloat = floatY(frame, 0.018 + index * 0.002, 2, index * 0.7);
+  // Visible continuous motion (8-10px, different phase per card)
+  const cardFloat = visibleFloat(frame, 0.018 + index * 0.002, 9, index * 0.7);
   const shimmerPos = shimmerPosition(frame, 200, delay + 30);
   const glow = borderGlow(frame, 0.02 + index * 0.003);
-  const iconPulse = pulse(frame, 0.03 + index * 0.003, 0.05, 1);
-  const cardBreathe = idleBreathe(frame, 0.03 + index * 0.003, 0.004);
+  const iconPulse = pulse(frame, 0.03 + index * 0.003, 0.08, 1);
+  const cardBreathe = visibleBreathe(frame, 0.03 + index * 0.003, 0.018);
+
+  // Highlight sweep — after cards enter (~frame 80+)
+  const sweepIntensity = highlightSweep(frame, 80, 40, index, totalCards);
+  const isSweepActive = sweepIntensity > 0.5;
+
+  // Dynamic border opacity: sweep makes border brighter
+  const borderOpacity = interpolate(sweepIntensity, [0, 1], [0.3, 0.7]);
+  const borderActiveOpacity = isSweepActive
+    ? interpolate(sweepIntensity, [0.5, 1], [0, 0.5], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      })
+    : 0;
+
+  // Sweep-driven scale boost
+  const sweepScale = interpolate(sweepIntensity, [0, 1], [1, 1.04]);
 
   // Severity color based on fine string
   const severityColor =
@@ -178,29 +202,50 @@ const ViolationCard: React.FC<{
         ? COLORS.warning
         : COLORS.success;
 
+  // Fine text gets brighter during sweep
+  const fineBrightness = interpolate(sweepIntensity, [0, 1], [0.85, 1.2]);
+  const fineColor = isSweepActive ? COLORS.text : severityColor;
+
   return (
     <div
       style={{
         width: 210,
         backgroundColor: COLORS.bgCard,
-        border: `1px solid rgba(6,182,212,${glow * 0.3})`,
+        border: `1px solid rgba(6,182,212,${borderOpacity + borderActiveOpacity})`,
         borderRadius: 14,
         padding: "12px 16px",
         opacity,
         transform: transforms(
           `translateY(${translateY + cardFloat}px)`,
-          `scale(${scale * cardBreathe})`,
+          `scale(${scale * cardBreathe * sweepScale})`,
         ),
         position: "relative",
         overflow: "hidden",
+        // Active highlight: brighter border + subtle glow
+        boxShadow: isSweepActive
+          ? `0 0 20px rgba(6,182,212,${borderActiveOpacity * 0.3}), inset 0 0 15px rgba(6,182,212,${borderActiveOpacity * 0.05})`
+          : "none",
       }}
     >
+      {/* Active border overlay */}
+      {isSweepActive && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            border: `2px solid rgba(6,182,212,${borderActiveOpacity})`,
+            borderRadius: 14,
+            pointerEvents: "none",
+          }}
+        />
+      )}
+
       {/* Shimmer sweep */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          background: `linear-gradient(105deg, transparent 40%, rgba(6,182,212,${shimmerPos * 0.04}) 50%, transparent 60%)`,
+          background: `linear-gradient(105deg, transparent 40%, rgba(6,182,212,${(shimmerPos + sweepIntensity * 0.5) * 0.04}) 50%, transparent 60%)`,
           pointerEvents: "none",
         }}
       />
@@ -215,7 +260,7 @@ const ViolationCard: React.FC<{
           width: 3,
           backgroundColor: severityColor,
           borderRadius: 2,
-          opacity: 0.7,
+          opacity: interpolate(sweepIntensity, [0, 1], [0.7, 1]),
         }}
       />
 
@@ -229,8 +274,19 @@ const ViolationCard: React.FC<{
           paddingLeft: 6,
         }}
       >
-        <div style={{ transform: `scale(${iconPulse})` }}>
-          <Icon name={violation.icon} size={20} color={COLORS.primary} />
+        <div
+          style={{
+            transform: `scale(${iconPulse})`,
+            filter: isSweepActive
+              ? `drop-shadow(0 0 6px rgba(6,182,212,0.5))`
+              : "none",
+          }}
+        >
+          <Icon
+            name={violation.icon}
+            size={20}
+            color={isSweepActive ? COLORS.primary : COLORS.primary}
+          />
         </div>
         <div
           style={{
@@ -267,7 +323,8 @@ const ViolationCard: React.FC<{
             fontFamily,
             fontSize: 16,
             fontWeight: 700,
-            color: severityColor,
+            color: fineColor,
+            filter: `brightness(${fineBrightness})`,
           }}
         >
           {violation.fine}

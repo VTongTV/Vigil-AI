@@ -16,8 +16,10 @@ import {
   transforms,
   CONFIG_ELASTIC,
   CONFIG_SMOOTH,
-  idleFloat,
-  idleBreathe,
+  visibleFloat,
+  visibleBreathe,
+  highlightSweep,
+  fadeInEased,
   sceneExit,
 } from "../animations";
 import { AnimatedBackground } from "../AnimatedBackground";
@@ -79,9 +81,9 @@ export const BeyondDetection: React.FC = () => {
   const titleY = interpolate(titleProgress, [0, 1], [30, 0]);
   const titleScale = interpolate(titleProgress, [0.3, 1], [0.92, 1]);
 
-  /* ── Continuous idle motion for text ── */
-  const labelIdle = idleFloat(frame, 0.035, 1.5, 0);
-  const titleIdle = idleFloat(frame, 0.04, 2, 0.5);
+  /* ── Continuous visible motion for text ── */
+  const labelIdle = visibleFloat(frame, 0.04, 10, 0);
+  const titleIdle = visibleFloat(frame, 0.045, 12, 0.5);
 
   /* ── Scene exit ── */
   const exit = sceneExit(frame, TOTAL_FRAMES, 18);
@@ -220,7 +222,11 @@ interface FeatureCardProps {
 
 /**
  * Individual feature card with colored icon, label, description,
- * spring entrance, and continuous idle motion.
+ * spring entrance, highlight sweep, and continuous visible motion.
+ *
+ * After entrance (frame ~60+), cards highlight one by one via
+ * highlightSweep. The active card gets a brighter border, scale
+ * boost, glowing icon, and its description text fades in.
  */
 const FeatureCard: React.FC<FeatureCardProps> = ({
   label,
@@ -237,30 +243,59 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
   const progress = spring({ frame, fps, delay, config: CONFIG_ELASTIC });
   const opacity = interpolate(progress, [0, 1], [0, 1]);
   const translateY = interpolate(progress, [0, 1], [35, 0]);
-  const scale = interpolate(progress, [0.3, 1], [0.9, 1]);
+  const entranceScale = interpolate(progress, [0.3, 1], [0.9, 1]);
 
-  const breathe = idleBreathe(frame, 0.04, 0.005);
-  const float = idleFloat(frame, 0.045, 3, index * 0.6);
+  /* ── Highlight sweep: each card lights up sequentially after frame 60 ── */
+  const sweepIntensity = highlightSweep(frame, 60, 60, index, 6);
+  const isActive = sweepIntensity > 0.5;
+
+  /* ── Visible ambient motion (10-12px drift, ±2% breathe) ── */
+  const breathe = visibleBreathe(frame, 0.04, 0.02);
+  const float = visibleFloat(frame, 0.045, 12, index * 0.6);
+
+  /* ── Active card scale boost ── */
+  const sweepScale = interpolate(sweepIntensity, [0, 1], [1, 1.04]);
+
+  /* ── Icon glow when active ── */
+  const iconGlow = interpolate(sweepIntensity, [0, 1], [0, 0.8]);
+
+  /* ── Description text fades in when card is highlighted ── */
+  const descOpacity = interpolate(sweepIntensity, [0, 0.5, 1], [0.4, 0.7, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  /* ── Border brightness based on sweep ── */
+  const borderOpacity = interpolate(sweepIntensity, [0, 1], [0.3, 0.9], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
 
   return (
     <div
       style={{
         flex: 1,
         backgroundColor: COLORS.bgCard,
-        borderLeft: `4px solid ${color}`,
         borderRadius: 12,
         padding: "20px 22px",
         opacity,
         transform: transforms(
           `translateY(${translateY + float}px)`,
-          `scale(${scale * breathe})`,
+          `scale(${entranceScale * breathe * sweepScale})`,
         ),
         display: "flex",
         alignItems: "flex-start",
         gap: 14,
+        boxShadow: isActive
+          ? `0 0 20px ${color}30, inset 0 0 30px ${color}08`
+          : "none",
+        border: isActive
+          ? `1px solid ${color}${Math.round(borderOpacity * 99).toString().padStart(2, "0")}`
+          : `1px solid ${COLORS.border}`,
+        borderLeft: `4px solid ${color}`,
       }}
     >
-      {/* Icon */}
+      {/* Icon with glow when active */}
       <div
         style={{
           width: 40,
@@ -271,6 +306,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
           alignItems: "center",
           justifyContent: "center",
           flexShrink: 0,
+          boxShadow: iconGlow > 0 ? `0 0 ${12 * iconGlow}px ${color}60` : "none",
+          transform: `scale(${1 + iconGlow * 0.08})`,
         }}
       >
         <Icon name={icon} size={22} color={color} />
@@ -283,7 +320,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
             fontFamily,
             fontSize: 18,
             fontWeight: 700,
-            color: COLORS.text,
+            color: isActive ? COLORS.text : COLORS.textMuted,
             lineHeight: 1.2,
           }}
         >
@@ -296,6 +333,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
             fontWeight: 400,
             color: COLORS.textMuted,
             lineHeight: 1.4,
+            opacity: descOpacity,
           }}
         >
           {desc}

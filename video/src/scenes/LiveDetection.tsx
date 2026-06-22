@@ -8,28 +8,19 @@ import {
   Img,
   staticFile,
 } from "remotion";
-import { COLORS, VIOLATION_TYPES, FPS } from "../constants";
+import { COLORS, FPS } from "../constants";
 import {
-  fadeIn,
-  fadeInEased,
-  stagger,
-  floatY,
-  shimmerPosition,
-  borderGlow,
   pulse,
   glowOp,
-  transforms,
   CONFIG_SNAPPY,
   CONFIG_SMOOTH,
   CONFIG_BOUNCY,
-  idleFloat,
-  idleBreathe,
-  idleDrift,
+  visibleFloat,
+  visibleBreathe,
   kenBurns,
   sceneExit,
 } from "../animations";
 import { AnimatedBackground } from "../AnimatedBackground";
-import { Icon } from "../Icon";
 import { loadFont } from "@remotion/google-fonts/Inter";
 
 const { fontFamily } = loadFont("normal", {
@@ -37,19 +28,62 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
-const TOTAL_FRAMES = 12 * FPS;
+const TOTAL_FRAMES = 15 * FPS;
 
-// Simulated bounding boxes for detection visualization
-const DETECTION_BOXES = [
-  { x: 280, y: 180, w: 100, h: 140, label: "No Helmet", color: COLORS.danger, delay: 60 },
-  { x: 520, y: 200, w: 90, h: 130, label: "Triple Riding", color: COLORS.warning, delay: 90 },
-  { x: 750, y: 160, w: 110, h: 160, label: "No Helmet", color: COLORS.danger, delay: 75 },
+/** Detection set: boxes visible during a time window. */
+interface DetectionBox {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  label: string;
+  color: string;
+}
+
+/**
+ * 3 cycling sets of detections with frame ranges.
+ * Each set fades in with spring, previous set fades out.
+ */
+const DETECTION_SETS: Array<{
+  startFrame: number;
+  endFrame: number;
+  cumulativeCount: number;
+  boxes: DetectionBox[];
+}> = [
+  {
+    startFrame: 60,
+    endFrame: 240,
+    cumulativeCount: 2,
+    boxes: [
+      { x: 280, y: 180, w: 100, h: 140, label: "No Helmet", color: COLORS.danger },
+      { x: 520, y: 200, w: 90, h: 130, label: "Triple Riding", color: COLORS.warning },
+    ],
+  },
+  {
+    startFrame: 240,
+    endFrame: 480,
+    cumulativeCount: 5,
+    boxes: [
+      { x: 350, y: 160, w: 110, h: 160, label: "No Helmet", color: COLORS.danger },
+      { x: 650, y: 200, w: 95, h: 140, label: "Wrong Side", color: "#EC4899" },
+      { x: 800, y: 180, w: 90, h: 130, label: "No Helmet", color: COLORS.danger },
+    ],
+  },
+  {
+    startFrame: 480,
+    endFrame: 720,
+    cumulativeCount: 7,
+    boxes: [
+      { x: 420, y: 300, w: 140, h: 100, label: "Illegal Parking", color: COLORS.secondary },
+      { x: 600, y: 150, w: 100, h: 150, label: "No Helmet", color: COLORS.danger },
+    ],
+  },
 ];
 
 /**
  * Scene 5: Live Detection
  * Simulated camera feed with CRT scan line,
- * animated bounding boxes, and detection readout.
+ * cycling bounding box sets, and live detection readout.
  */
 export const LiveDetection: React.FC = () => {
   const frame = useCurrentFrame();
@@ -75,24 +109,36 @@ export const LiveDetection: React.FC = () => {
   const statsOp = interpolate(statsProgress, [0, 1], [0, 1]);
   const statsX = interpolate(statsProgress, [0, 1], [30, 0]);
 
-  // Idle motion
-  const labelIdle = idleFloat(frame, 0.035, 1.5, 0);
-  const titleIdle = idleFloat(frame, 0.04, 2, 0.5);
-  const kb = kenBurns(frame, TOTAL_FRAMES, 1.02, 6, 3);
-  const sidebarBreathe = idleBreathe(frame, 0.03, 0.003);
-  const sidebarFloat = idleFloat(frame, 0.025, 1.5, 0);
-  const sidebarFloat2 = idleFloat(frame, 0.03, 1.5, 1.5);
-  const sidebarFloat3 = idleFloat(frame, 0.028, 1.5, 3.0);
-  const bboxFloat = idleFloat(frame, 0.06, 1, 0);
+  // Visible continuous motion (10-12px amplitude)
+  const labelFloat = visibleFloat(frame, 0.035, 10, 0);
+  const titleFloat = visibleFloat(frame, 0.04, 12, 0.5);
+  const kb = kenBurns(frame, TOTAL_FRAMES, 1.01, 3, 2);
+  const sidebarBreathe = visibleBreathe(frame, 0.03, 0.02);
+  const sidebarFloat1 = visibleFloat(frame, 0.025, 10, 0);
+  const sidebarFloat2 = visibleFloat(frame, 0.03, 10, 1.5);
+  const sidebarFloat3 = visibleFloat(frame, 0.028, 10, 3.0);
 
   // Scene exit
   const exit = sceneExit(frame, TOTAL_FRAMES, 18);
 
-  // Detection counter
-  const detectionCount = Math.min(
-    3,
-    Math.floor(linearProgressFast(frame, 60, 140) * 3),
+  // Fluctuating latency
+  const latency = (2.4 + Math.sin(frame * 0.03) * 0.3).toFixed(1);
+
+  // Determine which detection set is active and render boxes with transitions
+  const activeSetIndex = DETECTION_SETS.findIndex(
+    (s) => frame >= s.startFrame && frame < s.endFrame,
   );
+  const prevSetIndex = activeSetIndex > 0 ? activeSetIndex - 1 : -1;
+
+  // Detection counter: 0→2→5→7 based on sets
+  const detectionCount = (() => {
+    for (let i = DETECTION_SETS.length - 1; i >= 0; i--) {
+      if (frame >= DETECTION_SETS[i].startFrame) {
+        return DETECTION_SETS[i].cumulativeCount;
+      }
+    }
+    return 0;
+  })();
 
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
@@ -119,7 +165,7 @@ export const LiveDetection: React.FC = () => {
             gap: 16,
             marginBottom: 24,
             opacity: labelOp,
-            transform: `translateY(${labelIdle}px)`,
+            transform: `translateY(${labelFloat}px)`,
           }}
         >
           <div style={{ width: 20, height: 1, backgroundColor: COLORS.danger }} />
@@ -146,7 +192,7 @@ export const LiveDetection: React.FC = () => {
             fontWeight: 700,
             color: COLORS.text,
             opacity: titleOp,
-            transform: `translateY(${titleY + titleIdle}px)`,
+            transform: `translateY(${titleY + titleFloat}px)`,
             marginBottom: 30,
           }}
         >
@@ -187,7 +233,7 @@ export const LiveDetection: React.FC = () => {
               />
             </div>
 
-            {/* CRT scan line */}
+            {/* CRT scan line — increased opacity */}
             <div
               style={{
                 position: "absolute",
@@ -195,7 +241,7 @@ export const LiveDetection: React.FC = () => {
                 right: 0,
                 top: scanY - 1,
                 height: 3,
-                background: `linear-gradient(180deg, transparent, rgba(6,182,212,0.15), transparent)`,
+                background: `linear-gradient(180deg, transparent, rgba(6,182,212,0.3), transparent)`,
                 pointerEvents: "none",
               }}
             />
@@ -210,78 +256,114 @@ export const LiveDetection: React.FC = () => {
               }}
             />
 
-            {/* Bounding boxes */}
-            {DETECTION_BOXES.map((box, i) => {
-              if (i >= detectionCount) return null;
-
-              const boxProgress = spring({
-                frame,
-                fps,
-                delay: box.delay,
-                config: CONFIG_SNAPPY,
-              });
-              const boxOp = interpolate(boxProgress, [0, 1], [0, 1]);
-              const boxScale = interpolate(boxProgress, [0.5, 1], [1.1, 1]);
-
-              // Bounding box corner flicker
-              const flickerOp = glowOp(frame, 0.08 + i * 0.01, 0.5, 1);
-
-              return (
-                <div
-                  key={i}
-                  style={{
-                    position: "absolute",
-                    left: box.x,
-                    top: box.y,
-                    width: box.w,
-                    height: box.h,
-                    opacity: boxOp,
-                    transform: `scale(${boxScale})`,
-                  }}
-                >
-                  {/* Box border — dashed */}
+            {/* Previous set — fading out */}
+            {prevSetIndex >= 0 &&
+              DETECTION_SETS[prevSetIndex].boxes.map((box, i) => {
+                const fadeOutProgress = interpolate(
+                  frame,
+                  [DETECTION_SETS[prevSetIndex].endFrame - 20, DETECTION_SETS[prevSetIndex].endFrame],
+                  [1, 0],
+                  { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+                );
+                if (fadeOutProgress <= 0) return null;
+                const flickerOp = glowOp(frame, 0.08 + i * 0.01, 0.5, 1);
+                return (
                   <div
+                    key={`prev-${prevSetIndex}-${i}`}
                     style={{
                       position: "absolute",
-                      inset: 0,
-                      border: `2px solid ${box.color}`,
-                      borderRadius: 4,
-                      opacity: flickerOp,
-                      boxShadow: `0 0 12px ${box.color}40, inset 0 0 12px ${box.color}10`,
-                    }}
-                  />
-
-                  {/* Corner accents */}
-                  {/* Top-left */}
-                  <div style={{ position: "absolute", top: -1, left: -1, width: 12, height: 2, backgroundColor: box.color }} />
-                  <div style={{ position: "absolute", top: -1, left: -1, width: 2, height: 12, backgroundColor: box.color }} />
-                  {/* Bottom-right */}
-                  <div style={{ position: "absolute", bottom: -1, right: -1, width: 12, height: 2, backgroundColor: box.color }} />
-                  <div style={{ position: "absolute", bottom: -1, right: -1, width: 2, height: 12, backgroundColor: box.color }} />
-
-                  {/* Label */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: -24,
-                      left: 0,
-                      fontFamily,
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: box.color,
-                      backgroundColor: `${COLORS.bg}cc`,
-                      padding: "2px 6px",
-                      borderRadius: 3,
-                      letterSpacing: "0.06em",
-                      whiteSpace: "nowrap" as const,
-                      transform: `translateY(${bboxFloat}px)`,
+                      left: box.x,
+                      top: box.y,
+                      width: box.w,
+                      height: box.h,
+                      opacity: fadeOutProgress * 0.6,
+                      transform: `scale(1)`,
                     }}
                   >
-                    {box.label}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        border: `2px solid ${box.color}`,
+                        borderRadius: 4,
+                        opacity: flickerOp * fadeOutProgress,
+                        boxShadow: `0 0 12px ${box.color}40`,
+                      }}
+                    />
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+
+            {/* Active set — springing in */}
+            {activeSetIndex >= 0 &&
+              DETECTION_SETS[activeSetIndex].boxes.map((box, i) => {
+                const boxSpring = spring({
+                  frame: frame - DETECTION_SETS[activeSetIndex].startFrame,
+                  fps,
+                  delay: i * 10,
+                  config: CONFIG_SNAPPY,
+                });
+                const boxOp = interpolate(boxSpring, [0, 1], [0, 1]);
+                const boxScale = interpolate(boxSpring, [0.5, 1], [1.15, 1]);
+                const flickerOp = glowOp(frame, 0.08 + i * 0.01, 0.5, 1);
+                const labelFloatVal = visibleFloat(frame, 0.06, 6, i);
+
+                return (
+                  <div
+                    key={`active-${activeSetIndex}-${i}`}
+                    style={{
+                      position: "absolute",
+                      left: box.x,
+                      top: box.y,
+                      width: box.w,
+                      height: box.h,
+                      opacity: boxOp,
+                      transform: `scale(${boxScale})`,
+                    }}
+                  >
+                    {/* Box border — dashed */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        border: `2px solid ${box.color}`,
+                        borderRadius: 4,
+                        opacity: flickerOp,
+                        boxShadow: `0 0 12px ${box.color}40, inset 0 0 12px ${box.color}10`,
+                      }}
+                    />
+
+                    {/* Corner accents */}
+                    {/* Top-left */}
+                    <div style={{ position: "absolute", top: -1, left: -1, width: 12, height: 2, backgroundColor: box.color }} />
+                    <div style={{ position: "absolute", top: -1, left: -1, width: 2, height: 12, backgroundColor: box.color }} />
+                    {/* Bottom-right */}
+                    <div style={{ position: "absolute", bottom: -1, right: -1, width: 12, height: 2, backgroundColor: box.color }} />
+                    <div style={{ position: "absolute", bottom: -1, right: -1, width: 2, height: 12, backgroundColor: box.color }} />
+
+                    {/* Label */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: -24,
+                        left: 0,
+                        fontFamily,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: box.color,
+                        backgroundColor: `${COLORS.bg}cc`,
+                        padding: "2px 6px",
+                        borderRadius: 3,
+                        letterSpacing: "0.06em",
+                        whiteSpace: "nowrap" as const,
+                        transform: `translateY(${labelFloatVal}px)`,
+                      }}
+                    >
+                      {box.label}
+                    </div>
+                  </div>
+                );
+              })}
 
             {/* LIVE indicator */}
             <div
@@ -347,7 +429,7 @@ export const LiveDetection: React.FC = () => {
             }}
           >
             {/* Processing status */}
-            <div style={{ transform: `translateY(${sidebarFloat}px) scale(${sidebarBreathe})` }}>
+            <div style={{ transform: `translateY(${sidebarFloat1}px) scale(${sidebarBreathe})` }}>
               <div
                 style={{
                   backgroundColor: COLORS.bgCard,
@@ -439,7 +521,7 @@ export const LiveDetection: React.FC = () => {
               </div>
             </div>
 
-            {/* Latency */}
+            {/* Latency — fluctuating */}
             <div style={{ transform: `translateY(${sidebarFloat3}px) scale(${sidebarBreathe})` }}>
               <div
                 style={{
@@ -472,7 +554,7 @@ export const LiveDetection: React.FC = () => {
                     letterSpacing: "-0.03em",
                   }}
                 >
-                  2.4
+                  {latency}
                 </span>
                 <span
                   style={{
@@ -492,11 +574,3 @@ export const LiveDetection: React.FC = () => {
     </AbsoluteFill>
   );
 };
-
-/** Fast linear progress helper (local to this scene) */
-function linearProgressFast(frame: number, startFrame: number, endFrame: number): number {
-  return interpolate(frame, [startFrame, endFrame], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-}

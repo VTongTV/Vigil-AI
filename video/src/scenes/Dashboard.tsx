@@ -17,9 +17,10 @@ import {
   pulse,
   glowOp,
   transforms,
-  idleFloat,
-  idleBreathe,
-  idleDrift,
+  visibleFloat,
+  visibleBreathe,
+  countUpEased,
+  pulseRing,
   sceneExit,
   CONFIG_SNAPPY,
   CONFIG_SMOOTH,
@@ -34,59 +35,70 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
+/** 12 seconds at 60 fps = 720 frames. */
 const TOTAL_FRAMES = 12 * FPS;
 
-// Dashboard KPI cards
+/**
+ * Dashboard KPI cards with numeric values for countUpEased animation.
+ * Values count from 0 → target starting at staggered delays.
+ */
 const KPI_CARDS = [
-  { label: "Violations Today", value: "1,247", icon: "alert" as const, color: COLORS.danger, delta: "+12%" },
-  { label: "Approval Rate", value: "94%", icon: "check" as const, color: COLORS.success, delta: "" },
-  { label: "Avg Processing", value: "2.4s", icon: "clock" as const, color: COLORS.primary, delta: "-0.3s" },
-  { label: "Active Cameras", value: "142", icon: "camera" as const, color: COLORS.secondary, delta: "+8" },
-];
-
-// Recent violations feed
-const FEED_ITEMS = [
-  { time: "14:32", type: "No Helmet", location: "MG Road Junction", severity: "high" },
-  { time: "14:28", type: "Triple Riding", location: "Koramangala Signal", severity: "high" },
-  { time: "14:25", type: "Illegal Parking", location: "Indiranagar 100ft Rd", severity: "low" },
-  { time: "14:21", type: "Wrong Side", location: "Hebbal Flyover", severity: "medium" },
-  { time: "14:18", type: "No Helmet", location: "Whitefield Main Rd", severity: "high" },
+  { label: "Violations Today", numericValue: 281, suffix: "", icon: "alert" as const, color: COLORS.danger, delta: "+12%", isDecimal: false, countStart: 60, countDur: 120 },
+  { label: "Approval Rate", numericValue: 94.2, suffix: "%", icon: "check" as const, color: COLORS.success, delta: "", isDecimal: true, countStart: 75, countDur: 100 },
+  { label: "Avg Processing", numericValue: 2.4, suffix: "s", icon: "clock" as const, color: COLORS.primary, delta: "-0.3s", isDecimal: true, countStart: 90, countDur: 90 },
+  { label: "Active Cameras", numericValue: 142, suffix: "", icon: "camera" as const, color: COLORS.secondary, delta: "+8", isDecimal: false, countStart: 105, countDur: 100 },
 ];
 
 /**
- * Scene 7: Command Center Dashboard
- * Simulated live dashboard with KPI cards, violation feed,
- * pulsing indicators, and continuous motion.
+ * Recent violations feed — items appear progressively every ~90 frames.
+ * First batch visible from frame 50, new entries slide in at 140, 230, 320, 410.
+ */
+const FEED_ITEMS = [
+  { time: "14:32", type: "No Helmet", location: "MG Road Junction", severity: "high" as const, appearFrame: 50 },
+  { time: "14:28", type: "Triple Riding", location: "Koramangala Signal", severity: "high" as const, appearFrame: 50 },
+  { time: "14:25", type: "Illegal Parking", location: "Indiranagar 100ft Rd", severity: "low" as const, appearFrame: 140 },
+  { time: "14:21", type: "Wrong Side", location: "Hebbal Flyover", severity: "medium" as const, appearFrame: 230 },
+  { time: "14:18", type: "No Helmet", location: "Whitefield Main Rd", severity: "high" as const, appearFrame: 320 },
+  { time: "14:12", type: "No Seatbelt", location: "Outer Ring Road", severity: "high" as const, appearFrame: 410 },
+];
+
+/**
+ * Scene 7: Command Center Dashboard (12 seconds)
+ *
+ * Narrative progression:
+ * - KPI counters tick up from 0 to target values
+ * - Feed items slide in progressively at intervals
+ * - Camera dot pulses visibly
+ * - Continuous visible ambient motion on all elements
  */
 export const Dashboard: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Section label
+  /* ── Section label ── */
   const labelProgress = spring({ frame, fps, delay: 0, config: CONFIG_SMOOTH });
   const labelOp = interpolate(labelProgress, [0, 1], [0, 1]);
 
-  // Title
+  /* ── Title ── */
   const titleProgress = spring({ frame, fps, delay: 8, config: CONFIG_BOUNCY });
   const titleOp = interpolate(titleProgress, [0, 1], [0, 1]);
   const titleY = interpolate(titleProgress, [0, 1], [20, 0]);
 
-  // Dashboard container entrance
+  /* ── Dashboard container entrance ── */
   const dashProgress = spring({ frame, fps, delay: 20, config: CONFIG_SMOOTH });
   const dashOp = interpolate(dashProgress, [0, 1], [0, 1]);
   const dashScale = interpolate(dashProgress, [0.5, 1], [0.97, 1]);
 
-  // Scene exit
+  /* ── Scene exit ── */
   const exit = sceneExit(frame, TOTAL_FRAMES, 18);
 
-  // Idle motion
-  const labelIdle = idleFloat(frame, 0.035, 1.5, 0);
-  const titleIdle = idleFloat(frame, 0.04, 2, 0.5);
-  const dashBreathe = idleBreathe(frame, 0.02, 0.002);
+  /* ── Visible ambient motion (8-10px drift, ±2% breathe) ── */
+  const labelIdle = visibleFloat(frame, 0.04, 10, 0);
+  const titleIdle = visibleFloat(frame, 0.045, 12, 0.5);
+  const dashBreathe = visibleBreathe(frame, 0.035, 0.015);
 
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
-      {/* Animated background */}
       <AnimatedBackground particleCount={15} seed={66} />
 
       <div
@@ -180,7 +192,7 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <div style={{ padding: 24, display: "flex", gap: 24 }}>
-            {/* Left column: KPI cards */}
+            {/* Left column: KPI cards with countUp */}
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 14 }}>
               {KPI_CARDS.map((kpi, i) => (
                 <KpiCard key={i} kpi={kpi} index={i} frame={frame} fps={fps} />
@@ -203,16 +215,30 @@ export const Dashboard: React.FC = () => {
                   gap: 8,
                 }}
               >
-                <div
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    backgroundColor: COLORS.danger,
-                    transform: `scale(${pulse(frame, 0.05, 0.2, 1)})`,
-                    boxShadow: `0 0 6px ${COLORS.danger}`,
-                  }}
-                />
+                {/* Pulsing live indicator dot with ring effect */}
+                <div style={{ position: "relative", width: 14, height: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div
+                    style={{
+                      position: "absolute",
+                      width: 14,
+                      height: 14,
+                      borderRadius: "50%",
+                      border: `1.5px solid ${COLORS.danger}`,
+                      opacity: pulseRing(frame, 0, 60, 2.5).opacity * 0.5,
+                      transform: `scale(${pulseRing(frame, 0, 60, 2.5).scale})`,
+                    }}
+                  />
+                  <div
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      backgroundColor: COLORS.danger,
+                      transform: `scale(${pulse(frame, 0.06, 0.25, 1)})`,
+                      boxShadow: `0 0 10px ${COLORS.danger}`,
+                    }}
+                  />
+                </div>
                 Recent Violations
               </div>
 
@@ -242,9 +268,16 @@ const KpiCard: React.FC<{
   const translateX = interpolate(progress, [0, 1], [-20, 0]);
 
   const shimmerPos = shimmerPosition(frame, 180, delay + 20);
-  const cardFloat = floatY(frame, 0.015 + index * 0.003, 1.5, index * 0.6);
-  const iconPulse = pulse(frame, 0.03 + index * 0.004, 0.04, 1);
-  const cardBreathe = idleBreathe(frame, 0.03 + index * 0.004, 0.003);
+  const cardFloat = visibleFloat(frame, 0.03 + index * 0.004, 8, index * 0.6);
+  const iconPulse = pulse(frame, 0.03 + index * 0.004, 0.06, 1);
+  const cardBreathe = visibleBreathe(frame, 0.03 + index * 0.004, 0.018);
+
+  /* ── CountUpEased for numeric value ── */
+  const counted = countUpEased(frame, kpi.countStart, kpi.countDur, 0, kpi.numericValue);
+  const countDone = frame >= kpi.countStart + kpi.countDur;
+  const displayValue = kpi.isDecimal
+    ? counted.toFixed(1)
+    : Math.round(counted).toLocaleString();
 
   return (
     <div
@@ -314,19 +347,30 @@ const KpiCard: React.FC<{
               letterSpacing: "-0.02em",
             }}
           >
-            {kpi.value}
+            {displayValue}
           </span>
-          {kpi.delta && (
+          {/* Only show suffix after count completes */}
+          {countDone && kpi.suffix && (
+            <span
+              style={{
+                fontFamily,
+                fontSize: 18,
+                fontWeight: 600,
+                color: COLORS.textMuted,
+              }}
+            >
+              {kpi.suffix}
+            </span>
+          )}
+          {kpi.delta && countDone && (
             <span
               style={{
                 fontFamily,
                 fontSize: 13,
                 fontWeight: 600,
-                color: kpi.delta.startsWith("+") || kpi.delta.startsWith("-0")
+                color: kpi.delta.startsWith("+")
                   ? COLORS.success
-                  : kpi.delta.startsWith("+")
-                    ? COLORS.danger
-                    : COLORS.success,
+                  : COLORS.success,
               }}
             >
               {kpi.delta}
@@ -346,13 +390,17 @@ const FeedItem: React.FC<{
   frame: number;
   fps: number;
 }> = ({ item, index, frame, fps }) => {
-  const delay = stagger(index, 6) + 50;
+  /* Staggered entrance based on each item's appearFrame */
+  const itemProgress = spring({
+    frame,
+    fps,
+    delay: item.appearFrame,
+    config: CONFIG_SMOOTH,
+  });
+  const opacity = interpolate(itemProgress, [0, 1], [0, 1]);
+  const translateY = interpolate(itemProgress, [0, 1], [16, 0]);
 
-  const progress = spring({ frame, fps, delay, config: CONFIG_SMOOTH });
-  const opacity = interpolate(progress, [0, 1], [0, 1]);
-  const translateY = interpolate(progress, [0, 1], [10, 0]);
-
-  const feedIdle = idleFloat(frame, 0.035, 1, index * 0.4);
+  const feedIdle = visibleFloat(frame, 0.04, 8, index * 0.4);
 
   const severityColor =
     item.severity === "high"

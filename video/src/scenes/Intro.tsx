@@ -19,9 +19,10 @@ import {
   CONFIG_BOUNCY,
   CONFIG_SMOOTH,
   CONFIG_GENTLE,
-  idleFloat,
-  idleBreathe,
-  idleDrift,
+  visibleFloat,
+  visibleBreathe,
+  highlightSweep,
+  pulseRing,
   sceneExit,
 } from "../animations";
 import { AnimatedBackground } from "../AnimatedBackground";
@@ -33,13 +34,14 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
-const TOTAL_FRAMES = 8 * FPS;
+const TOTAL_FRAMES = 5 * FPS;
 const RING_PARTICLES = 24;
+const FEATURE_COUNT = 3;
 
 /**
  * Scene 3: VigilAI Introduction
- * Logo reveal with rotating particle ring, depth layers,
- * and continuous glow animation.
+ * Logo reveal with rotating particle ring, expanding pulse rings,
+ * sequential feature highlights, and continuous visible animations.
  */
 export const Intro: React.FC = () => {
   const frame = useCurrentFrame();
@@ -48,7 +50,7 @@ export const Intro: React.FC = () => {
   // Camera slow drift
   const zoom = cameraZoom(frame, TOTAL_FRAMES, 1.03);
 
-  // Scene exit
+  // Scene exit — triggers at frame 282 (300-18)
   const exit = sceneExit(frame, TOTAL_FRAMES, 18);
 
   // Logo spring entrance
@@ -63,6 +65,11 @@ export const Intro: React.FC = () => {
   const ringScale = spring({ frame, fps, delay: 20, config: CONFIG_GENTLE });
   const ringOp = interpolate(ringScale, [0, 1], [0, 1]);
 
+  // Pulse rings radiating from logo (staggered after logo appears)
+  const ring1 = pulseRing(frame, 40, 50, 3);
+  const ring2 = pulseRing(frame, 100, 50, 3);
+  const ring3 = pulseRing(frame, 160, 50, 3);
+
   // Title entrance
   const titleProgress = spring({ frame, fps, delay: 35, config: CONFIG_SMOOTH });
   const titleOp = interpolate(titleProgress, [0, 1], [0, 1]);
@@ -73,12 +80,12 @@ export const Intro: React.FC = () => {
   const tagOp = interpolate(tagProgress, [0, 1], [0, 1]);
   const tagY = interpolate(tagProgress, [0, 1], [12, 0]);
 
-  // Idle motions
-  const titleIdle = idleFloat(frame, 0.045, 3, 0);
-  const tagIdle = idleFloat(frame, 0.04, 2, 1.0);
-  const logoBreathe = idleBreathe(frame, 0.03, 0.005);
+  // Visible idle motions (10-12px drift instead of 2-3px)
+  const titleIdle = visibleFloat(frame, 0.045, 10, 0);
+  const tagIdle = visibleFloat(frame, 0.04, 10, 1.0);
+  const logoBreathe = visibleBreathe(frame, 0.035, 0.02);
 
-  // Features entrance (staggered)
+  // Feature entrance + highlight sweep
   const featureLabels = ["AI-Powered Detection", "Real-Time Evidence", "Court-Admissible"];
 
   // Icon pulse
@@ -143,6 +150,25 @@ export const Intro: React.FC = () => {
             );
           })}
         </div>
+
+        {/* Pulse rings — expanding circles radiating from logo */}
+        {[ring1, ring2, ring3].map((ring, i) => (
+          <div
+            key={`pulse-ring-${i}`}
+            style={{
+              position: "absolute",
+              left: cx - 40,
+              top: cy - 40,
+              width: 80,
+              height: 80,
+              borderRadius: "50%",
+              border: `2px solid ${COLORS.primary}`,
+              opacity: ring.opacity,
+              transform: `scale(${ring.scale})`,
+              pointerEvents: "none",
+            }}
+          />
+        ))}
 
         {/* Central logo */}
         <div
@@ -218,7 +244,7 @@ export const Intro: React.FC = () => {
           Intelligent Traffic Enforcement
         </div>
 
-        {/* Feature pills */}
+        {/* Feature pills with sequential highlight sweep */}
         <div
           style={{
             display: "flex",
@@ -235,7 +261,22 @@ export const Intro: React.FC = () => {
             });
             const fop = interpolate(fp, [0, 1], [0, 1]);
             const fy = interpolate(fp, [0, 1], [15, 0]);
-            const pillIdle = idleFloat(frame, 0.04, 1.5, i * 0.7);
+            const pillIdle = visibleFloat(frame, 0.04, 8, i * 0.7);
+
+            // Sequential highlight: active pill gets brighter border + text
+            const highlight = highlightSweep(frame, 80, 40, i, FEATURE_COUNT);
+            const pillBorderColor = interpolate(
+              highlight,
+              [0, 0.3, 1],
+              [0, 0.2, 1],
+              { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+            );
+            const pillTextColor = interpolate(
+              highlight,
+              [0, 0.3, 1],
+              [0, 0.3, 1],
+              { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+            );
 
             return (
               <div
@@ -244,14 +285,24 @@ export const Intro: React.FC = () => {
                   fontFamily,
                   fontSize: 16,
                   fontWeight: 500,
-                  color: COLORS.textMuted,
+                  color: interpolate(pillTextColor, [0, 1], [0, 1]) > 0.5
+                    ? COLORS.primary
+                    : COLORS.textMuted,
                   backgroundColor: COLORS.bgElevated,
-                  border: `1px solid ${COLORS.border}`,
+                  border: `1px solid ${interpolate(
+                    pillBorderColor,
+                    [0, 1],
+                    [0.3, 1],
+                    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+                  ) > 0.5 ? COLORS.primary : COLORS.border}`,
                   borderRadius: 20,
                   padding: "8px 20px",
                   opacity: fop,
                   transform: `translateY(${fy + pillIdle}px)`,
                   letterSpacing: "0.04em",
+                  boxShadow: highlight > 0.5
+                    ? `0 0 12px ${COLORS.primaryGlow}`
+                    : "none",
                 }}
               >
                 {label}
