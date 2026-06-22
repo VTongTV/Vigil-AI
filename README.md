@@ -398,9 +398,45 @@ Toggle the **DEMO** badge in the header to switch between live backend and hardc
 
 ## Project Structure
 
-<div align="center">
-<img src="docs/assets/project-structure.svg" alt="Project structure: configs, backend, frontend, data, outputs, docs, scripts" width="780" />
-</div>
+```
+Round 2/
+├── configs/
+│   └── default.yaml           # Model paths, thresholds, lane polygons, camera config
+├── backend/
+│   ├── app/
+│   │   ├── main.py            # FastAPI app + lifespan (pre-warm, cleanup)
+│   │   ├── config.py          # Pydantic Settings
+│   │   ├── schemas.py         # Pydantic request/response models
+│   │   ├── routes/            # detect, violations, evidence, analytics, challan, cameras
+│   │   ├── core/              # CV pipeline: preprocessing, detector, violations, ocr, evidence
+│   │   └── db/                # SQLite engine + SQLAlchemy ORM models
+│   ├── tests/                 # 211 backend tests
+│   └── weights/               # Pre-trained model weights (YOLOv8n, helmet, plate, seatbelt)
+├── frontend/
+│   ├── src/
+│   │   ├── pages/             # Dashboard, Upload, Violations, Evidence, Analytics, Map
+│   │   ├── components/        # Layout, AnnotatedViewer, HeatmapLayer, ASTraMAlertFeed
+│   │   ├── lib/               # API client
+│   │   └── types/             # TypeScript types (mirrors Pydantic schemas)
+│   └── package.json
+├── data/
+│   ├── sample_images/         # Demo traffic camera images
+│   └── sample_videos/         # Test video clips
+├── outputs/
+│   └── evidence/              # Generated annotated evidence images (SHA-256 hashed)
+├── docs/
+│   ├── assets/                # SVG diagrams for README
+│   ├── plan.md                # Master plan
+│   ├── phase-1-cv-pipeline.md
+│   ├── phase-2-backend.md
+│   ├── phase-3-frontend.md
+│   ├── tech-stack.md
+│   └── violations-spec.md
+└── scripts/
+    ├── setup_weights.py       # Download model weights
+    ├── seed_bengaluru_demo.py # Seed 281 violations at 10 Bengaluru junctions
+    └── eval_metrics.py        # mAP, Precision, Recall, F1, OCR accuracy evaluation
+```
 
 ---
 
