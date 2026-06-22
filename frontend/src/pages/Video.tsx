@@ -62,6 +62,13 @@ export default function Video() {
   const fileRef = useRef<HTMLInputElement>(null);
   const prefersReduced = useReducedMotion();
   const demoMode = useAppStore((s) => s.demoMode);
+  const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  /** Clean up object URLs and timers on unmount. */
+  useEffect(() => () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    if (progressTimerRef.current) clearInterval(progressTimerRef.current);
+  }, [previewUrl]);
 
   /** Handle file selection from input or drop. */
   const handleFile = useCallback((f: File) => {
@@ -93,6 +100,7 @@ export default function Video() {
           total: prev.total + 4,
         }));
       }, 800);
+      progressTimerRef.current = progressTimer;
 
       const res = await detectVideo(file, cameraId || undefined, Number(fps));
 
