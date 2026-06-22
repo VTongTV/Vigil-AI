@@ -61,6 +61,9 @@ export default function Citizen() {
   const prefersReduced = useReducedMotion();
   const demoMode = useAppStore((s) => s.demoMode);
 
+  /** Clean up object URL on unmount. */
+  useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
+
   /** Handle file selection from input or drop. */
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) return;

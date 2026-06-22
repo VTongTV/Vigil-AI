@@ -50,6 +50,9 @@ export default function Deepfake() {
   const prefersReduced = useReducedMotion();
   const demoMode = useAppStore((s) => s.demoMode);
 
+  /** Clean up object URL on unmount. */
+  useEffect(() => () => { if (previewUrl) URL.revokeObjectURL(previewUrl); }, [previewUrl]);
+
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) { setError("Please upload a JPEG or PNG image."); return; }
     setError(null);
