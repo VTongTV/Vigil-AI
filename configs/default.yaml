@@ -14,7 +14,7 @@ models:
   helmet:
     path: weights/helmet.pt
     device: cuda
-    conf_threshold: 0.10
+    conf_threshold: 0.15
     iou_threshold: 0.45
     resident: true
     classes:
@@ -53,13 +53,13 @@ preprocessing:
 violations:
   helmet:
     head_fraction: 0.3
-    iou_threshold: 0.3
-    helmet_min_confidence: 0.35
+    rider_overlap_ratio: 0.30
+    min_no_helmet_confidence: 0.25
+    negative_inference_min_person_conf: 0.60
+    confident_with_helmet_threshold: 0.40
   triple_riding:
     max_riders: 2
-    horizontal_center_threshold: 0.25
-    vertical_overlap_threshold: 0.15
-    person_iou_threshold: 0.15
+    rider_overlap_ratio: 0.20
   wrong_side:
     enabled: true
     lane_polygons:
@@ -156,72 +156,72 @@ violations:
     stop_line_zones:
     - id: stop_electronic
       camera_id: ELECTRONIC-01
-      # Band across road at intersection (y 0.25–0.55)
+      # Narrow band AT the stop line — catches vehicles just crossing
       polygon:
       - - 0.15
-        - 0.25
+        - 0.52
       - - 0.85
-        - 0.25
+        - 0.52
       - - 0.85
-        - 0.55
+        - 0.63
       - - 0.15
-        - 0.55
+        - 0.63
     - id: stop_krpuram
       camera_id: KRPURAM-01
-      # Band at intersection (y 0.10–0.30)
+      # Narrow band AT the stop line (near bottom of image)
       polygon:
       - - 0.1
-        - 0.10
+        - 0.55
       - - 0.9
-        - 0.10
+        - 0.55
       - - 0.9
-        - 0.30
+        - 0.65
       - - 0.1
-        - 0.30
+        - 0.65
     - id: stop_yelahanka
       camera_id: YELAHANKA-01
-      # Band at intersection (y 0.20–0.45)
+      # Full road width at stop line to catch motorcycles at edges
       polygon:
-      - - 0.1
-        - 0.20
-      - - 0.95
-        - 0.20
-      - - 0.95
-        - 0.45
-      - - 0.1
-        - 0.45
+      - - 0.00
+        - 0.38
+      - - 0.98
+        - 0.38
+      - - 0.98
+        - 0.55
+      - - 0.00
+        - 0.55
     - id: stop_hebbal
       camera_id: HEBBAL-01
-      # Band at intersection (y 0.45–0.70)
+      # Narrow band AT the stop line
       polygon:
       - - 0.1
-        - 0.45
+        - 0.62
       - - 0.9
-        - 0.45
+        - 0.62
       - - 0.9
         - 0.70
       - - 0.1
         - 0.70
     - id: stop_mgroad
       camera_id: MGROAD-01
-      # Band at intersection — vehicles past stop line (y 0.25–0.50)
+      # Narrow band AT the stop line — vehicles just past the line
       polygon:
       - - 0.05
-        - 0.25
+        - 0.42
       - - 0.95
-        - 0.25
+        - 0.42
       - - 0.95
         - 0.50
       - - 0.05
         - 0.50
     - id: stop_silkboard
       camera_id: SILKBOARD-01
-      # Band at intersection — vehicles past stop line (y 0.15–0.40)
+      # Narrow band AT the stop line
       polygon:
       - - 0.1
-        - 0.15
+        - 0.32
       - - 0.9
-        - 0.15
+        - 0.32
       - - 0.9
         - 0.40
       - - 0.1
