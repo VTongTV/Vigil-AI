@@ -18,6 +18,12 @@ import {
   BarChart3,
   MapPin,
   Radio,
+  Video,
+  Users,
+  Activity,
+  ScanFace,
+  Wand2,
+  Globe,
   ChevronLeft,
   ChevronRight,
   Sun,
@@ -46,6 +52,12 @@ const NAV_ITEMS = [
   { to: "/dashboard/evidence", label: "Evidence", icon: FileImage, short: "EVI" },
   { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3, short: "ANA" },
   { to: "/dashboard/map", label: "Map", icon: MapPin, short: "MAP" },
+  { to: "/dashboard/video", label: "Video", icon: Video, short: "VID" },
+  { to: "/dashboard/citizen", label: "Citizen", icon: Users, short: "CIT" },
+  { to: "/dashboard/tracking", label: "Tracking", icon: Activity, short: "TRK" },
+  { to: "/dashboard/deepfake", label: "Deepfake", icon: ScanFace, short: "DFK" },
+  { to: "/dashboard/generator", label: "Generator", icon: Wand2, short: "GEN" },
+  { to: "/dashboard/scraper", label: "Scraper", icon: Globe, short: "SCR" },
 ] as const;
 
 /** Format a Date as HH:MM:SS IST. */

@@ -12,6 +12,12 @@ import Violations from "./pages/Violations";
 import Evidence from "./pages/Evidence";
 import Analytics from "./pages/Analytics";
 import Map from "./pages/Map";
+import Video from "./pages/Video";
+import Citizen from "./pages/Citizen";
+import Tracking from "./pages/Tracking";
+import Deepfake from "./pages/Deepfake";
+import Generator from "./pages/Generator";
+import Scraper from "./pages/Scraper";
 import LandingPage from "./landing/LandingPage";
 
 export default function App() {
@@ -28,6 +34,12 @@ export default function App() {
         <Route path="evidence" element={<Evidence />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="map" element={<Map />} />
+        <Route path="video" element={<Video />} />
+        <Route path="citizen" element={<Citizen />} />
+        <Route path="tracking" element={<Tracking />} />
+        <Route path="deepfake" element={<Deepfake />} />
+        <Route path="generator" element={<Generator />} />
+        <Route path="scraper" element={<Scraper />} />
       </Route>
     </Routes>
   );
