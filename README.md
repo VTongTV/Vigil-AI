@@ -49,6 +49,10 @@ Bengaluru has 75 AI-enabled junctions covering approximately 87% contactless enf
 ## The Solution: Augmented Enforcement
 
 <div align="center">
+<img src="docs/assets/2026-06-23 01-28-30(1).gif" alt="VigilAI Live Detection Demo" width="780" />
+</div>
+
+<div align="center">
 <img src="docs/assets/pipeline-flow.svg" alt="CCTV to Evidence pipeline" width="780" />
 </div>
 
@@ -649,12 +653,6 @@ The hackathon build is a vertical slice of the production architecture. Same mod
 ---
 
 ## Screenshots
-
-### Live Detection Demo
-
-<div align="center">
-<img src="docs/assets/2026-06-23 01-28-30(1).gif" alt="VigilAI Live Detection Demo" width="780" />
-</div>
 
 ### Command Center Dashboard
 
