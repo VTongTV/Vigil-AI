@@ -223,17 +223,17 @@ export const Evidence: React.FC = () => {
               }}
             />
 
-            {/* Bounding box — appears at frame 100 */}
+            {/* Bounding box — appears at frame 100, centered on 3 riders */}
             <div
               style={{
                 position: "absolute",
-                left: 120,
-                top: 60,
-                width: 140,
-                height: 180,
-                border: `2px solid ${COLORS.danger}`,
+                left: 140,
+                top: 40,
+                width: 220,
+                height: 250,
+                border: `2px solid ${COLORS.warning}`,
                 borderRadius: 4,
-                boxShadow: `0 0 20px rgba(239,68,68,0.25)`,
+                boxShadow: `0 0 20px rgba(245,158,11,0.25)`,
                 opacity: bboxOp,
                 transform: `scale(${bboxScale})`,
                 transformOrigin: "top left",
@@ -247,9 +247,44 @@ export const Evidence: React.FC = () => {
                   fontFamily,
                   fontSize: 13,
                   fontWeight: 600,
-                  color: COLORS.danger,
+                  color: COLORS.warning,
                   backgroundColor: `${COLORS.bg}dd`,
                   padding: "3px 8px",
+                  borderRadius: 3,
+                  whiteSpace: "nowrap" as const,
+                }}
+              >
+                TRIPLE RIDING · 92%
+              </div>
+            </div>
+
+            {/* Secondary No Helmet box on child/passenger */}
+            <div
+              style={{
+                position: "absolute",
+                left: 150,
+                top: 50,
+                width: 80,
+                height: 60,
+                border: `2px solid ${COLORS.danger}`,
+                borderRadius: 4,
+                boxShadow: `0 0 12px rgba(239,68,68,0.2)`,
+                opacity: bboxOp * 0.85,
+                transform: `scale(${bboxScale})`,
+                transformOrigin: "top left",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  top: -20,
+                  left: 0,
+                  fontFamily,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: COLORS.danger,
+                  backgroundColor: `${COLORS.bg}dd`,
+                  padding: "2px 6px",
                   borderRadius: 3,
                   whiteSpace: "nowrap" as const,
                 }}
