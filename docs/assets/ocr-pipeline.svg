@@ -1,0 +1,52 @@
+<svg width="780" height="130" viewBox="0 0 780 130" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="780" height="130" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="390" y="22" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#e2e8f0" letter-spacing="2">LICENSE PLATE OCR -- TWO-STAGE PIPELINE</text>
+
+  <!-- Stage 1 -->
+  <rect x="30" y="40" width="180" height="70" rx="8" fill="#1e1b4b" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="120" y="60" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#fbbf24">STAGE 1</text>
+  <text x="120" y="78" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">YOLOv8n Plate Detection</text>
+  <text x="120" y="93" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#475569">On-demand CUDA load</text>
+
+  <!-- Arrow 1 -->
+  <line x1="215" y1="75" x2="265" y2="75" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3">
+    <animate attributeName="stroke-dashoffset" values="0;-14" dur="1s" repeatCount="indefinite"/>
+  </line>
+  <polygon points="263,71 263,79 271,75" fill="#475569"/>
+  <text x="240" y="65" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="7" fill="#fbbf24">bboxes</text>
+
+  <!-- Intermediate -->
+  <rect x="275" y="40" width="160" height="70" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+  <text x="355" y="60" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#94a3b8">PLATE CROPS</text>
+  <text x="355" y="78" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">Region of interest</text>
+  <text x="355" y="93" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Crop + resize for OCR</text>
+
+  <!-- Arrow 2 -->
+  <line x1="440" y1="75" x2="490" y2="75" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3">
+    <animate attributeName="stroke-dashoffset" values="0;-14" dur="1s" repeatCount="indefinite"/>
+  </line>
+  <polygon points="488,71 488,79 496,75" fill="#475569"/>
+  <text x="465" y="65" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="7" fill="#60a5fa">pixels</text>
+
+  <!-- Stage 2 -->
+  <rect x="500" y="40" width="170" height="70" rx="8" fill="#1e1b4b" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="585" y="60" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#60a5fa">STAGE 2</text>
+  <text x="585" y="78" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">RapidOCR (CPU, ONNX)</text>
+  <text x="585" y="93" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#475569">4 threads | NO CUDA</text>
+
+  <!-- Arrow 3 -->
+  <line x1="675" y1="75" x2="700" y2="75" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3">
+    <animate attributeName="stroke-dashoffset" values="0;-14" dur="1s" repeatCount="indefinite"/>
+  </line>
+  <polygon points="698,71 698,79 706,75" fill="#475569"/>
+
+  <!-- Result -->
+  <rect x="710" y="40" width="55" height="70" rx="6" fill="#1e293b" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="737" y="64" text-anchor="middle" font-family="monospace" font-weight="700" font-size="9" fill="#4ade80">KA</text>
+  <text x="737" y="78" text-anchor="middle" font-family="monospace" font-weight="700" font-size="9" fill="#4ade80">01</text>
+  <text x="737" y="92" text-anchor="middle" font-family="monospace" font-weight="700" font-size="9" fill="#4ade80">AB</text>
+  <text x="737" y="106" text-anchor="middle" font-family="monospace" font-weight="700" font-size="6" fill="#64748b">1234</text>
+
+  <!-- Post-processing note -->
+  <text x="390" y="124" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Post-processing: O/0 confusion, I/1 confusion, missing spaces | Regex: KA##XX#### (Karnataka RTO format)</text>
+</svg>
