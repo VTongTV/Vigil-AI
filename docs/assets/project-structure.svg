@@ -1,0 +1,74 @@
+<svg width="780" height="340" viewBox="0 0 780 340" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="780" height="340" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="390" y="24" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#e2e8f0" letter-spacing="2">PROJECT STRUCTURE -- PRODUCTION MONOREPO</text>
+
+  <!-- Left column -->
+  <text x="30" y="52" font-family="monospace" font-size="9" fill="#94a3b8">Round 2/</text>
+
+  <!-- configs -->
+  <text x="30" y="72" font-family="monospace" font-size="8" fill="#fbbf24">configs/</text>
+  <text x="50" y="86" font-family="monospace" font-size="8" fill="#64748b">default.yaml</text>
+  <text x="200" y="86" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Model paths, thresholds, lane polygons, camera config</text>
+
+  <!-- backend -->
+  <text x="30" y="106" font-family="monospace" font-size="8" fill="#3b82f6">backend/</text>
+  <text x="50" y="122" font-family="monospace" font-size="8" fill="#60a5fa">app/</text>
+  <text x="70" y="138" font-family="monospace" font-size="8" fill="#64748b">main.py</text>
+  <text x="200" y="138" font-family="system-ui, sans-serif" font-size="7" fill="#475569">FastAPI app + lifespan (pre-warm, cleanup)</text>
+  <text x="70" y="154" font-family="monospace" font-size="8" fill="#64748b">config.py</text>
+  <text x="200" y="154" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Pydantic Settings</text>
+  <text x="70" y="170" font-family="monospace" font-size="8" fill="#64748b">schemas.py</text>
+  <text x="200" y="170" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Pydantic request/response models</text>
+  <text x="70" y="186" font-family="monospace" font-size="8" fill="#818cf8">routes/</text>
+  <text x="200" y="186" font-family="system-ui, sans-serif" font-size="7" fill="#475569">detect, violations, evidence, analytics, challan, cameras</text>
+  <text x="70" y="202" font-family="monospace" font-size="8" fill="#818cf8">core/</text>
+  <text x="200" y="202" font-family="system-ui, sans-serif" font-size="7" fill="#475569">CV pipeline: preprocessing, detector, violations, ocr, evidence</text>
+  <text x="70" y="218" font-family="monospace" font-size="8" fill="#818cf8">db/</text>
+  <text x="200" y="218" font-family="system-ui, sans-serif" font-size="7" fill="#475569">SQLite engine + SQLAlchemy ORM models</text>
+  <text x="50" y="238" font-family="monospace" font-size="8" fill="#64748b">tests/</text>
+  <text x="200" y="238" font-family="system-ui, sans-serif" font-size="7" fill="#475569">211 backend tests</text>
+  <text x="50" y="258" font-family="monospace" font-size="8" fill="#64748b">weights/</text>
+  <text x="200" y="258" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Pre-trained model weights (YOLOv8n, helmet, plate, seatbelt)</text>
+
+  <!-- Right column -->
+  <!-- frontend -->
+  <text x="410" y="52" font-family="monospace" font-size="8" fill="#22c55e">frontend/</text>
+  <text x="430" y="68" font-family="monospace" font-size="8" fill="#4ade80">src/</text>
+  <text x="450" y="84" font-family="monospace" font-size="8" fill="#818cf8">pages/</text>
+  <text x="560" y="84" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Dashboard, Upload, Violations, Evidence, Analytics, Map</text>
+  <text x="450" y="100" font-family="monospace" font-size="8" fill="#818cf8">components/</text>
+  <text x="560" y="100" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Layout, AnnotatedViewer, HeatmapLayer, ASTraMAlertFeed</text>
+  <text x="450" y="116" font-family="monospace" font-size="8" fill="#818cf8">lib/</text>
+  <text x="560" y="116" font-family="system-ui, sans-serif" font-size="7" fill="#475569">API client</text>
+  <text x="450" y="132" font-family="monospace" font-size="8" fill="#818cf8">types/</text>
+  <text x="560" y="132" font-family="system-ui, sans-serif" font-size="7" fill="#475569">TypeScript types (mirrors Pydantic schemas)</text>
+  <text x="430" y="148" font-family="monospace" font-size="8" fill="#64748b">package.json</text>
+
+  <!-- data -->
+  <text x="410" y="168" font-family="monospace" font-size="8" fill="#f59e0b">data/</text>
+  <text x="430" y="184" font-family="monospace" font-size="8" fill="#64748b">sample_images/</text>
+  <text x="560" y="184" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Demo traffic camera images</text>
+  <text x="430" y="200" font-family="monospace" font-size="8" fill="#64748b">sample_videos/</text>
+  <text x="560" y="200" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Test video clips</text>
+
+  <!-- outputs -->
+  <text x="410" y="220" font-family="monospace" font-size="8" fill="#ef4444">outputs/</text>
+  <text x="430" y="236" font-family="monospace" font-size="8" fill="#64748b">evidence/</text>
+  <text x="560" y="236" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Generated annotated evidence images (SHA-256 hashed)</text>
+
+  <!-- docs -->
+  <text x="410" y="256" font-family="monospace" font-size="8" fill="#a78bfa">docs/</text>
+  <text x="430" y="272" font-family="monospace" font-size="8" fill="#64748b">assets/</text>
+  <text x="560" y="272" font-family="system-ui, sans-serif" font-size="7" fill="#475569">SVG diagrams for README</text>
+  <text x="430" y="288" font-family="monospace" font-size="8" fill="#64748b">plan.md</text>
+  <text x="560" y="288" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Master plan</text>
+  <text x="430" y="304" font-family="monospace" font-size="8" fill="#64748b">violations-spec.md</text>
+  <text x="560" y="304" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Violation detection specifications</text>
+
+  <!-- scripts -->
+  <text x="410" y="324" font-family="monospace" font-size="8" fill="#fb923c">scripts/</text>
+  <text x="430" y="336" font-family="monospace" font-size="8" fill="#64748b">setup_weights.py</text>
+  <text x="560" y="336" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Download model weights</text>
+  <text x="430" y="324" font-family="monospace" font-size="8" fill="#64748b">seed_bengaluru_demo.py</text>
+  <text x="560" y="324" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Seed 281 violations at 10 Bengaluru junctions</text>
+</svg>
