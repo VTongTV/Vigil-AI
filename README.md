@@ -650,6 +650,12 @@ The hackathon build is a vertical slice of the production architecture. Same mod
 
 ## Screenshots
 
+### Live Detection Demo
+
+<div align="center">
+<img src="docs/assets/2026-06-23 01-28-30(1).gif" alt="VigilAI Live Detection Demo" width="780" />
+</div>
+
 ### Command Center Dashboard
 
 <div align="center">
