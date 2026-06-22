@@ -1,0 +1,54 @@
+<svg width="780" height="200" viewBox="0 0 780 200" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="780" height="200" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="390" y="24" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#e2e8f0" letter-spacing="2">CURRENT BUILD -- HACKATHON VERTICAL SLICE</text>
+
+  <!-- Browser -->
+  <rect x="40" y="50" width="180" height="90" rx="8" fill="#1e1b4b" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="130" y="72" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#818cf8">BROWSER</text>
+  <text x="130" y="90" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">React 19 Dashboard</text>
+  <text x="130" y="104" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">localhost:5173</text>
+  <text x="130" y="118" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Vite 6 + TailwindCSS v4</text>
+  <text x="130" y="132" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#475569">shadcn/ui + Zustand</text>
+
+  <!-- Arrow -->
+  <line x1="225" y1="95" x2="275" y2="95" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3">
+    <animate attributeName="stroke-dashoffset" values="0;-14" dur="1s" repeatCount="indefinite"/>
+  </line>
+  <polygon points="273,91 273,99 281,95" fill="#475569"/>
+  <text x="250" y="86" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="7" fill="#60a5fa">HTTP</text>
+
+  <!-- FastAPI + CV -->
+  <rect x="285" y="50" width="220" height="90" rx="8" fill="#1e1b4b" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="395" y="72" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#60a5fa">FASTAPI SERVER</text>
+  <text x="395" y="90" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">localhost:8000</text>
+  <text x="395" y="104" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">+ CV Pipeline (CUDA)</text>
+  <text x="395" y="118" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Uvicorn + SQLAlchemy 2.0</text>
+  <text x="395" y="132" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#475569">FastAPI lifespan events</text>
+
+  <!-- Arrow -->
+  <line x1="510" y1="95" x2="560" y2="95" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3">
+    <animate attributeName="stroke-dashoffset" values="0;-14" dur="1s" repeatCount="indefinite"/>
+  </line>
+  <polygon points="558,91 558,99 566,95" fill="#475569"/>
+  <text x="535" y="86" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="7" fill="#34d399">R/W</text>
+
+  <!-- SQLite -->
+  <rect x="570" y="50" width="180" height="90" rx="8" fill="#1e1b4b" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="660" y="72" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#4ade80">SQLite DB</text>
+  <text x="660" y="90" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">+ Evidence Store</text>
+  <text x="660" y="104" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">./violations.db</text>
+  <text x="660" y="118" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#475569">ORM models + SHA-256</text>
+  <text x="660" y="132" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Annotated JPEGs</text>
+
+  <!-- GPU box -->
+  <rect x="340" y="155" width="120" height="35" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="400" y="173" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#fbbf24">RTX 3050</text>
+  <text x="400" y="185" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#64748b">4 GB VRAM | CUDA 12.x</text>
+
+  <!-- GPU arrow -->
+  <line x1="395" y1="140" x2="395" y2="155" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3"/>
+  <polygon points="391,153 399,153 395,159" fill="#f59e0b"/>
+
+  <!-- Footer -->
+  <text x="390" y="200" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">Single-machine vertical slice -- same models, same violation logic, same evidence format as production</text>
+</svg>
