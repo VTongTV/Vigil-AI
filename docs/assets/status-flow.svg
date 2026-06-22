@@ -1,0 +1,76 @@
+<svg width="780" height="260" viewBox="0 0 780 260" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="780" height="260" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="390" y="24" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#e2e8f0" letter-spacing="2">VIOLATION STATUS FLOW -- STATE MACHINE</text>
+
+  <!-- PENDING -->
+  <rect x="50" y="55" width="130" height="50" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+  <text x="115" y="76" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#fbbf24">PENDING</text>
+  <text x="115" y="93" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">AI detection inserts</text>
+
+  <!-- Arrow PENDING -> UNDER_REVIEW -->
+  <line x1="185" y1="80" x2="218" y2="80" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3">
+    <animate attributeName="stroke-dashoffset" values="0;-14" dur="1s" repeatCount="indefinite"/>
+  </line>
+  <polygon points="216,76 216,84 224,80" fill="#475569"/>
+  <text x="202" y="70" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#64748b">review</text>
+
+  <!-- UNDER_REVIEW -->
+  <rect x="228" y="55" width="140" height="50" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="298" y="76" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#60a5fa">UNDER_REVIEW</text>
+  <text x="298" y="93" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">Officer examines</text>
+
+  <!-- Branch arrows UP to APPROVED -->
+  <line x1="340" y1="55" x2="440" y2="42" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="4,3">
+    <animate attributeName="stroke-dashoffset" values="0;-14" dur="1s" repeatCount="indefinite"/>
+  </line>
+  <polygon points="438,38 442,46 448,39" fill="#22c55e"/>
+  <text x="390" y="38" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#4ade80">approve</text>
+
+  <!-- Branch arrows DOWN to REJECTED -->
+  <line x1="340" y1="105" x2="440" y2="175" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3">
+    <animate attributeName="stroke-dashoffset" values="0;-14" dur="1s" repeatCount="indefinite"/>
+  </line>
+  <polygon points="437,172 443,178 447,170" fill="#ef4444"/>
+  <text x="390" y="152" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#f87171">reject</text>
+
+  <!-- APPROVED -->
+  <rect x="450" y="30" width="130" height="50" rx="8" fill="#1e293b" stroke="#22c55e" stroke-width="2"/>
+  <text x="515" y="51" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#4ade80">APPROVED</text>
+  <text x="515" y="68" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">Ready for issuance</text>
+
+  <!-- REJECTED -->
+  <rect x="450" y="155" width="130" height="50" rx="8" fill="#1e293b" stroke="#ef4444" stroke-width="2"/>
+  <text x="515" y="176" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#f87171">REJECTED</text>
+  <text x="515" y="193" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">Logged + archived</text>
+
+  <!-- Arrow APPROVED -> ISSUED -->
+  <line x1="585" y1="55" x2="628" y2="55" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3">
+    <animate attributeName="stroke-dashoffset" values="0;-14" dur="1s" repeatCount="indefinite"/>
+  </line>
+  <polygon points="626,51 626,59 634,55" fill="#475569"/>
+  <text x="610" y="45" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#64748b">issue</text>
+
+  <!-- ISSUED -->
+  <rect x="638" y="30" width="120" height="50" rx="8" fill="#1e293b" stroke="#818cf8" stroke-width="2"/>
+  <text x="698" y="51" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#a78bfa">ISSUED</text>
+  <text x="698" y="68" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#64748b">E-challan generated</text>
+
+  <!-- Rejected from any status - dashed arrows -->
+  <path d="M515 80 L515 150" fill="none" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,3" opacity="0.3"/>
+  <path d="M698 80 Q720 120 600 155" fill="none" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,3" opacity="0.3"/>
+
+  <!-- Audit trail box -->
+  <rect x="50" y="145" width="220" height="95" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="160" y="168" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#94a3b8">AUDIT TRAIL</text>
+  <text x="160" y="186" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">Every action logged with</text>
+  <text x="160" y="200" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">officer_id + timestamp</text>
+  <text x="160" y="214" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">Immutable entry per transition</text>
+  <text x="160" y="232" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#818cf8">Rule 166A compliant</text>
+
+  <!-- Audit trail arrow from REJECTED -->
+  <path d="M450 180 Q360 195 270 192" fill="none" stroke="#475569" stroke-width="1" stroke-dasharray="3,3"/>
+  <polygon points="272,188 272,196 264,192" fill="#475569"/>
+
+  <!-- Footer note -->
+  <text x="390" y="252" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">Any status except REJECTED itself can transition to REJECTED -- officers can correct errors at any stage</text>
+</svg>
