@@ -83,11 +83,11 @@ Every detection enters the system as `pending`. Officers review the annotated ev
 
 ### Production Scale Model
 
-```
-Edge Node (Jetson/RTX 3050)    Cloud Aggregator (FastAPI+GPU)    BTP ASTraM / Vahan
-  Per junction                      Central processing               E-challan + DB
-  1 FPS capture                     Model serving                    Govt integration
-```
+| Layer | Location | Function |
+|-------|----------|----------|
+| Edge Node | Jetson/RTX 3050 per junction | 1 FPS capture, on-device inference |
+| Cloud Aggregator | Central GPU cluster | FastAPI + model serving, central processing |
+| BTP ASTraM / Vahan | Government infrastructure | E-challan DB, govt integration |
 
 The hackathon build is a vertical slice of this production architecture. Same models, same violation logic, same evidence format -- deployed on a single machine.
 
@@ -109,23 +109,11 @@ The hackathon build is a vertical slice of this production architecture. Same mo
 
 ### Helmet Non-Compliance (Head-Region Spatial Association)
 
+<div align="center">
+<img src="docs/assets/helmet-headregion.svg" alt="Head-region spatial association: top 30% of person bbox as head region with IoU thresholds" width="780" />
+</div>
+
 Instead of naive bbox overlap, we extract the **top 30% of each person bbox** as the head region and compute IoU against helmet/no-helmet detections. Persons are first associated with two-wheelers by checking if their center falls within a two-wheeler bbox with a 5% margin.
-
-```
-Person Bbox (full height)
-+------------------+
-|   HEAD REGION    | <-- Top 30% (anatomically constrained)
-+------------------+
-|                  |
-|     TORSO        |
-|                  |
-|     LEGS         |
-+------------------+
-
-IoU >= 0.15 with helmet    --> COMPLIANT
-IoU >= 0.15 with no_helmet --> VIOLATION (conf = no_helmet.confidence)
-Nothing overlaps head      --> VIOLATION (conservative, conf *= 0.8)
-```
 
 **Why not naive overlap?** A person standing next to a motorcycle with a helmet on the handlebars would produce a false positive with simple bbox IoU. The head-region constraint ensures the helmet must be on the person's head, not just nearby.
 
@@ -141,10 +129,9 @@ Detection uses configurable polygon zones defined per camera in `configs/default
 
 ### License Plate OCR (Two-Stage Pipeline)
 
-```
-Stage 1: YOLOv8n Plate Detection  --> Plate bounding boxes (on-demand CUDA load)
-Stage 2: RapidOCR (CPU, ONNX)     --> Text extraction + Indian KA##XX#### regex
-```
+<div align="center">
+<img src="docs/assets/ocr-pipeline.svg" alt="Two-stage OCR: YOLOv8n plate detection on CUDA to RapidOCR on CPU with Indian plate regex" width="780" />
+</div>
 
 RapidOCR runs exclusively on CPU with `OMP_NUM_THREADS=4` and `ONNX_NUM_THREADS=4`. ONNX Runtime verified to have NO CUDA provider. Post-processing handles O/0 confusion, I/1 confusion, and missing spaces common in Indian plate OCR.
 
@@ -298,29 +285,9 @@ camera_id: <optional string>
 
 ### Violation Status Flow
 
-```
-                       +-----------+
-                       |  PENDING  |  <-- AI detection inserts here
-                       +-----+-----+
-                             |
-                    Officer reviews evidence
-                        /           \
-                   APPROVE         REJECT
-                      /               \
-              +-------+-------+  +----+-----+
-              |  UNDER_REVIEW |  | REJECTED |
-              +-------+-------+  +----------+
-                      |               ^
-                  APPROVE            |
-                      |            REJECT
-              +-------+-------+  (any status
-              |   APPROVED    |   can transition
-              +-------+-------+   to REJECTED)
-                      |
-              +-------+-------+
-              |    ISSUED     |  <-- E-challan generated
-              +---------------+
-```
+<div align="center">
+<img src="docs/assets/status-flow.svg" alt="Violation status flow: pending to under_review to approved/issued with reject at any stage" width="780" />
+</div>
 
 Any violation can transition to `REJECTED` from any status except `REJECTED` itself. This ensures officers can correct errors at any stage of the review pipeline.
 
@@ -431,45 +398,9 @@ Toggle the **DEMO** badge in the header to switch between live backend and hardc
 
 ## Project Structure
 
-```
-Round 2/
-├── configs/
-│   └── default.yaml           # Model paths, thresholds, lane polygons, camera config
-├── backend/
-│   ├── app/
-│   │   ├── main.py            # FastAPI app + lifespan (pre-warm, cleanup)
-│   │   ├── config.py          # Pydantic Settings
-│   │   ├── schemas.py         # Pydantic request/response models
-│   │   ├── routes/            # detect, violations, evidence, analytics, challan, cameras
-│   │   ├── core/              # CV pipeline: preprocessing, detector, violations, ocr, evidence
-│   │   └── db/                # SQLite engine + SQLAlchemy ORM models
-│   ├── tests/                 # 211 backend tests
-│   └── weights/               # Pre-trained model weights (YOLOv8n, helmet, plate, seatbelt)
-├── frontend/
-│   ├── src/
-│   │   ├── pages/             # Dashboard, Upload, Violations, Evidence, Analytics, Map
-│   │   ├── components/        # Layout, AnnotatedViewer, HeatmapLayer, ASTraMAlertFeed
-│   │   ├── lib/               # API client
-│   │   └── types/             # TypeScript types (mirrors Pydantic schemas)
-│   └── package.json
-├── data/
-│   ├── sample_images/         # Demo traffic camera images
-│   └── sample_videos/         # Test video clips
-├── outputs/
-│   └── evidence/              # Generated annotated evidence images (SHA-256 hashed)
-├── docs/
-│   ├── assets/                # SVG diagrams for README
-│   ├── plan.md                # Master plan
-│   ├── phase-1-cv-pipeline.md
-│   ├── phase-2-backend.md
-│   ├── phase-3-frontend.md
-│   ├── tech-stack.md
-│   └── violations-spec.md
-└── scripts/
-    ├── setup_weights.py       # Download model weights
-    ├── seed_bengaluru_demo.py # Seed 281 violations at 10 Bengaluru junctions
-    └── eval_metrics.py        # mAP, Precision, Recall, F1, OCR accuracy evaluation
-```
+<div align="center">
+<img src="docs/assets/project-structure.svg" alt="Project structure: configs, backend, frontend, data, outputs, docs, scripts" width="780" />
+</div>
 
 ---
 
@@ -533,22 +464,9 @@ Computes mAP@50, Precision, Recall, F1 per violation type, OCR accuracy on label
 
 ### ROI Methodology
 
-```
-Conservative:
-  500 junctions x 80 violations/day x 0.50 detection rate x Rs.500 avg fine
-  x 30% compliance rate x 365 days = Rs.219 Cr/year
-
-Aggressive:
-  500 junctions x 80 violations/day x 1.00 detection rate x Rs.500 avg fine
-  x 30% compliance rate x 365 days = Rs.438 Cr/year
-
-Investment:
-  Rs.50,000/junction x 500 junctions = Rs.2.5 Cr (software + edge compute)
-  
-Payback:
-  Rs.219 Cr / Rs.2.5 Cr = 87x ROI (Year 1)
-  Rs.438 Cr / Rs.2.5 Cr = 175x ROI (Year 1)
-```
+<div align="center">
+<img src="docs/assets/roi-methodology.svg" alt="ROI methodology: Conservative Rs.219 Cr (87x) vs Aggressive Rs.438 Cr (175x) with Rs.2.5 Cr investment" width="780" />
+</div>
 
 The compliance rate of 30% is based on BTP's published challan collection rate. The 80 violations/day per junction is conservative -- Silk Board junction alone processes 200+ violations during peak hours.
 
@@ -607,29 +525,9 @@ python scripts/eval_metrics.py
 
 ### Test Architecture
 
-```
-backend/tests/
-  test_preprocessing.py    -- CLAHE, denoise, gamma validation
-  test_detector.py          -- Model loading, inference, bbox format
-  test_violations.py        -- Helmet, triple riding, spatial logic
-  test_ocr.py               -- RapidOCR, regex, O/0 I/1 confusion
-  test_evidence.py           -- SHA-256 hash, annotated image, metadata
-  test_routes_detect.py     -- POST /detect with various images
-  test_routes_violations.py -- GET /violations filtering, pagination
-  test_routes_evidence.py   -- Evidence retrieval, integrity check
-  test_routes_analytics.py  -- Statistics aggregation
-  test_schemas.py           -- Pydantic validation, enum constraints
-  test_config.py            -- Settings loading, defaults
-
-frontend/src/
-  __tests__/
-    Dashboard.test.tsx       -- Page renders, stats display
-    Upload.test.tsx          -- File upload, drag-and-drop
-    Violations.test.tsx      -- Table, filtering, approve/reject
-    Evidence.test.tsx        -- Annotated viewer, hash verification
-    Analytics.test.tsx       -- Charts, date range filtering
-    DemoMode.test.tsx        -- Toggle, hardcoded response flow
-```
+<div align="center">
+<img src="docs/assets/test-architecture.svg" alt="Test architecture: 211 backend tests and 58 frontend tests with file breakdown" width="780" />
+</div>
 
 ---
 
@@ -669,35 +567,15 @@ VigilAI evidence packages are designed to satisfy the requirements of **Section 
 
 ### Current Build (Hackathon Vertical Slice)
 
-```
-+-------------------+     +---------------------+     +-------------------+
-|  Browser          |     |  FastAPI Server      |     |  SQLite DB        |
-|  React Dashboard  |<--->|  + CV Pipeline      |<--->|  + Evidence Store |
-|  localhost:5173   |     |  localhost:8000      |     |  ./violations.db  |
-+-------------------+     +---------------------+     +-------------------+
-                                  |
-                          +-------+-------+
-                          |  RTX 3050     |
-                          |  4 GB VRAM    |
-                          |  CUDA 12.x    |
-                          +---------------+
-```
+<div align="center">
+<img src="docs/assets/deployment-current.svg" alt="Current deployment: Browser to FastAPI to SQLite with RTX 3050 GPU" width="780" />
+</div>
 
 ### Production Scale (Target)
 
-```
-+----------+     +-------------+     +----------------+     +-----------+
-| CCTV     |     | Edge Node   |     | Cloud          |     | BTP       |
-| Capture  |---->| Jetson/RTX  |---->| Aggregator     |---->| ASTraM    |
-| 1 FPS    |     | Per Junction|     | FastAPI+GPU    |     | Vahan DB  |
-+----------+     +-------------+     +----------------+     +-----------+
-                        |                    |
-                   +----+----+         +----+----+
-                   | On-     |         | Scale   |
-                   | Device  |         | Out GPU |
-                   | Infer   |         | Serving |
-                   +---------+         +---------+
-```
+<div align="center">
+<img src="docs/assets/deployment-production.svg" alt="Production deployment: CCTV to Edge Node to Cloud Aggregator to BTP ASTraM" width="780" />
+</div>
 
 The hackathon build is a vertical slice of the production architecture. Same models, same violation logic, same evidence format -- deployed on a single machine. Migration to production requires: (1) RTSP stream ingestion replacing file upload, (2) PostgreSQL replacing SQLite, (3) GPU model serving with Triton, (4) ASTraM/Vahan API integration.
 
