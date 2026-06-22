@@ -1,0 +1,67 @@
+<svg width="780" height="220" viewBox="0 0 780 220" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="780" height="220" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="390" y="22" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#e2e8f0" letter-spacing="2">HELMET DETECTION -- HEAD-REGION SPATIAL ASSOCIATION</text>
+
+  <!-- Person bbox -->
+  <rect x="60" y="40" width="120" height="170" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+  <!-- Head region (top 30%) -->
+  <rect x="60" y="40" width="120" height="51" rx="4" fill="#818cf8" opacity="0.15" stroke="#818cf8" stroke-width="1.5"/>
+  <text x="120" y="56" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#a78bfa">HEAD REGION</text>
+  <text x="120" y="72" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#818cf8">Top 30%</text>
+
+  <!-- Torso region -->
+  <rect x="60" y="91" width="120" height="70" fill="#334155" opacity="0.3"/>
+  <text x="120" y="130" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="10" fill="#64748b">TORSO</text>
+
+  <!-- Legs region -->
+  <rect x="60" y="161" width="120" height="49" rx="0 0 4 4" fill="#1e293b" opacity="0.5"/>
+  <text x="120" y="190" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="10" fill="#475569">LEGS</text>
+
+  <!-- 30% label -->
+  <line x1="50" y1="40" x2="50" y2="91" stroke="#818cf8" stroke-width="1"/>
+  <line x1="46" y1="40" x2="54" y2="40" stroke="#818cf8" stroke-width="1"/>
+  <line x1="46" y1="91" x2="54" y2="91" stroke="#818cf8" stroke-width="1"/>
+  <text x="42" y="70" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="8" fill="#818cf8" transform="rotate(-90,42,70)">30%</text>
+
+  <!-- 70% label -->
+  <line x1="50" y1="91" x2="50" y2="210" stroke="#475569" stroke-width="1"/>
+  <line x1="46" y1="210" x2="54" y2="210" stroke="#475569" stroke-width="1"/>
+  <text x="42" y="155" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="8" fill="#475569" transform="rotate(-90,42,155)">70%</text>
+
+  <!-- Arrow to IoU results -->
+  <line x1="190" y1="65" x2="270" y2="65" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3">
+    <animate attributeName="stroke-dashoffset" values="0;-14" dur="1s" repeatCount="indefinite"/>
+  </line>
+  <polygon points="268,61 268,69 276,65" fill="#475569"/>
+
+  <!-- IoU Result 1: COMPLIANT -->
+  <rect x="280" y="40" width="210" height="45" rx="6" fill="#1e293b" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="385" y="58" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#4ade80">IoU >= 0.15 with helmet</text>
+  <text x="385" y="76" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#22c55e">COMPLIANT</text>
+
+  <!-- IoU Result 2: VIOLATION -->
+  <rect x="280" y="92" width="210" height="45" rx="6" fill="#1e293b" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="385" y="110" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#fca5a5">IoU >= 0.15 with no_helmet</text>
+  <text x="385" y="128" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#ef4444">VIOLATION</text>
+
+  <!-- IoU Result 3: VIOLATION (conservative) -->
+  <rect x="280" y="144" width="210" height="45" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="385" y="162" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#fcd34d">Nothing overlaps head</text>
+  <text x="385" y="180" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#f59e0b">VIOLATION (conservative, conf x 0.8)</text>
+
+  <!-- Why not naive section -->
+  <rect x="530" y="40" width="230" height="170" rx="6" fill="#1e1b4b" stroke="#ef4444" stroke-width="1"/>
+  <text x="645" y="60" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#f87171">WHY NOT NAIVE OVERLAP?</text>
+  <text x="645" y="80" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#94a3b8">Person standing next to</text>
+  <text x="645" y="94" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#94a3b8">motorcycle with helmet</text>
+  <text x="645" y="108" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#94a3b8">on handlebars = FALSE</text>
+  <text x="645" y="122" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#94a3b8">POSITIVE with bbox IoU</text>
+  <line x1="545" y1="135" x2="745" y2="135" stroke="#334155" stroke-width="1"/>
+  <text x="645" y="152" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#4ade80">Head-region constraint</text>
+  <text x="645" y="166" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#4ade80">ensures helmet is ON</text>
+  <text x="645" y="180" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#4ade80">the person's head</text>
+  <text x="645" y="198" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#64748b">Anatomically constrained</text>
+
+  <!-- Two-wheeler association note -->
+  <text x="390" y="214" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">Persons first associated with two-wheelers by checking center-in-bbox with 5% margin</text>
+</svg>
