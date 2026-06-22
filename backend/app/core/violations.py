@@ -227,8 +227,14 @@ def detect_helmet_violations(
     """
     cfg = get_violation_config("helmet")
     head_fraction = cfg.get("head_fraction", 0.30)
-    iou_threshold = cfg.get("iou_threshold", 0.15)
-    margin = cfg.get("person_on_moto_margin", 0.05)
+    rider_overlap_ratio = cfg.get("rider_overlap_ratio", 0.30)
+    min_no_helmet_conf = cfg.get("min_no_helmet_confidence", 0.25)
+    negative_inference_min_person_conf = cfg.get(
+        "negative_inference_min_person_conf", 0.70
+    )
+    confident_with_helmet_threshold = cfg.get(
+        "confident_with_helmet_threshold", 0.40
+    )
 
     violations = []
 
@@ -236,26 +242,31 @@ def detect_helmet_violations(
         p_bbox = person["bbox"]  # pixel coords
         p_conf = person["confidence"]
 
-        # Check if person is near a two-wheeler
-        p_cx, p_cy = bbox_center(p_bbox)
-        near_moto = False
-        for tw in two_wheeler_boxes:
-            tw_bbox = tw["bbox"]
-            # Normalize person center to check against two-wheeler
-            norm_cx = p_cx / img_w
-            norm_cy = p_cy / img_h
-            tw_norm = [tw_bbox[0] / img_w, tw_bbox[1] / img_h,
-                       tw_bbox[2] / img_w, tw_bbox[3] / img_h]
-
-            if (tw_norm[0] - margin <= norm_cx <= tw_norm[2] + margin and
-                    tw_norm[1] - margin <= norm_cy <= tw_norm[3] + margin):
-                near_moto = True
-                break
-
-        if not near_moto:
+        # --- Rider check: only evaluate persons actually riding a two-wheeler ---
+        # Use overlap ratio (overlap_area / person_area) per AICITY2024 winner.
+        # This prevents flagging pedestrians near motorcycles.
+        is_rider = False
+        p_area = (p_bbox[2] - p_bbox[0]) * (p_bbox[3] - p_bbox[1])
+        if p_area <= 0:
             continue
 
-        # Extract head region (top 30% of person bbox)
+        best_overlap_ratio = 0.0
+        for tw in two_wheeler_boxes:
+            tw_bbox = tw["bbox"]
+            # Compute intersection area
+            ix1 = max(p_bbox[0], tw_bbox[0])
+            iy1 = max(p_bbox[1], tw_bbox[1])
+            ix2 = min(p_bbox[2], tw_bbox[2])
+            iy2 = min(p_bbox[3], tw_bbox[3])
+            inter_area = max(0, ix2 - ix1) * max(0, iy2 - iy1)
+            overlap_ratio = inter_area / p_area
+            if overlap_ratio > best_overlap_ratio:
+                best_overlap_ratio = overlap_ratio
+
+        if best_overlap_ratio < rider_overlap_ratio:
+            continue
+
+        # Extract head region (top fraction of person bbox)
         head_bbox = [
             p_bbox[0],
             p_bbox[1],
@@ -263,52 +274,65 @@ def detect_helmet_violations(
             p_bbox[1] + (p_bbox[3] - p_bbox[1]) * head_fraction,
         ]
 
-        # Check helmet overlap with head region
-        has_no_helmet = False
-        no_helmet_conf = 0.0
-        has_helmet = False
-        helmet_min_conf = cfg.get("helmet_min_confidence", 0.35)
+        # --- Two-stage helmet detection ---
+        # Stage 1: Positive-only — flag when model explicitly outputs
+        # "No Helmet"/"Without Helmet" above the minimum confidence.
+        # Stage 2: Constrained negative inference — only when person has high
+        # confidence, is clearly riding a motorcycle, AND there is no
+        # confident "With Helmet" detection for the head region. A low-conf
+        # "With Helmet" (< 0.40) is treated as unreliable model noise, since
+        # a genuinely worn helmet typically produces conf > 0.50.
+        # This avoids FP issues (turbans, pedestrians) while catching obvious
+        # no-helmet cases where the model fails to fire or produces weak noise.
+        best_no_helmet_conf = 0.0
+        has_confident_with_helmet = False
 
         for h_det in helmet_boxes:
             h_bbox = h_det["bbox"]
             h_class = h_det["class_name"].lower().replace("_", " ")
             h_conf = h_det["confidence"]
 
+            # Center-point association: is helmet detection center inside the head region?
             h_cx, h_cy = bbox_center(h_bbox)
+            if not (head_bbox[0] <= h_cx <= head_bbox[2] and
+                    head_bbox[1] <= h_cy <= head_bbox[3]):
+                continue
 
-            # Center-point association: is helmet center inside the head region?
-            if head_bbox[0] <= h_cx <= head_bbox[2] and head_bbox[1] <= h_cy <= head_bbox[3]:
-                if "no helmet" in h_class or "without" in h_class:
-                    has_no_helmet = True
-                    no_helmet_conf = max(no_helmet_conf, h_conf)
-                elif ("helmet" in h_class or "with" in h_class) and h_conf >= helmet_min_conf:
-                    # Only trust "With Helmet" above minimum confidence.
-                    # A low-confidence "With Helmet" (e.g. 0.23) is likely noise.
-                    has_helmet = True
+            # A confident "With Helmet" blocks negative inference
+            if ("helmet" in h_class and "no" not in h_class and
+                    "without" not in h_class and h_conf >= confident_with_helmet_threshold):
+                has_confident_with_helmet = True
 
-        # Determine violation using three-state logic:
-        # 1. Explicit no-helmet detection → high-confidence violation
-        # 2. No detection of ANY class overlapping head → inference-based violation
-        # 3. Valid "with helmet" detection → no violation
-        if has_no_helmet:
+            # Only count "No Helmet"/"Without Helmet" detections above threshold
+            if h_conf >= min_no_helmet_conf and (
+                "no helmet" in h_class or "without" in h_class
+            ):
+                best_no_helmet_conf = max(best_no_helmet_conf, h_conf)
+
+        # Stage 1: Explicit no-helmet detection
+        if best_no_helmet_conf >= min_no_helmet_conf:
             violations.append({
                 "type": "no_helmet",
                 "bbox": [p_bbox[0] / img_w, p_bbox[1] / img_h,
                          p_bbox[2] / img_w, p_bbox[3] / img_h],
                 "person_bbox": [p_bbox[0] / img_w, p_bbox[1] / img_h,
                                 p_bbox[2] / img_w, p_bbox[3] / img_h],
-                "confidence": no_helmet_conf,
+                "confidence": best_no_helmet_conf,
             })
-        elif not has_helmet:
-            # No helmet model output overlaps this person's head.
-            # Absence of helmet evidence → flag as violation with reduced confidence.
+        # Stage 2: Constrained negative inference
+        # Only flag when: no confident "With Helmet" in head region AND
+        # person confidence is high AND person is clearly a motorcycle rider.
+        elif (
+            not has_confident_with_helmet
+            and p_conf >= negative_inference_min_person_conf
+        ):
             violations.append({
                 "type": "no_helmet",
                 "bbox": [p_bbox[0] / img_w, p_bbox[1] / img_h,
                          p_bbox[2] / img_w, p_bbox[3] / img_h],
                 "person_bbox": [p_bbox[0] / img_w, p_bbox[1] / img_h,
                                 p_bbox[2] / img_w, p_bbox[3] / img_h],
-                "confidence": p_conf * 0.8,
+                "confidence": p_conf * 0.7,
             })
 
     return violations
@@ -322,53 +346,113 @@ def detect_triple_riding(
     two_wheeler_boxes: list[dict],
     img_w: int,
     img_h: int,
+    helmet_boxes: list[dict] | None = None,
 ) -> list[dict]:
-    """Detect triple riding using 2D spatial constraints.
+    """Detect triple riding using 2D spatial constraints + head counting.
 
-    Algorithm:
-        1. For each two-wheeler, find persons whose horizontal center
-           is within the vehicle bbox and vertical overlap > 30%
-        2. If 3+ riders → triple riding violation
+    Algorithm (dual-method):
+        1. Primary: For each two-wheeler, count persons with overlap_ratio
+           >= rider_overlap_ratio. If 3+ riders → violation.
+        2. Secondary (head counting): If person count < 3, count helmet/head
+           detections whose center falls within the motorcycle bbox. If 3+
+           heads detected → violation. This catches tightly-packed riders
+           where COCO merges person bodies but the helmet model still sees
+           separate heads (production approach per CVPRW/AI City Challenge).
 
     Args:
         person_boxes: COCO person detections.
         two_wheeler_boxes: COCO motorcycle/bicycle detections.
         img_w: Image width in pixels.
         img_h: Image height in pixels.
+        helmet_boxes: Helmet model detections (optional, for head counting).
 
     Returns:
         List of violation dicts.
     """
     cfg = get_violation_config("triple_riding")
     max_riders = cfg.get("max_riders", 2)
-    center_margin = cfg.get("horizontal_center_threshold", 0.15)
-    vert_overlap_thresh = cfg.get("vertical_overlap_threshold", 0.30)
+    rider_overlap_ratio = cfg.get("rider_overlap_ratio", 0.20)
 
     violations = []
 
     for tw in two_wheeler_boxes:
         tw_bbox = tw["bbox"]
+        tw_area = (tw_bbox[2] - tw_bbox[0]) * (tw_bbox[3] - tw_bbox[1])
+        if tw_area <= 0:
+            continue
         riders = []
 
+        # Method 1: Person-body overlap association
         for person in person_boxes:
             p_bbox = person["bbox"]
-
-            # Horizontal center check
-            p_cx = (p_bbox[0] + p_bbox[2]) / 2
-            tw_cx = (tw_bbox[0] + tw_bbox[2]) / 2
-            tw_w = tw_bbox[2] - tw_bbox[0]
-
-            if abs(p_cx - tw_cx) > tw_w * (0.5 + center_margin):
+            p_area = (p_bbox[2] - p_bbox[0]) * (p_bbox[3] - p_bbox[1])
+            if p_area <= 0:
                 continue
 
-            # Vertical overlap check
-            overlap_y1 = max(p_bbox[1], tw_bbox[1])
-            overlap_y2 = min(p_bbox[3], tw_bbox[3])
-            overlap_h = max(0, overlap_y2 - overlap_y1)
-            person_h = p_bbox[3] - p_bbox[1]
+            # Overlap-ratio based rider association (AICITY2024 winner approach).
+            # overlap_ratio = intersection_area / person_area
+            # This prevents cross-motorcycle matching — a person on an adjacent
+            # bike will have low overlap with THIS motorcycle.
+            ix1 = max(p_bbox[0], tw_bbox[0])
+            iy1 = max(p_bbox[1], tw_bbox[1])
+            ix2 = min(p_bbox[2], tw_bbox[2])
+            iy2 = min(p_bbox[3], tw_bbox[3])
+            inter_area = max(0, ix2 - ix1) * max(0, iy2 - iy1)
+            overlap_ratio = inter_area / p_area
 
-            if person_h > 0 and overlap_h / person_h >= vert_overlap_thresh:
+            if overlap_ratio >= rider_overlap_ratio:
                 riders.append(person)
+
+        # Method 2: Head counting via helmet model detections
+        # When COCO merges tightly-packed rider bodies into 1-2 detections,
+        # the helmet model can still see separate heads. Search an expanded
+        # region above the motorcycle bbox (riders' heads extend above the
+        # vehicle, especially for upright/tightly-packed riders).
+        # Also re-check persons against expanded region for better association.
+        if len(riders) <= max_riders and helmet_boxes:
+            tw_h = tw_bbox[3] - tw_bbox[1]
+            head_search = [
+                tw_bbox[0], tw_bbox[1] - tw_h * 0.40,
+                tw_bbox[2], tw_bbox[3],
+            ]
+            head_count = 0
+            heads_in_region = []
+            for h_det in helmet_boxes:
+                h_bbox = h_det["bbox"]
+                h_cx, h_cy = bbox_center(h_bbox)
+                if (head_search[0] <= h_cx <= head_search[2] and
+                        head_search[1] <= h_cy <= head_search[3]):
+                    head_count += 1
+                    heads_in_region.append(h_det)
+
+            # If 3+ heads detected, override the person-based count
+            if head_count > max_riders:
+                riders = [
+                    {"bbox": h["bbox"], "confidence": h["confidence"]}
+                    for h in heads_in_region
+                ]
+
+        # Method 3: Combined person + head counting with relaxed spatial
+        # association. Some riders may be mis-assigned to adjacent motorcycles
+        # by the strict overlap_ratio check. Count all persons whose CENTER
+        # falls within the expanded head search region plus motorcycle bbox.
+        if len(riders) <= max_riders:
+            tw_h = tw_bbox[3] - tw_bbox[1]
+            expanded = [
+                tw_bbox[0] - tw_h * 0.10,
+                tw_bbox[1] - tw_h * 0.40,
+                tw_bbox[2] + tw_h * 0.10,
+                tw_bbox[3],
+            ]
+            expanded_riders = []
+            for person in person_boxes:
+                p_bbox = person["bbox"]
+                p_cx, p_cy = bbox_center(p_bbox)
+                if (expanded[0] <= p_cx <= expanded[2] and
+                        expanded[1] <= p_cy <= expanded[3]):
+                    expanded_riders.append(person)
+            if len(expanded_riders) > max_riders:
+                riders = expanded_riders
 
         if len(riders) > max_riders:
             rider_bboxes = [
@@ -853,9 +937,9 @@ def detect_all_violations(
     )
     all_violations.extend(helmet_violations)
 
-    # P1: Triple riding
+    # P1: Triple riding (pass helmet detections for head counting)
     triple_violations = detect_triple_riding(
-        persons, two_wheelers, img_w, img_h
+        persons, two_wheelers, img_w, img_h, helmet_detections
     )
     all_violations.extend(triple_violations)
 
