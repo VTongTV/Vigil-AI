@@ -30,7 +30,7 @@ const { fontFamily } = loadFont("normal", {
 
 const TOTAL_FRAMES = 15 * FPS;
 
-/** Detection set: boxes visible during a time window. */
+/** Detection box with pixel coordinates inside the 760×460 camera feed. */
 interface DetectionBox {
   x: number;
   y: number;
@@ -41,41 +41,52 @@ interface DetectionBox {
 }
 
 /**
- * 3 cycling sets of detections with frame ranges.
- * Each set fades in with spring, previous set fades out.
+ * 3 cycling detection sets — each uses a DIFFERENT demo image
+ * so violations match the actual scene content.
+ *
+ * Set 1: Silk Board — No Helmet violations (rider clearly helmetless)
+ * Set 2: KR Puram  — Triple Riding + No Helmet (3 people on 1 bike)
+ * Set 3: Koramangala — Illegal Parking (car in no-parking zone)
  */
 const DETECTION_SETS: Array<{
   startFrame: number;
   endFrame: number;
   cumulativeCount: number;
+  image: string;
+  cameraLabel: string;
   boxes: DetectionBox[];
 }> = [
   {
     startFrame: 60,
     endFrame: 240,
     cumulativeCount: 2,
+    image: "demo/demo_no_helmet_silkboard-01.jpg",
+    cameraLabel: "CAM-BLR-0421 · SILK BOARD",
     boxes: [
-      { x: 280, y: 180, w: 100, h: 140, label: "No Helmet", color: COLORS.danger },
-      { x: 520, y: 200, w: 90, h: 130, label: "Triple Riding", color: COLORS.warning },
+      { x: 140, y: 160, w: 120, h: 180, label: "No Helmet", color: COLORS.danger },
+      { x: 460, y: 190, w: 100, h: 150, label: "No Helmet", color: COLORS.danger },
     ],
   },
   {
     startFrame: 240,
     endFrame: 480,
     cumulativeCount: 5,
+    image: "demo/demo_triple_riding_krpuram-01.jpg",
+    cameraLabel: "CAM-BLR-0712 · KR PURAM",
     boxes: [
-      { x: 350, y: 160, w: 110, h: 160, label: "No Helmet", color: COLORS.danger },
-      { x: 650, y: 200, w: 95, h: 140, label: "Wrong Side", color: "#EC4899" },
-      { x: 800, y: 180, w: 90, h: 130, label: "No Helmet", color: COLORS.danger },
+      { x: 260, y: 120, w: 170, h: 240, label: "Triple Riding", color: COLORS.warning },
+      { x: 275, y: 90, w: 140, h: 70, label: "No Helmet", color: COLORS.danger },
+      { x: 480, y: 170, w: 100, h: 150, label: "No Helmet", color: COLORS.danger },
     ],
   },
   {
     startFrame: 480,
     endFrame: 720,
     cumulativeCount: 7,
+    image: "demo/demo_illegal_parking_kormangala-01.jpg",
+    cameraLabel: "CAM-BLR-0315 · KORMANGALA",
     boxes: [
-      { x: 420, y: 300, w: 140, h: 100, label: "Illegal Parking", color: COLORS.secondary },
-      { x: 600, y: 150, w: 100, h: 150, label: "No Helmet", color: COLORS.danger },
+      { x: 230, y: 130, w: 210, h: 160, label: "Illegal Parking", color: COLORS.secondary },
     ],
   },
 ];
@@ -213,25 +224,49 @@ export const LiveDetection: React.FC = () => {
               boxShadow: `0 4px 30px rgba(0,0,0,0.4), 0 0 60px rgba(6,182,212,0.05)`,
             }}
           >
-            {/* Demo image */}
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                transform: `scale(${kb.scale}) translate(${kb.x}px, ${kb.y}px)`,
-                transformOrigin: "center center",
-              }}
-            >
-              <Img
-                src={staticFile("demo/demo_no_helmet_silkboard-01.jpg")}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  filter: "brightness(0.7) contrast(1.1) saturate(0.8)",
-                }}
-              />
-            </div>
+            {/* Demo image — switches per detection set */}
+            {DETECTION_SETS.map((set, si) => {
+              const isActive = si === activeSetIndex;
+              const isPrev = si === prevSetIndex;
+              const imgOp = isActive
+                ? interpolate(
+                    frame,
+                    [set.startFrame - 5, set.startFrame + 15],
+                    [0, 1],
+                    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+                  )
+                : isPrev
+                  ? interpolate(
+                      frame,
+                      [set.endFrame - 20, set.endFrame],
+                      [1, 0],
+                      { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+                    )
+                  : 0;
+              if (imgOp <= 0) return null;
+              return (
+                <div
+                  key={`img-${si}`}
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    opacity: imgOp,
+                    transform: `scale(${kb.scale}) translate(${kb.x}px, ${kb.y}px)`,
+                    transformOrigin: "center center",
+                  }}
+                >
+                  <Img
+                    src={staticFile(set.image)}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      filter: "brightness(0.7) contrast(1.1) saturate(0.8)",
+                    }}
+                  />
+                </div>
+              );
+            })}
 
             {/* CRT scan line — increased opacity */}
             <div
@@ -399,7 +434,7 @@ export const LiveDetection: React.FC = () => {
               </span>
             </div>
 
-            {/* Timestamp */}
+            {/* Timestamp — switches camera label per detection set */}
             <div
               style={{
                 position: "absolute",
@@ -413,7 +448,10 @@ export const LiveDetection: React.FC = () => {
                 letterSpacing: "0.05em",
               }}
             >
-              CAM-BLR-0421 · {String(Math.floor(frame / fps)).padStart(2, "0")}:{String((frame % fps) * 2).padStart(4, "0").slice(0, 2)}
+              {activeSetIndex >= 0
+                ? DETECTION_SETS[activeSetIndex].cameraLabel
+                : DETECTION_SETS[0].cameraLabel}{" "}
+              · {String(Math.floor(frame / fps)).padStart(2, "0")}:{String((frame % fps) * 2).padStart(4, "0").slice(0, 2)}
             </div>
           </div>
 
