@@ -12,6 +12,7 @@ import { ViolationTypes } from "./scenes/ViolationTypes";
 import { Dashboard } from "./scenes/Dashboard";
 import { Evidence } from "./scenes/Evidence";
 import { Impact } from "./scenes/Impact";
+import { BeyondDetection } from "./scenes/BeyondDetection";
 
 /**
  * VigilAI Launch Video — Main Composition
@@ -37,6 +38,7 @@ const SCENE_DURATIONS = {
   violationTypes: 10 * FPS, // 10s
   dashboard:     12 * FPS,  // 12s
   evidence:      5 * FPS,   // 5s
+  beyondDetection: 8 * FPS, // 8s
   impact:        10 * FPS,  // 10s
 };
 
@@ -116,7 +118,16 @@ export const VigilAILaunch: React.FC = () => {
           timing={linearTiming({ durationInFrames: TRANSITION_DUR })}
         />
 
-        {/* Scene 9: Impact + Closing */}
+        {/* Scene 9: Beyond Detection */}
+        <TransitionSeries.Sequence durationInFrames={SCENE_DURATIONS.beyondDetection}>
+          <BeyondDetection />
+        </TransitionSeries.Sequence>
+        <TransitionSeries.Transition
+          presentation={fade()}
+          timing={linearTiming({ durationInFrames: TRANSITION_DUR })}
+        />
+
+        {/* Scene 10: Impact + Closing */}
         <TransitionSeries.Sequence durationInFrames={SCENE_DURATIONS.impact}>
           <Impact />
         </TransitionSeries.Sequence>
