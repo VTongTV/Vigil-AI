@@ -340,17 +340,20 @@ export default function Generator() {
 
       {/* Preset Selector + Run Button */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="flex-1 max-w-sm">
+        <div className="flex-1 max-w-lg">
           <Select value={selectedId ?? ""} onValueChange={(v) => { if (v) handlePresetChange(v); }}>
-            <SelectTrigger className="h-9 text-[13px] bg-[var(--color-paper-1)]/70 ring-1 ring-[var(--color-paper-3)]/60">
+            <SelectTrigger className="h-9 text-[13px] bg-[var(--color-paper-1)]/70 ring-1 ring-[var(--color-paper-3)]/60 w-full">
               <SelectValue placeholder="Select an edge-case scenario..." />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="min-w-[360px]">
               {GENERATOR_PRESETS.map((p) => (
-                <SelectItem key={p.id} value={p.id} className="text-[13px]">
-                  <span className="flex items-center gap-2">
+                <SelectItem key={p.id} value={p.id} className="text-[13px] py-2.5">
+                  <span className="flex items-center gap-2.5">
                     <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: VIOLATION_COLORS[p.violationType] }} />
-                    {p.label}
+                    <span className="flex flex-col">
+                      <span className="font-medium">{p.label}</span>
+                      <span className="text-[10px] text-[var(--color-ink-faint)]">{VIOLATION_LABELS[p.violationType]}</span>
+                    </span>
                   </span>
                 </SelectItem>
               ))}

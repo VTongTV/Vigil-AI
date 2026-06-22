@@ -181,7 +181,7 @@ export default function Layout() {
               )}
             </AnimatePresence>
           </button>
-          <nav className={cn("flex-1 py-3", collapsed ? "flex flex-col items-center gap-0.5 px-0" : "space-y-0.5 px-2.5")}>
+          <nav className={cn("flex-1 min-h-0 overflow-y-auto py-3", collapsed ? "flex flex-col items-center gap-0.5 px-0" : "space-y-0.5 px-2.5")}>
             {NAV_ITEMS.map(({ to, label, icon: Icon, short }) => {
               const isActive = to === "/dashboard"
                 ? location.pathname === "/dashboard"

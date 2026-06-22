@@ -46,7 +46,7 @@ async def list_violations(
     confidence_tier: Optional[str] = Query(None, description="Filter by tier: high, medium, low"),
     hide_duplicates: bool = Query(True, description="Hide duplicate violations (F7)"),
     page: int = Query(1, ge=1, description="Page number"),
-    page_size: int = Query(20, ge=1, le=100, description="Items per page"),
+    page_size: int = Query(20, ge=1, le=1000, description="Items per page"),
     db: Session = Depends(get_db),
 ):
     """List violations with filtering, pagination, and optional dedup hiding."""
