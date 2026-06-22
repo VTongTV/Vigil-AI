@@ -648,6 +648,46 @@ The hackathon build is a vertical slice of the production architecture. Same mod
 
 ---
 
+## Screenshots
+
+### Command Center Dashboard
+
+<div align="center">
+<img src="doc/doc/screenshots/Screenshot 2026-06-21 at 19-44-35 VigilAI — Signal Console.png" alt="VigilAI Command Center Dashboard" width="780" />
+</div>
+
+### Violation Detection
+
+<div align="center">
+<img src="doc/doc/screenshots/Screenshot 2026-06-21 at 19-45-08 VigilAI — Signal Console.png" alt="Violation Detection Interface" width="780" />
+</div>
+
+### Evidence Viewer
+
+<div align="center">
+<img src="doc/doc/screenshots/Screenshot 2026-06-21 at 19-45-24 VigilAI — Signal Console.png" alt="Evidence Viewer with SHA-256 Verification" width="780" />
+</div>
+
+### Analytics Dashboard
+
+<div align="center">
+<img src="doc/doc/screenshots/Screenshot 2026-06-21 at 19-45-47 VigilAI — Signal Console.png" alt="Analytics Dashboard" width="780" />
+</div>
+
+### Map View
+
+<div align="center">
+<img src="doc/doc/screenshots/Screenshot 2026-06-21 at 19-46-02 VigilAI — Signal Console.png" alt="Map View with Bengaluru Junctions" width="780" />
+</div>
+
+### Upload & Detect
+
+<div align="center">
+<img src="doc/doc/screenshots/Screenshot 2026-06-21 at 19-46-15 VigilAI — Signal Console.png" alt="Upload and Detect Interface" width="780" />
+</div>
+
+---
+
 ## License
 
 Built for Flipkart GridLock 2.0 hackathon.
