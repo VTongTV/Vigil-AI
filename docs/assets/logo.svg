@@ -13,20 +13,28 @@
       </feMerge>
     </filter>
   </defs>
-  <path d="M60 8 L108 28 L108 60 C108 88 86 108 60 116 C34 108 12 88 12 60 L12 28 Z" fill="url(#shieldGrad)" opacity="0.15" stroke="url(#shieldGrad)" stroke-width="1.5">
-    <animate attributeName="opacity" values="0.15;0.25;0.15" dur="3s" repeatCount="indefinite"/>
+  <!-- Shield background (pulsing) -->
+  <path d="M60 10 L105 28 L105 55 C105 82 85 100 60 108 C35 100 15 82 15 55 L15 28 Z" fill="url(#shieldGrad)" opacity="0.12" stroke="url(#shieldGrad)" stroke-width="1">
+    <animate attributeName="opacity" values="0.12;0.22;0.12" dur="3s" repeatCount="indefinite"/>
   </path>
-  <path d="M60 8 L108 28 L108 60 C108 88 86 108 60 116 C34 108 12 88 12 60 L12 28 Z" fill="none" stroke="url(#shieldGrad)" stroke-width="2"/>
-  <ellipse cx="60" cy="52" rx="22" ry="14" fill="none" stroke="#6366f1" stroke-width="2" opacity="0.8">
-    <animate attributeName="ry" values="14;16;14" dur="2s" repeatCount="indefinite"/>
+  <!-- Shield border -->
+  <path d="M60 10 L105 28 L105 55 C105 82 85 100 60 108 C35 100 15 82 15 55 L15 28 Z" fill="none" stroke="url(#shieldGrad)" stroke-width="2"/>
+  <!-- Eye ellipse -->
+  <ellipse cx="60" cy="46" rx="24" ry="13" fill="none" stroke="#6366f1" stroke-width="2" opacity="0.8">
+    <animate attributeName="ry" values="13;15;13" dur="2s" repeatCount="indefinite"/>
   </ellipse>
-  <circle cx="60" cy="52" r="6" fill="#6366f1" filter="url(#glow)">
-    <animate attributeName="r" values="5;7;5" dur="2s" repeatCount="indefinite"/>
+  <!-- Eye pupil -->
+  <circle cx="60" cy="46" r="5" fill="#6366f1" filter="url(#glow)">
+    <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite"/>
   </circle>
-  <line x1="30" y1="52" x2="90" y2="52" stroke="#3b82f6" stroke-width="1" opacity="0.4">
-    <animate attributeName="y1" values="35;70;35" dur="2.5s" repeatCount="indefinite"/>
-    <animate attributeName="y2" values="35;70;35" dur="2.5s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.6;0;0.6" dur="2.5s" repeatCount="indefinite"/>
+  <!-- Scan line -->
+  <line x1="30" y1="46" x2="90" y2="46" stroke="#3b82f6" stroke-width="1" opacity="0.4">
+    <animate attributeName="y1" values="30;65;30" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="y2" values="30;65;30" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.5;0;0.5" dur="2.5s" repeatCount="indefinite"/>
   </line>
-  <text x="60" y="98" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="800" font-size="22" fill="url(#shieldGrad)" letter-spacing="4">VIGIL</text>
+  <!-- VIGIL text - positioned well inside shield, above narrowing -->
+  <text x="60" y="80" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="800" font-size="18" fill="url(#shieldGrad)" letter-spacing="3">VIGIL</text>
+  <!-- AI subtitle -->
+  <text x="60" y="95" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="10" fill="#818cf8" letter-spacing="2">AI</text>
 </svg>
