@@ -1,0 +1,77 @@
+<svg width="780" height="300" viewBox="0 0 780 300" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="780" height="300" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="390" y="24" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#e2e8f0" letter-spacing="2">TEST ARCHITECTURE -- 269 TESTS PASSING</text>
+
+  <!-- Backend tests header -->
+  <rect x="20" y="42" width="370" height="28" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1"/>
+  <text x="205" y="62" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#60a5fa">BACKEND TESTS -- 211 PASSING (pytest)</text>
+
+  <!-- Backend test files -->
+  <rect x="20" y="76" width="370" height="210" rx="6" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="35" y="96" font-family="monospace" font-size="8" fill="#818cf8">backend/tests/</text>
+
+  <text x="35" y="116" font-family="monospace" font-size="8" fill="#64748b">test_preprocessing.py</text>
+  <text x="250" y="116" font-family="system-ui, sans-serif" font-size="7" fill="#475569">CLAHE, denoise, gamma validation</text>
+
+  <text x="35" y="134" font-family="monospace" font-size="8" fill="#64748b">test_detector.py</text>
+  <text x="250" y="134" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Model loading, inference, bbox format</text>
+
+  <text x="35" y="152" font-family="monospace" font-size="8" fill="#64748b">test_violations.py</text>
+  <text x="250" y="152" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Helmet, triple riding, spatial logic</text>
+
+  <text x="35" y="170" font-family="monospace" font-size="8" fill="#64748b">test_ocr.py</text>
+  <text x="250" y="170" font-family="system-ui, sans-serif" font-size="7" fill="#475569">RapidOCR, regex, O/0 I/1 confusion</text>
+
+  <text x="35" y="188" font-family="monospace" font-size="8" fill="#64748b">test_evidence.py</text>
+  <text x="250" y="188" font-family="system-ui, sans-serif" font-size="7" fill="#475569">SHA-256 hash, annotated image, metadata</text>
+
+  <text x="35" y="206" font-family="monospace" font-size="8" fill="#64748b">test_routes_detect.py</text>
+  <text x="250" y="206" font-family="system-ui, sans-serif" font-size="7" fill="#475569">POST /detect with various images</text>
+
+  <text x="35" y="224" font-family="monospace" font-size="8" fill="#64748b">test_routes_violations.py</text>
+  <text x="250" y="224" font-family="system-ui, sans-serif" font-size="7" fill="#475569">GET /violations filtering, pagination</text>
+
+  <text x="35" y="242" font-family="monospace" font-size="8" fill="#64748b">test_routes_evidence.py</text>
+  <text x="250" y="242" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Evidence retrieval, integrity check</text>
+
+  <text x="35" y="260" font-family="monospace" font-size="8" fill="#64748b">test_routes_analytics.py</text>
+  <text x="250" y="260" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Statistics aggregation</text>
+
+  <text x="35" y="278" font-family="monospace" font-size="8" fill="#64748b">test_schemas.py + test_config.py</text>
+  <text x="250" y="278" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Pydantic validation, Settings loading</text>
+
+  <!-- Frontend tests header -->
+  <rect x="410" y="42" width="350" height="28" rx="6" fill="#1e293b" stroke="#22c55e" stroke-width="1"/>
+  <text x="585" y="62" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="10" fill="#4ade80">FRONTEND TESTS -- 58 PASSING (Vitest)</text>
+
+  <!-- Frontend test files -->
+  <rect x="410" y="76" width="350" height="210" rx="6" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="425" y="96" font-family="monospace" font-size="8" fill="#4ade80">frontend/src/__tests__/</text>
+
+  <text x="425" y="116" font-family="monospace" font-size="8" fill="#64748b">Dashboard.test.tsx</text>
+  <text x="620" y="116" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Page renders, stats display</text>
+
+  <text x="425" y="134" font-family="monospace" font-size="8" fill="#64748b">Upload.test.tsx</text>
+  <text x="620" y="134" font-family="system-ui, sans-serif" font-size="7" fill="#475569">File upload, drag-and-drop</text>
+
+  <text x="425" y="152" font-family="monospace" font-size="8" fill="#64748b">Violations.test.tsx</text>
+  <text x="620" y="152" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Table, filtering, approve/reject</text>
+
+  <text x="425" y="170" font-family="monospace" font-size="8" fill="#64748b">Evidence.test.tsx</text>
+  <text x="620" y="170" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Annotated viewer, hash verification</text>
+
+  <text x="425" y="188" font-family="monospace" font-size="8" fill="#64748b">Analytics.test.tsx</text>
+  <text x="620" y="188" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Charts, date range filtering</text>
+
+  <text x="425" y="206" font-family="monospace" font-size="8" fill="#64748b">DemoMode.test.tsx</text>
+  <text x="620" y="206" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Toggle, hardcoded response flow</text>
+
+  <!-- Coverage note -->
+  <rect x="410" y="226" width="350" height="50" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="585" y="246" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="600" font-size="8" fill="#94a3b8">Test Scope</text>
+  <text x="585" y="262" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Backend: CV pipeline, violation logic, OCR, evidence, API routes</text>
+  <text x="585" y="274" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#475569">Frontend: Page renders, API integration, demo mode, state management</text>
+
+  <!-- Footer -->
+  <text x="390" y="296" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#475569">Run: pytest backend/tests/ -v -m "not slow" (fast) | pytest backend/tests/ -v (full GPU) | cd frontend && npx vitest run</text>
+</svg>
