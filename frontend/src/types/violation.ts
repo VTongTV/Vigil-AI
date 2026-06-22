@@ -206,3 +206,100 @@ export const STATUS_COLORS: Record<ViolationStatus, string> = {
   issued: "#06b6d4",
   rejected: "#ef4444",
 };
+
+// ---------------------------------------------------------------------------
+// Feature 1: Citizen Reporting
+// ---------------------------------------------------------------------------
+
+export interface CitizenDetectResponse {
+  success: boolean;
+  processing_time_ms: number;
+  violations_found: number;
+  violation_types: string[];
+  image_dimensions: ImageDimensions;
+  detection_summary: DetectionSummary;
+  message: string;
+}
+
+// ---------------------------------------------------------------------------
+// Feature 3: Deepfake Detection
+// ---------------------------------------------------------------------------
+
+export interface DeepfakeAnalysis {
+  is_likely_ai: boolean;
+  confidence: number;
+  artifacts_detected: string[];
+  explanation: string;
+}
+
+export interface DeepfakeResponse {
+  is_likely_ai: boolean;
+  confidence: number;
+  artifacts_detected: string[];
+  explanation: string;
+  analysis_details: DeepfakeAnalysis;
+}
+
+// ---------------------------------------------------------------------------
+// Feature 4: Web Scraper
+// ---------------------------------------------------------------------------
+
+export interface ScrapedFeedItem {
+  id: string;
+  platform: string;
+  source_url: string;
+  thumbnail_url: string | null;
+  caption: string | null;
+  timestamp: string;
+  location: string | null;
+  analysis_status: string;
+}
+
+export interface ScraperFeedResponse {
+  total: number;
+  items: ScrapedFeedItem[];
+  last_scraped: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Feature 5: Video Processing
+// ---------------------------------------------------------------------------
+
+export interface VideoFrameResult {
+  frame_index: number;
+  timestamp_ms: number;
+  violations_count: number;
+  violation_types: string[];
+  evidence_url: string | null;
+}
+
+export interface VideoDetectResponse {
+  success: boolean;
+  total_frames: number;
+  frames_processed: number;
+  total_violations: number;
+  processing_time_ms: number;
+  frame_results: VideoFrameResult[];
+  summary: Record<string, unknown>;
+}
+
+// ---------------------------------------------------------------------------
+// Feature 6: Tracking Dashboard
+// ---------------------------------------------------------------------------
+
+export interface TrackingCamera {
+  camera_id: string;
+  junction_name: string;
+  status: CameraStatus;
+  violations_last_hour: number;
+  last_violation_type: string | null;
+  last_violation_time: string | null;
+  feed_url: string | null;
+}
+
+export interface TrackingOverviewResponse {
+  active_cameras: number;
+  total_violations_last_hour: number;
+  alerts_active: number;
+  cameras: TrackingCamera[];
+}
