@@ -76,7 +76,7 @@
 \thispagestyle{empty}
 \begin{tikzpicture}[remember picture,overlay]
   \fill[deepnavy] (current page.south west) rectangle (current page.north east);
-  \fill[vigilaccent!22] ([xshift=-2cm,yshift=2cm]current page.north east) circle (5.4cm);
+  \fill[vigilcyan!22] ([xshift=-2cm,yshift=2cm]current page.north east) circle (5.4cm);
   \fill[vigilcyan!16] ([xshift=1.4cm,yshift=-1.4cm]current page.south west) circle (5.1cm);
   \draw[vigilaccent!35,line width=0.8pt] ([xshift=1.1cm,yshift=-1.1cm]current page.north west) rectangle ([xshift=-1.1cm,yshift=1.1cm]current page.south east);
   \draw[vigilcyan!20,line width=0.4pt] ([xshift=1.45cm,yshift=-1.45cm]current page.north west) rectangle ([xshift=-1.45cm,yshift=1.45cm]current page.south east);
@@ -126,7 +126,18 @@ Processes existing CCTV images, citizen reports, and video clips; detects violat
 \end{minipage}}
 
 \vspace{0.2cm}
-{\small\color{white!80}\url{https://github.com/VTongTV/flipkart-gridlock-2.0-round-II.git}}
+{\small\color{white!80}\url{https://github.com/VTongTV/Vigil-AI.git}}
+
+\vspace{0.5cm}
+\fcolorbox{vigilgreen}{vigilgreen!15}{\begin{minipage}{0.92\linewidth}\centering
+\vspace{4pt}
+{\Large\bfseries\color{vigilgreen} LIVE \& DEPLOYED}\\[6pt]
+{\normalsize\color{white!90}This system is running right now. Judges can try it without any setup.}\\[8pt]
+{\large\bfseries\color{white} Frontend Dashboard:}\;\;{\normalsize\color{vigilcyan}\url{https://vigil-ai-gules.vercel.app/dashboard}}\\[6pt]
+{\large\bfseries\color{white} Backend API Docs:}\;\;{\normalsize\color{vigilcyan}\url{https://vtongtv-vigilai-backend.hf.space/docs}}\\[6pt]
+{\small\color{white!70}HuggingFace Spaces (CPU Basic, 16\,GB RAM) + Vercel (CDN) \;\textbullet\; Zero cost, zero GPU required}\\[4pt]
+\vspace{4pt}
+\end{minipage}}
 
 \vspace{0.6cm}
 {\color{vigilcyan}\rule{\linewidth}{1.5pt}}
@@ -173,6 +184,15 @@ Efficiency and scalability & VRAM-aware model loading planned for a 4\,GB RTX 30
 \vspace{8pt}
 
 \judgecallout{Winning thesis}{VigilAI turns traffic images into officer-verified, tamper-evident enforcement records using practical computer vision and a police-oriented command center.}
+
+\vspace{8pt}
+
+\fcolorbox{vigilgreen}{vigilgreen!10}{\begin{minipage}{0.94\linewidth}
+{\bfseries\large\color{vigilgreen} LIVE DEMO — No setup required}\\[6pt]
+{\bfseries\color{vigilblue}Frontend:}\;\;\url{https://vigil-ai-gules.vercel.app/dashboard}\\[4pt]
+{\bfseries\color{vigilblue}Backend API:}\;\;\url{https://vtongtv-vigilai-backend.hf.space/docs}\\[4pt]
+{\small\color{vigilgray}Deployed on HuggingFace Spaces (Docker, CPU Basic, 16\,GB RAM) + Vercel (CDN). Both free tier. Judges: open the dashboard link and try it.}
+\end{minipage}}
 
 \vfill
 \begin{center}
@@ -424,6 +444,57 @@ Scalability choices & YOLOv8n model choice; COCO and helmet models resident; pla
 \textbf{The product story in one line:} VigilAI covers the complete path from traffic image to officer-reviewed evidence record, while keeping the most uncertain modules clearly marked as heuristic, best-effort, prototype, or demo.
 \end{minipage}}
 \end{center}
+
+% ============================================================
+% SECTION — LIVE DEPLOYMENT
+% ============================================================
+\section{Live Deployment}
+\sectionrule
+
+VigilAI is not a local prototype. It is deployed and accessible right now on the open web, running on cloud infrastructure at zero cost.
+
+\begin{center}
+\fcolorbox{vigilgreen}{vigilgreen!8}{\begin{minipage}{0.94\linewidth}
+\vspace{4pt}
+\begin{center}{\Large\bfseries\color{vigilgreen} LIVE \& DEPLOYED}\end{center}
+\vspace{6pt}
+\begin{tabular}{@{}p{3.2cm}p{3cm}p{6cm}@{}}
+\hline
+\textbf{Component} & \textbf{Platform} & \textbf{URL} \\
+\hline
+Frontend Dashboard & Vercel (CDN) & \url{https://vigil-ai-gules.vercel.app/dashboard} \\
+Backend API Docs & HuggingFace Spaces & \url{https://vtongtv-vigilai-backend.hf.space/docs} \\
+Source Code & GitHub & \url{https://github.com/VTongTV/Vigil-AI} \\
+\hline
+\end{tabular}
+\vspace{4pt}
+\end{minipage}}
+\end{center}
+
+\subsection{Why This Matters}
+
+Most hackathon teams submit a local demo that requires judges to clone a repo, install dependencies, and hope it works on their machine. VigilAI runs in the cloud. A judge opens a URL and the system is live.
+
+\begin{itemize}
+  \item \textbf{Zero setup.} No cloning, no \texttt{pip install}, no GPU required. Open the dashboard URL and start testing.
+  \item \textbf{Always available.} The Vercel frontend never sleeps. The HuggingFace Spaces backend auto-wakes on request with cold-boot retry handled client-side.
+  \item \textbf{Real infrastructure.} Docker-based backend on HuggingFace Spaces CPU Basic (16\,GB RAM). Not a mock. Not a notebook. A production-style deployment.
+  \item \textbf{Zero cost.} Both platforms are free tier. No credit card, no trial period, no expiry before the hackathon deadline.
+\end{itemize}
+
+\subsection{Cloud Deployment Stack}
+
+\begin{longtable}{@{}p{3.6cm}p{4cm}p{5.5cm}@{}}
+\hline
+\textbf{Layer} & \textbf{Technology} & \textbf{Purpose} \\
+\hline
+Frontend Hosting & Vercel (free) & Static React SPA, global CDN, always-on \\
+Backend Hosting & HuggingFace Spaces (free, CPU Basic) & FastAPI + models on 16\,GB RAM, Docker-based \\
+Model Runtime & PyTorch CPU + ONNX Runtime & CPU-only inference, no GPU required for demo \\
+Database & SQLite (embedded) & Zero-config, per-container persistence \\
+CI/CD & GitHub push → auto-deploy & Vercel and HF Spaces both auto-deploy on push \\
+\hline
+\end{longtable}
 
 % ============================================================
 % SECTION 5 — THE COMMAND CENTER (SCREENSHOTS)
@@ -708,6 +779,8 @@ VigilAI is designed as an assistive enforcement system, not an autonomous punish
 % ============================================================
 \section{Suggested Judge Demo Flow}
 \sectionrule
+
+\judgecallout{Quick start}{Open \textbf{\url{https://vigil-ai-gules.vercel.app/dashboard}} in any browser. No setup, no installation, no GPU. The system is live.}
 
 \begin{enumerate}
   \item Open the dashboard to see live city-level statistics and seeded Bengaluru junctions.

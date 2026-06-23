@@ -15,6 +15,15 @@
 <img src="https://img.shields.io/badge/Tests-269%20Passing-22c55e?style=flat-square&labelColor=1a1a2e" alt="269 Tests" />
 <img src="https://img.shields.io/badge/VRAM-0.023%20GB%20Allocated-3b82f6?style=flat-square&labelColor=1a1a2e" alt="VRAM" />
 
+<br/>
+
+<a href="https://vigil-ai-gules.vercel.app/dashboard">
+  <img src="https://img.shields.io/badge/Live%20Demo-Frontend%20(Vercel)-22c55e?style=for-the-badge&labelColor=0f172a" alt="Live Frontend" />
+</a>
+<a href="https://vtongtv-vigilai-backend.hf.space/docs">
+  <img src="https://img.shields.io/badge/Live%20Demo-Backend%20API%20Docs%20(HF%20Spaces)-f59e0b?style=for-the-badge&labelColor=0f172a" alt="Live Backend" />
+</a>
+
 </div>
 
 ---
@@ -23,6 +32,22 @@
 
 **AI-assisted traffic violation detection that retrofits onto any existing CCTV infrastructure.**  
 **Officers verify. AI assists. Rule 166A compliant. ASTraM-ready.**
+
+</div>
+
+<div align="center">
+
+### **LIVE & DEPLOYED** — Try it now, no setup required
+
+<a href="https://vigil-ai-gules.vercel.app/dashboard">
+  <img src="https://img.shields.io/badge/%F0%9F%9A%80_OPEN_DASHBOARD-Vercel%20Frontend-22c55e?style=for-the-badge&labelColor=0f172a&color=22c55e" alt="Open Dashboard" />
+</a>
+&nbsp;&nbsp;
+<a href="https://vtongtv-vigilai-backend.hf.space/docs">
+  <img src="https://img.shields.io/badge/%F0%9F%94%84_API_DOCS-HuggingFace%20Spaces-f59e0b?style=for-the-badge&labelColor=0f172a&color=f59e0b" alt="API Docs" />
+</a>
+
+**Backend:** HuggingFace Spaces (CPU Basic, 16 GB RAM, Docker) • **Frontend:** Vercel (global CDN) • **Cost:** $0
 
 </div>
 
@@ -605,10 +630,20 @@ VigilAI evidence packages are designed to satisfy the requirements of **Section 
 
 ## Deployment Architecture
 
+### Live Demo (Cloud)
+
+| Component | Platform | URL | Notes |
+|-----------|----------|-----|-------|
+| **Frontend** | Vercel | [vigil-ai-gules.vercel.app](https://vigil-ai-gules.vercel.app/dashboard) | React SPA, always-on CDN, zero sleep |
+| **Backend API** | HuggingFace Spaces | [vtongtv-vigilai-backend.hf.space](https://vtongtv-vigilai-backend.hf.space/docs) | FastAPI on CPU Basic (16 GB RAM), cold-boot ~30-60s |
+| **Source Code** | GitHub | [VTongTV/Vigil-AI](https://github.com/VTongTV/Vigil-AI) | Open-source repository |
+
+Both platforms are **free tier** — zero cost for the hackathon demo. The frontend cold-boot retry logic handles HF Spaces wake-up automatically (exponential backoff on 502/503/504).
+
 ### Current Build (Hackathon Vertical Slice)
 
 <div align="center">
-<img src="docs/assets/deployment-current.svg" alt="Current deployment: Browser to FastAPI to SQLite with RTX 3050 GPU" width="780" />
+<img src="docs/assets/deployment-current.svg" alt="Current deployment: Browser to Vercel Frontend to HF Spaces Backend to SQLite" width="780" />
 </div>
 
 ### Production Scale (Target)
@@ -618,6 +653,16 @@ VigilAI evidence packages are designed to satisfy the requirements of **Section 
 </div>
 
 The hackathon build is a vertical slice of the production architecture. Same models, same violation logic, same evidence format -- deployed on a single machine. Migration to production requires: (1) RTSP stream ingestion replacing file upload, (2) PostgreSQL replacing SQLite, (3) GPU model serving with Triton, (4) ASTraM/Vahan API integration.
+
+### Cloud Deployment Stack
+
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| Frontend Hosting | Vercel (free) | Static React SPA, global CDN, always-on |
+| Backend Hosting | HuggingFace Spaces (free, CPU Basic) | FastAPI + models on 16 GB RAM, Docker-based |
+| Model Runtime | PyTorch CPU + ONNX Runtime | CPU-only inference, no GPU required for demo |
+| Database | SQLite (embedded) | Zero-config, per-container persistence |
+| CI/CD | GitHub push → auto-deploy | Vercel and HF Spaces both auto-deploy on push |
 
 ---
 
