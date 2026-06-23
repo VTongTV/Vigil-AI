@@ -1,0 +1,24 @@
+render:
+  - type: web
+    name: vigilai-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python scripts/setup_weights.py || true && python -m uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.6"
+      - key: RAILWAY_ENVIRONMENT
+        value: "1"
+      - key: VIGILAI_DEMO_MODE
+        value: "false"
+    plan: free
+    healthCheckPath: /health
+  - type: web
+    name: vigilai-frontend
+    runtime: node
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npx serve dist -s -l $PORT
+    envVars:
+      - key: VITE_API_BASE
+        sync: false
+    plan: free
