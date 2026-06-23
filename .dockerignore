@@ -1,0 +1,19 @@
+# Exclude everything not needed for the backend
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+venv/
+node_modules/
+.git/
+frontend/
+video/
+datasets/
+outputs/
+doc/
+docs/
+.agents/
+runs/
+.gitignore
+*.md
