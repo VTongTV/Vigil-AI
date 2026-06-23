@@ -286,6 +286,7 @@ def detect_helmet_violations(
         # no-helmet cases where the model fails to fire or produces weak noise.
         best_no_helmet_conf = 0.0
         has_confident_with_helmet = False
+        has_any_helmet_detection_in_region = False
 
         for h_det in helmet_boxes:
             h_bbox = h_det["bbox"]
@@ -297,6 +298,9 @@ def detect_helmet_violations(
             if not (head_bbox[0] <= h_cx <= head_bbox[2] and
                     head_bbox[1] <= h_cy <= head_bbox[3]):
                 continue
+
+            # At least one helmet model detection found in head region
+            has_any_helmet_detection_in_region = True
 
             # A confident "With Helmet" blocks negative inference
             if ("helmet" in h_class and "no" not in h_class and
@@ -320,10 +324,15 @@ def detect_helmet_violations(
                 "confidence": best_no_helmet_conf,
             })
         # Stage 2: Constrained negative inference
-        # Only flag when: no confident "With Helmet" in head region AND
-        # person confidence is high AND person is clearly a motorcycle rider.
+        # Only flag when: helmet model returned at least 1 detection somewhere
+        # in the image (so the model is actually working), no confident
+        # "With Helmet" found in head region, AND person confidence is high.
+        # If the helmet model returned zero detections anywhere, we cannot
+        # infer anything — the model simply didn't fire, which is not
+        # evidence of no helmet.
         elif (
-            not has_confident_with_helmet
+            len(helmet_boxes) > 0
+            and not has_confident_with_helmet
             and p_conf >= negative_inference_min_person_conf
         ):
             violations.append({
@@ -483,17 +492,21 @@ def detect_wrong_side(
     lane_polygons: list[dict],
     img_w: int,
     img_h: int,
+    stop_line_zones: Optional[list[dict]] = None,
 ) -> list[dict]:
     """Detect vehicles traveling against lane direction.
 
     Uses configurable lane polygons. A vehicle in the "wrong side"
-    portion of a lane is flagged.
+    portion of a lane is flagged. Vehicles that are also in a stop-line
+    zone are excluded — they are more likely waiting at a signal than
+    driving the wrong way.
 
     Args:
         vehicle_boxes: COCO vehicle detections.
         lane_polygons: Configured lane regions with direction info.
         img_w: Image width in pixels.
         img_h: Image height in pixels.
+        stop_line_zones: Stop-line zones to exclude (optional).
 
     Returns:
         List of violation dicts.
@@ -507,6 +520,16 @@ def detect_wrong_side(
         bbox = vehicle["bbox"]
         cx_norm = ((bbox[0] + bbox[2]) / 2) / img_w
         cy_norm = ((bbox[1] + bbox[3]) / 2) / img_h
+
+        # Skip vehicles in stop-line zones (likely waiting at signal)
+        if stop_line_zones:
+            in_stop_zone = False
+            for sz in stop_line_zones:
+                if point_in_polygon(cx_norm, cy_norm, sz.get("polygon", [])):
+                    in_stop_zone = True
+                    break
+            if in_stop_zone:
+                continue
 
         for lane in lane_polygons:
             polygon = lane.get("polygon", [])
@@ -944,9 +967,11 @@ def detect_all_violations(
     all_violations.extend(triple_violations)
 
     # P1: Wrong-side driving (if lane polygons configured)
+    # Pass stop_line_zones to exclude vehicles waiting at signals
     if lane_polygons:
         wrong_side_violations = detect_wrong_side(
-            all_vehicles, lane_polygons, img_w, img_h
+            all_vehicles, lane_polygons, img_w, img_h,
+            stop_line_zones=stop_line_zones
         )
         all_violations.extend(wrong_side_violations)
 

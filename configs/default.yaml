@@ -106,16 +106,16 @@ violations:
     - id: park_kormangala
       camera_id: KORMANGALA-01
       name: No Parking - Bus Bay
-      # Right-side curb parking zone — covers large parked car at ~(0.46,0.47)
+      # Narrowed to actual parked car area ~(0.46,0.47), exclude moving traffic
       polygon:
-      - - 0.15
-        - 0.25
-      - - 0.95
-        - 0.25
-      - - 0.95
-        - 0.85
-      - - 0.15
-        - 0.85
+      - - 0.30
+        - 0.35
+      - - 0.75
+        - 0.35
+      - - 0.75
+        - 0.70
+      - - 0.30
+        - 0.70
     - id: park_mgroad
       camera_id: MGROAD-01
       name: No Parking - Bus Stop
@@ -132,17 +132,17 @@ violations:
     - id: park_silkboard
       camera_id: SILKBOARD-01
       name: No Parking - Service Road
-      # Covers illegally parked truck at ~(0.42,0.57) and cars in lower half
+      # Narrowed to pickup truck on zebra crossing area, exclude moving traffic
       polygon:
-      - - 0.1
-        - 0.25
-      - - 0.65
-        - 0.25
-      - - 0.65
-        - 0.75
-      - - 0.1
-        - 0.75
-    min_confidence: 0.5
+      - - 0.25
+        - 0.40
+      - - 0.60
+        - 0.40
+      - - 0.60
+        - 0.70
+      - - 0.25
+        - 0.70
+    min_confidence: 0.55
   seatbelt:
     enabled: true
     windshield_crop_ratio_top: 0.4
