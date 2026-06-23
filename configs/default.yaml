@@ -256,6 +256,8 @@ api:
   max_image_size_mb: 10
   cors_origins:
   - http://localhost:5173
+  - http://localhost:3000
+  - https://*.up.railway.app
 database:
   path: outputs/vigilai.db
 demo:

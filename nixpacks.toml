@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["python311", "gcc"]
+
+[phases.install]
+cmd = "pip install -r requirements.txt"
+
+[variables]
+PYTHONDONTWRITEBYTECODE = "1"

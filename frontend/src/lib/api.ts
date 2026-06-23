@@ -21,14 +21,53 @@ import {
 } from "./mocks";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api/v1";
+/** Backend base URL without /api/v1 — used for static assets like evidence images. */
+const BACKEND_BASE = API_BASE.replace(/\/api\/v1\/?$/, "");
+
+/** Maximum number of retries when the backend is cold-booting (Railway Serverless). */
+const COLD_BOOT_RETRIES = 4;
+/** Delay between retries (ms) — doubles each attempt (1s, 2s, 4s, 8s). */
+const COLD_BOOT_BASE_DELAY = 1000;
+
+/**
+ * Fetch with automatic retry on 502/503/504 errors.
+ *
+ * When Railway Serverless wakes a slept service, the first 1-2 requests
+ * may return 502 Bad Gateway while the app finishes starting up. This
+ * wrapper retries those errors with exponential backoff so the user
+ * sees a loading state instead of a crash.
+ */
+async function fetchWithColdBootRetry<T>(
+  url: string,
+  options?: RequestInit,
+  retries: number = COLD_BOOT_RETRIES,
+): Promise<T> {
+  try {
+    const res = await fetch(url, options);
+    // Retry on gateway/availability errors (cold boot)
+    if ((res.status === 502 || res.status === 503 || res.status === 504) && retries > 0) {
+      const delay = COLD_BOOT_BASE_DELAY * (2 ** (COLD_BOOT_RETRIES - retries));
+      await new Promise((r) => setTimeout(r, delay));
+      return fetchWithColdBootRetry<T>(url, options, retries - 1);
+    }
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`API ${res.status}: ${body}`);
+    }
+    return res.json();
+  } catch (err) {
+    // Retry on network errors (service not yet reachable)
+    if (err instanceof TypeError && retries > 0) {
+      const delay = COLD_BOOT_BASE_DELAY * (2 ** (COLD_BOOT_RETRIES - retries));
+      await new Promise((r) => setTimeout(r, delay));
+      return fetchWithColdBootRetry<T>(url, options, retries - 1);
+    }
+    throw err;
+  }
+}
 
 async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${url}`, options);
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`API ${res.status}: ${body}`);
-  }
-  return res.json();
+  return fetchWithColdBootRetry<T>(`${API_BASE}${url}`, options);
 }
 
 // ---------------------------------------------------------------------------
@@ -183,7 +222,7 @@ export function getEvidenceUrl(violationId: string): string {
     return `https://placehold.co/1280x720?text=Evidence+${violationId}`;
   }
 
-  return `${API_BASE}/evidence/${violationId}`;
+  return `${BACKEND_BASE}/api/v1/evidence/${violationId}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -191,7 +230,7 @@ export function getEvidenceUrl(violationId: string): string {
 // ---------------------------------------------------------------------------
 
 export function getChallanPdfUrl(violationId: string): string {
-  return `${API_BASE}/evidence/${violationId}/challan-pdf`;
+  return `${BACKEND_BASE}/api/v1/evidence/${violationId}/challan-pdf`;
 }
 
 export async function generateChallanPdf(violationId: string): Promise<Blob> {

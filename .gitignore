@@ -12,13 +12,10 @@ venv/
 .env
 datasets
 
-# Model weights (too large for git)
-backend/weights/*.pt
+# Model weights — committed for cloud deployment (~28MB total)
+# Large or rarely-used weights can still be excluded:
 backend/weights/*.onnx
 backend/weights/*.pth
-!backend/weights/.gitkeep
-*.pt
-!backend/weights/.gitkeep
 
 # Outputs (generated at runtime)
 outputs/

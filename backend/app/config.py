@@ -58,8 +58,8 @@ class Settings(BaseSettings):
     # Demo mode
     demo_mode: bool = False
 
-    # CORS
-    cors_origins: list[str] = ["http://localhost:5173"]
+    # CORS — supports Railway domains via wildcard env var
+    cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000"]
 
     # Image upload
     max_image_size_mb: int = 10

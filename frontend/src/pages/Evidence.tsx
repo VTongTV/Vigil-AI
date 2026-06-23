@@ -233,7 +233,7 @@ export default function Evidence() {
                 <Card className="overflow-hidden border-[var(--rule-color)] bg-[var(--color-paper-1)]">
                   <CardContent className="p-2">
                     <AnnotatedViewer
-                      imageUrl={`http://localhost:8000${selectedViolation.evidence_url}`}
+                      imageUrl={`${import.meta.env.VITE_API_BASE?.replace(/\/api\/v1$/, "") || "http://localhost:8000"}${selectedViolation.evidence_url}`}
                       violations={[selectedViolation]}
                       alt={`Evidence for ${selectedViolation.id}`}
                     />

@@ -1,10 +1,14 @@
 """VigilAI FastAPI application with lifespan management.
 
 Loads models at startup, initializes database, and registers routes.
+On cloud deployments (Railway), models load in the background so the
+/health endpoint responds immediately — required for Serverless cold-boot.
 """
 
+import asyncio
 import logging
 import os
+import threading
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -21,6 +25,33 @@ logger = logging.getLogger(__name__)
 
 # Global model manager — initialized during lifespan
 model_manager: ModelManager | None = None
+_models_loading: bool = False
+
+
+def _load_models_background(app: FastAPI) -> None:
+    """Load YOLO models in a background thread.
+
+    This keeps the app responsive to /health checks during model loading,
+    which is critical for Railway Serverless cold-boot scenarios where
+    the healthcheck must pass within the timeout window.
+
+    Args:
+        app: FastAPI application instance to set model_manager on.
+    """
+    global model_manager, _models_loading
+    _models_loading = True
+    try:
+        model_manager = ModelManager()
+        model_manager.load_resident_models()
+        app.state.model_manager = model_manager
+        logger.info("Resident models loaded successfully (background)")
+    except Exception as e:
+        logger.error("Failed to load models: %s", e)
+        app.state.model_manager = None
+        if not settings.demo_mode:
+            logger.error("FATAL: demo_mode is off and models failed to load")
+    finally:
+        _models_loading = False
 
 
 @asynccontextmanager
@@ -30,8 +61,8 @@ async def lifespan(app: FastAPI):
     Startup:
         - Set environment variables for OCR threading
         - Initialize database tables
-        - Load resident models (COCO + Helmet) into GPU
         - Create evidence directory
+        - Start model loading in background thread
 
     Shutdown:
         - Log shutdown
@@ -51,24 +82,22 @@ async def lifespan(app: FastAPI):
         settings.evidence_dir.mkdir(parents=True, exist_ok=True)
         logger.info("Created evidence directory: %s", settings.evidence_dir)
 
-    # Load models
-    global model_manager
-    model_manager = ModelManager()
-
-    try:
-        model_manager.load_resident_models()
-        app.state.model_manager = model_manager
-        logger.info("Resident models loaded successfully")
-    except Exception as e:
-        logger.error("Failed to load models: %s", e)
-        app.state.model_manager = None
-        if not settings.demo_mode:
-            raise
+    # Load models in background thread so /health responds immediately
+    # This is critical for Railway Serverless — healthcheck must pass
+    # before models finish loading (30-60s on CPU)
+    load_thread = threading.Thread(
+        target=_load_models_background,
+        args=(app,),
+        daemon=True,
+        name="model-loader",
+    )
+    load_thread.start()
+    logger.info("Model loading started in background thread")
 
     # Mount evidence static files
     app.mount("/static/evidence", StaticFiles(directory=str(settings.evidence_dir)), name="evidence")
 
-    logger.info("VigilAI ready — demo_mode=%s", settings.demo_mode)
+    logger.info("VigilAI ready (models loading in background) — demo_mode=%s", settings.demo_mode)
 
     yield
 
@@ -82,11 +111,18 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS
+# CORS — in demo/production mode, allow all origins since the frontend
+# runs on a different Railway domain. In local dev, restrict to localhost.
+import os as _os
+
+_cors_origins = settings.cors_origins
+if _os.environ.get("RAILWAY_ENVIRONMENT") or _os.environ.get("VIGILAI_CORS_ALL") == "1":
+    _cors_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
-    allow_credentials=True,
+    allow_origins=_cors_origins,
+    allow_credentials=True if _cors_origins != ["*"] else False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -119,10 +155,34 @@ app.include_router(scraper_router, prefix="/api/v1", tags=["scraper"])
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint."""
+    """Health check endpoint.
+
+    Returns immediately even during model loading — critical for
+    Railway Serverless which requires the app to accept connections
+    within a timeout window. Models load in a background thread and
+    will be available once is_ready() returns True.
+    """
     from backend.app.schemas import HealthResponse
 
     return HealthResponse(
         models_loaded=model_manager is not None and model_manager.is_ready(),
         demo_mode=settings.demo_mode,
+    )
+
+
+@app.get("/ready")
+async def readiness_check():
+    """Readiness check — returns 503 until models are loaded.
+
+    Useful for more sophisticated health probes. The /health endpoint
+    always returns 200 (app is alive); /ready returns 200 only when
+    the app can actually process detection requests.
+    """
+    from fastapi.responses import JSONResponse
+
+    if model_manager is not None and model_manager.is_ready():
+        return {"status": "ready", "demo_mode": settings.demo_mode}
+    return JSONResponse(
+        status_code=503,
+        content={"status": "loading", "demo_mode": settings.demo_mode},
     )
