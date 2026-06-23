@@ -19,27 +19,29 @@
 \contentsline {subsection}{\numberline {3.4}OCR Pipeline}{8}{subsection.3.4}%
 \contentsline {subsection}{\numberline {3.5}VRAM Management}{8}{subsection.3.5}%
 \contentsline {section}{\numberline {4}Feature Inventory}{9}{section.4}%
-\contentsline {section}{\numberline {5}The Command Center}{10}{section.5}%
-\contentsline {subsection}{\numberline {5.1}The Extended Command Surface}{10}{subsection.5.1}%
-\contentsline {section}{\numberline {6}Methodology}{10}{section.6}%
-\contentsline {subsection}{\numberline {6.1}Model Selection}{12}{subsection.6.1}%
-\contentsline {subsection}{\numberline {6.2}Development Sprints with Go / No-Go Gates}{13}{subsection.6.2}%
-\contentsline {section}{\numberline {7}Assumptions}{14}{section.7}%
-\contentsline {subsection}{\numberline {7.1}Technical}{14}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}Operational \& Legal}{14}{subsection.7.2}%
-\contentsline {subsection}{\numberline {7.3}Data \& Performance}{15}{subsection.7.3}%
-\contentsline {section}{\numberline {8}Expected Evaluation Strategy}{15}{section.8}%
-\contentsline {subsection}{\numberline {8.1}Detection Metrics}{15}{subsection.8.1}%
-\contentsline {subsection}{\numberline {8.2}OCR \& Efficiency}{16}{subsection.8.2}%
-\contentsline {subsection}{\numberline {8.3}Robustness Evaluation Plan}{16}{subsection.8.3}%
-\contentsline {subsection}{\numberline {8.4}Target Evaluation Table}{18}{subsection.8.4}%
-\contentsline {subsection}{\numberline {8.5}Projected Impact}{19}{subsection.8.5}%
-\contentsline {section}{\numberline {9}Benefits to Society}{20}{section.9}%
-\contentsline {subsection}{\numberline {9.1}For Citizens — Safer Roads, Fewer Fatalities}{20}{subsection.9.1}%
-\contentsline {subsection}{\numberline {9.2}For the Police — Dignity and Focus}{20}{subsection.9.2}%
-\contentsline {subsection}{\numberline {9.3}For the City — Revenue That Funds Better Roads}{20}{subsection.9.3}%
-\contentsline {subsection}{\numberline {9.4}For Justice — Evidence That Holds Up}{21}{subsection.9.4}%
-\contentsline {subsection}{\numberline {9.5}For the Country — A Blueprint That Scales}{21}{subsection.9.5}%
-\contentsline {section}{\numberline {10}Responsible AI and Safeguards}{21}{section.10}%
-\contentsline {section}{\numberline {11}Suggested Judge Demo Flow}{22}{section.11}%
-\contentsline {section}{\numberline {12}Conclusion}{22}{section.12}%
+\contentsline {section}{\numberline {5}Live Deployment}{10}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Cloud Deployment Stack}{10}{subsection.5.1}%
+\contentsline {section}{\numberline {6}The Command Center}{11}{section.6}%
+\contentsline {subsection}{\numberline {6.1}The Extended Command Surface}{11}{subsection.6.1}%
+\contentsline {section}{\numberline {7}Methodology}{11}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Model Selection}{13}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Development Sprints with Go / No-Go Gates}{14}{subsection.7.2}%
+\contentsline {section}{\numberline {8}Assumptions}{15}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Technical}{15}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Operational \& Legal}{15}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Data \& Performance}{16}{subsection.8.3}%
+\contentsline {section}{\numberline {9}Expected Evaluation Strategy}{16}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Detection Metrics}{16}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}OCR \& Efficiency}{17}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}Robustness Evaluation Plan}{17}{subsection.9.3}%
+\contentsline {subsection}{\numberline {9.4}Target Evaluation Table}{19}{subsection.9.4}%
+\contentsline {subsection}{\numberline {9.5}Projected Impact}{20}{subsection.9.5}%
+\contentsline {section}{\numberline {10}Benefits to Society}{21}{section.10}%
+\contentsline {subsection}{\numberline {10.1}For Citizens — Safer Roads, Fewer Fatalities}{21}{subsection.10.1}%
+\contentsline {subsection}{\numberline {10.2}For the Police — Dignity and Focus}{21}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.3}For the City — Revenue That Funds Better Roads}{21}{subsection.10.3}%
+\contentsline {subsection}{\numberline {10.4}For Justice — Evidence That Holds Up}{22}{subsection.10.4}%
+\contentsline {subsection}{\numberline {10.5}For the Country — A Blueprint That Scales}{22}{subsection.10.5}%
+\contentsline {section}{\numberline {11}Responsible AI and Safeguards}{22}{section.11}%
+\contentsline {section}{\numberline {12}Suggested Demo Flow}{23}{section.12}%
+\contentsline {section}{\numberline {13}Conclusion}{23}{section.13}%

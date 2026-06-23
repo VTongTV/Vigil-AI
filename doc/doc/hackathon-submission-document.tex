@@ -76,8 +76,8 @@
 \thispagestyle{empty}
 \begin{tikzpicture}[remember picture,overlay]
   \fill[deepnavy] (current page.south west) rectangle (current page.north east);
-  \fill[vigilcyan!22] ([xshift=-2cm,yshift=2cm]current page.north east) circle (5.4cm);
-  \fill[vigilcyan!16] ([xshift=1.4cm,yshift=-1.4cm]current page.south west) circle (5.1cm);
+  \fill[vigilcyan!35] ([xshift=-2cm,yshift=2cm]current page.north east) circle (5.4cm);
+  \fill[vigilcyan!25] ([xshift=1.4cm,yshift=-1.4cm]current page.south west) circle (5.1cm);
   \draw[vigilaccent!35,line width=0.8pt] ([xshift=1.1cm,yshift=-1.1cm]current page.north west) rectangle ([xshift=-1.1cm,yshift=1.1cm]current page.south east);
   \draw[vigilcyan!20,line width=0.4pt] ([xshift=1.45cm,yshift=-1.45cm]current page.north west) rectangle ([xshift=-1.45cm,yshift=1.45cm]current page.south east);
 \end{tikzpicture}
@@ -89,7 +89,6 @@
 
 {\Huge\bfseries\color{white} VigilAI}\\[10pt]
 {\large\bfseries\color{vigilcyan} Software-Only AI Enforcement for Bengaluru Traffic Images}\\[6pt]
-{\normalsize\itshape\color{white!85} AI detects. Officers decide. Evidence stays auditable.}
 
 \vspace{0.8cm}
 {\color{vigilcyan!60}\rule{0.5\linewidth}{0.6pt}}
@@ -129,14 +128,14 @@ Processes existing CCTV images, citizen reports, and video clips; detects violat
 {\small\color{white!80}\url{https://github.com/VTongTV/Vigil-AI.git}}
 
 \vspace{0.5cm}
-\fcolorbox{vigilgreen}{vigilgreen!15}{\begin{minipage}{0.92\linewidth}\centering
-\vspace{4pt}
+\fcolorbox{vigilgreen}{deepnavy}{\begin{minipage}{0.92\linewidth}\centering
+\vspace{6pt}
 {\Large\bfseries\color{vigilgreen} LIVE \& DEPLOYED}\\[6pt]
-{\normalsize\color{white!90}This system is running right now. Judges can try it without any setup.}\\[8pt]
-{\large\bfseries\color{white} Frontend Dashboard:}\;\;{\normalsize\color{vigilcyan}\url{https://vigil-ai-gules.vercel.app/dashboard}}\\[6pt]
-{\large\bfseries\color{white} Backend API Docs:}\;\;{\normalsize\color{vigilcyan}\url{https://vtongtv-vigilai-backend.hf.space/docs}}\\[6pt]
-{\small\color{white!70}HuggingFace Spaces (CPU Basic, 16\,GB RAM) + Vercel (CDN) \;\textbullet\; Zero cost, zero GPU required}\\[4pt]
-\vspace{4pt}
+{\normalsize\color{white}This system is running right now. Anyone can try it without any setup.}\\[8pt]
+{\large\bfseries\color{vigilcyan} Frontend Dashboard:}\;\;{\normalsize\color{white}\url{https://vigil-ai-gules.vercel.app/dashboard}}\\[6pt]
+{\large\bfseries\color{vigilcyan} Backend API Docs:}\;\;{\normalsize\color{white}\url{https://vtongtv-vigilai-backend.hf.space/docs}}\\[6pt]
+{\small\color{white!80}HuggingFace Spaces (CPU Basic, 16\,GB RAM) + Vercel (CDN) \;\textbullet\; Zero cost, zero GPU required}\\[4pt]
+\vspace{6pt}
 \end{minipage}}
 
 \vspace{0.6cm}
@@ -163,7 +162,7 @@ Processes existing CCTV images, citizen reports, and video clips; detects violat
 \begin{center}
 \begin{tabular}{@{}p{3.5cm}p{9cm}@{}}
 \hline
-\textbf{What judges asked for} & \textbf{What VigilAI demonstrates} \\
+\textbf{What is required} & \textbf{What VigilAI demonstrates} \\
 \hline
 Image preprocessing & CLAHE, denoising, and gamma correction for CCTV-style inputs \\
 Vehicle / road-user detection & YOLOv8n-based person, vehicle, motorcycle, bus, truck, bicycle, helmet, and no-helmet detection \\
@@ -179,19 +178,21 @@ Efficiency and scalability & VRAM-aware model loading planned for a 4\,GB RTX 30
 
 \vspace{8pt}
 
-\noindent\textbf{What makes the prototype judge-friendly:} it is not only an object detector. It includes the full enforcement workflow: image or video intake $\rightarrow$ AI detection $\rightarrow$ OCR $\rightarrow$ evidence generation $\rightarrow$ officer approval / rejection $\rightarrow$ analytics and reporting.
+\noindent\textbf{Why our approach is better:} it is not only an object detector. It includes the full enforcement workflow: image or video intake $\rightarrow$ AI detection $\rightarrow$ OCR $\rightarrow$ evidence generation $\rightarrow$ officer approval / rejection $\rightarrow$ analytics and reporting.
 
 \vspace{8pt}
 
-\judgecallout{Winning thesis}{VigilAI turns traffic images into officer-verified, tamper-evident enforcement records using practical computer vision and a police-oriented command center.}
+\judgecallout{Novel areas}{VigilAI turns traffic images into officer-verified, tamper-evident enforcement records using practical computer vision and a police-oriented command center.}
 
 \vspace{8pt}
 
-\fcolorbox{vigilgreen}{vigilgreen!10}{\begin{minipage}{0.94\linewidth}
+\fcolorbox{vigilgreen}{deepnavy}{\begin{minipage}{0.94\linewidth}
+\vspace{4pt}
 {\bfseries\large\color{vigilgreen} LIVE DEMO — No setup required}\\[6pt]
-{\bfseries\color{vigilblue}Frontend:}\;\;\url{https://vigil-ai-gules.vercel.app/dashboard}\\[4pt]
-{\bfseries\color{vigilblue}Backend API:}\;\;\url{https://vtongtv-vigilai-backend.hf.space/docs}\\[4pt]
-{\small\color{vigilgray}Deployed on HuggingFace Spaces (Docker, CPU Basic, 16\,GB RAM) + Vercel (CDN). Both free tier. Judges: open the dashboard link and try it.}
+{\bfseries\color{vigilcyan}Frontend:}\;\;{\color{white}\url{https://vigil-ai-gules.vercel.app/dashboard}}\\[4pt]
+{\bfseries\color{vigilcyan}Backend API:}\;\;{\color{white}\url{https://vtongtv-vigilai-backend.hf.space/docs}}\\[4pt]
+{\small\color{white!80}Deployed on HuggingFace Spaces (Docker, CPU Basic, 16\,GB RAM) + Vercel (CDN). Both free tier. Judges: open the dashboard link and try it.}
+\vspace{4pt}
 \end{minipage}}
 
 \vfill
@@ -422,7 +423,7 @@ RapidOCR & CPU only — no CUDA provider & 0\,GB \\
 \section{Feature Inventory}
 \sectionrule
 
-This section lists the current prototype capabilities plainly, without relying on inflated claims. The aim is to make every shipped feature easy for judges to find.
+This section lists the current prototype capabilities plainly, without relying on inflated claims. The aim is to make every shipped feature easy for officers to find.
 
 \begin{longtable}{@{}p{3.3cm}p{8.8cm}@{}}
 \hline
@@ -454,26 +455,22 @@ Scalability choices & YOLOv8n model choice; COCO and helmet models resident; pla
 VigilAI is not a local prototype. It is deployed and accessible right now on the open web, running on cloud infrastructure at zero cost.
 
 \begin{center}
-\fcolorbox{vigilgreen}{vigilgreen!8}{\begin{minipage}{0.94\linewidth}
-\vspace{4pt}
+\fcolorbox{vigilgreen}{deepnavy}{\begin{minipage}{0.94\linewidth}
+\vspace{6pt}
 \begin{center}{\Large\bfseries\color{vigilgreen} LIVE \& DEPLOYED}\end{center}
 \vspace{6pt}
 \begin{tabular}{@{}p{3.2cm}p{3cm}p{6cm}@{}}
 \hline
-\textbf{Component} & \textbf{Platform} & \textbf{URL} \\
+{\bfseries\color{white}Component} & {\bfseries\color{white}Platform} & {\bfseries\color{white}URL} \\
 \hline
-Frontend Dashboard & Vercel (CDN) & \url{https://vigil-ai-gules.vercel.app/dashboard} \\
-Backend API Docs & HuggingFace Spaces & \url{https://vtongtv-vigilai-backend.hf.space/docs} \\
-Source Code & GitHub & \url{https://github.com/VTongTV/Vigil-AI} \\
+{\color{white}Frontend Dashboard} & {\color{white}Vercel (CDN)} & {\color{vigilcyan}\url{https://vigil-ai-gules.vercel.app/dashboard}} \\
+{\color{white}Backend API Docs} & {\color{white}HuggingFace Spaces} & {\color{vigilcyan}\url{https://vtongtv-vigilai-backend.hf.space/docs}} \\
+{\color{white}Source Code} & {\color{white}GitHub} & {\color{vigilcyan}\url{https://github.com/VTongTV/Vigil-AI}} \\
 \hline
 \end{tabular}
-\vspace{4pt}
+\vspace{6pt}
 \end{minipage}}
 \end{center}
-
-\subsection{Why This Matters}
-
-Most hackathon teams submit a local demo that requires judges to clone a repo, install dependencies, and hope it works on their machine. VigilAI runs in the cloud. A judge opens a URL and the system is live.
 
 \begin{itemize}
   \item \textbf{Zero setup.} No cloning, no \texttt{pip install}, no GPU required. Open the dashboard URL and start testing.
@@ -777,7 +774,7 @@ VigilAI is designed as an assistive enforcement system, not an autonomous punish
 % ============================================================
 % SECTION 10 — SUGGESTED JUDGE DEMO FLOW
 % ============================================================
-\section{Suggested Judge Demo Flow}
+\section{Suggested Demo Flow}
 \sectionrule
 
 \judgecallout{Quick start}{Open \textbf{\url{https://vigil-ai-gules.vercel.app/dashboard}} in any browser. No setup, no installation, no GPU. The system is live.}

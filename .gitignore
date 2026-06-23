@@ -50,3 +50,7 @@ data/sample_videos/*.mp4
 agents.md
 
 video/node_modules
+problem_statement.md
+data
+runs
+VigilAI-Source.zip

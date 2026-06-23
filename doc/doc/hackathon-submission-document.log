@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.2.1)  23 JUN 2026 01:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.2.1)  23 JUN 2026 15:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**"D:/Web Project/Flipkart/Round 2/doc/doc/hackathon-submission-document.tex"
-(D:/Web Project/Flipkart/Round 2/doc/doc/hackathon-submission-document.tex
+**./hackathon-submission-document.tex
+(hackathon-submission-document.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
 (C:\Users\Vedant\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
@@ -587,8 +587,7 @@ File: tikzlibrarycalc.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 ftex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count322
-)
-(D:\Web Project\Flipkart\Round 2\doc\doc\hackathon-submission-document.aux)
+) (hackathon-submission-document.aux)
 \openout1 = `hackathon-submission-document.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 70.
@@ -636,24 +635,22 @@ cfg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
 Package hyperref Info: Link coloring ON on input line 70.
-
-(D:\Web Project\Flipkart\Round 2\doc\doc\hackathon-submission-document.out)
-(D:\Web Project\Flipkart\Round 2\doc\doc\hackathon-submission-document.out)
+ (hackathon-submission-document.out) (hackathon-submission-document.out)
 \@outlinefile=\write4
 \openout4 = `hackathon-submission-document.out'.
 
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 104.
+(Font)              <10.95> on input line 103.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 104.
+(Font)              <8> on input line 103.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 104.
+(Font)              <6> on input line 103.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <14.4> on input line 105.
+(Font)              <14.4> on input line 104.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 105.
+(Font)              <7> on input line 104.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 129.
+(Font)              <5> on input line 128.
 
 (C:\Users\Vedant\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\se-pdfdoc.
 def
@@ -661,27 +658,22 @@ File: se-pdfdoc.def 2019/11/29 v1.12 stringenc: PDFDocEncoding
 ) [1
 
 {C:/Users/Vedant/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
-Underfull \hbox (badness 10000) in paragraph at lines 155--155
-[]|\OT1/cmr/bx/n/10.95 What judges
- []
-
-
-Underfull \hbox (badness 1137) in paragraph at lines 158--158
+Underfull \hbox (badness 1137) in paragraph at lines 168--168
 []|\OT1/cmr/m/n/10.95 Vehicle / road-user
  []
 
 
-Underfull \hbox (badness 4927) in paragraph at lines 160--160
+Underfull \hbox (badness 4927) in paragraph at lines 170--170
 []|\OT1/cmr/m/n/10.95 Violation clas-si-fi-ca-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 163--163
+Underfull \hbox (badness 10000) in paragraph at lines 173--173
 []|\OT1/cmr/m/n/10.95 Analytics and re-
  []
 
 
-Underfull \hbox (badness 5417) in paragraph at lines 163--164
+Underfull \hbox (badness 5417) in paragraph at lines 173--174
 []|\OT1/cmr/m/n/10.95 Dashboard, search-able vi-o-la-tions, trend charts,
  []
 
@@ -690,340 +682,375 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.181 \newpage
-               [1]
-(D:\Web Project\Flipkart\Round 2\doc\doc\hackathon-submission-document.toc
-[2])
+l.202 \newpage
+               [1] [2] (hackathon-submission-document.toc [3])
 \tf@toc=\write5
 \openout5 = `hackathon-submission-document.toc'.
 
- [3]
+ [4]
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.238 
+l.259 
        [1]
-<screenshots/02-problem.png, id=263, 1927.2pt x 976.64874pt>
+<screenshots/02-problem.png, id=282, 1927.2pt x 976.64874pt>
 File: screenshots/02-problem.png Graphic file (type png)
 <use screenshots/02-problem.png>
-Package pdftex.def Info: screenshots/02-problem.png  used on input line 244.
+Package pdftex.def Info: screenshots/02-problem.png  used on input line 265.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.2}) has 
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.261   \item \textbf
+l.282   \item \textbf
                      {Phase 3 — Evidence Package.} Approved violations are...
-[2 <D:/Web Project/Flipkart/Round 2/doc/doc/screenshots/02-problem.png>]
-<screenshots/03-solution.png, id=271, 1927.2pt x 976.64874pt>
+[2 <./screenshots/02-problem.png>]
+<screenshots/03-solution.png, id=291, 1927.2pt x 976.64874pt>
 File: screenshots/03-solution.png Graphic file (type png)
 <use screenshots/03-solution.png>
-Package pdftex.def Info: screenshots/03-solution.png  used on input line 264.
+Package pdftex.def Info: screenshots/03-solution.png  used on input line 285.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.3}) has 
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.281 
-       [3 <D:/Web Project/Flipkart/Round 2/doc/doc/screenshots/03-solution.png>
-]
-<screenshots/04-ai-engine.png, id=278, 1927.2pt x 976.64874pt>
+l.302 
+       [3 <./screenshots/03-solution.png>]
+<screenshots/04-ai-engine.png, id=297, 1927.2pt x 976.64874pt>
 File: screenshots/04-ai-engine.png Graphic file (type png)
 <use screenshots/04-ai-engine.png>
-Package pdftex.def Info: screenshots/04-ai-engine.png  used on input line 296.
+Package pdftex.def Info: screenshots/04-ai-engine.png  used on input line 317.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/09-architecture.png, id=279, 1927.2pt x 976.64874pt>
+<screenshots/09-architecture.png, id=298, 1927.2pt x 976.64874pt>
 File: screenshots/09-architecture.png Graphic file (type png)
 <use screenshots/09-architecture.png>
-Package pdftex.def Info: screenshots/09-architecture.png  used on input line 29
-8.
+Package pdftex.def Info: screenshots/09-architecture.png  used on input line 31
+9.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
 
-Overfull \hbox (1.80449pt too wide) in paragraph at lines 306--307
+Overfull \hbox (1.80449pt too wide) in paragraph at lines 327--328
 []\OT1/cmr/bx/n/10.95 Three-channel en-force-ment work-flow \OT1/cmr/m/n/10.95 
 com-bin-ing im-age/video de-tec-tion, privacy-redacted
  []
 
-[4]
-<screenshots/05-how-it-works.png, id=284, 1927.2pt x 976.64874pt>
+
+pdfTeX warning (ext4): destination with the same identifier (name{page.4}) has 
+been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.332 \end{itemize}
+                    [4]
+<screenshots/05-how-it-works.png, id=302, 1927.2pt x 976.64874pt>
 File: screenshots/05-how-it-works.png Graphic file (type png)
 <use screenshots/05-how-it-works.png>
-Package pdftex.def Info: screenshots/05-how-it-works.png  used on input line 31
-3.
+Package pdftex.def Info: screenshots/05-how-it-works.png  used on input line 33
+4.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/06-features.png, id=285, 1927.2pt x 976.64874pt>
+<screenshots/06-features.png, id=303, 1927.2pt x 976.64874pt>
 File: screenshots/06-features.png Graphic file (type png)
 <use screenshots/06-features.png>
-Package pdftex.def Info: screenshots/06-features.png  used on input line 315.
+Package pdftex.def Info: screenshots/06-features.png  used on input line 336.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/07-impact.png, id=286, 1927.2pt x 976.64874pt>
+<screenshots/07-impact.png, id=304, 1927.2pt x 976.64874pt>
 File: screenshots/07-impact.png Graphic file (type png)
 <use screenshots/07-impact.png>
-Package pdftex.def Info: screenshots/07-impact.png  used on input line 317.
+Package pdftex.def Info: screenshots/07-impact.png  used on input line 338.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
- [5 <D:/Web Project/Flipkart/Round 2/doc/doc/screenshots/04-ai-engine.png> <D:/
-Web Project/Flipkart/Round 2/doc/doc/screenshots/09-architecture.png>]
-[6 <D:/Web Project/Flipkart/Round 2/doc/doc/screenshots/05-how-it-works.png> <D
-:/Web Project/Flipkart/Round 2/doc/doc/screenshots/06-features.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 343--343
+ [5 <./screenshots/04-ai-engine.png> <./screenshots/09-architecture.png>] [6 <.
+/screenshots/05-how-it-works.png> <./screenshots/06-features.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 364--364
 []|\OT1/cmr/m/n/10.95 CLAHE + de-noise + gamma
  []
 
 
-Underfull \hbox (badness 3449) in paragraph at lines 349--349
+Underfull \hbox (badness 3449) in paragraph at lines 370--370
 []|\OT1/cmr/m/n/10.95 OpenCV an-no-ta-tion + SHA-256
  []
 
-[7 <D:/Web Project/Flipkart/Round 2/doc/doc/screenshots/07-impact.png>]
-[8]
-Underfull \hbox (badness 10000) in paragraph at lines 411--411
+[7 <./screenshots/07-impact.png>] [8]
+Underfull \hbox (badness 10000) in paragraph at lines 432--432
 []|\OT1/cmr/m/n/10.95 Computer vi-sion
  []
 
 
-Underfull \hbox (badness 4621) in paragraph at lines 413--413
+Underfull \hbox (badness 4621) in paragraph at lines 434--434
 []|\OT1/cmr/m/n/10.95 Evidence and re-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 416--417
+Underfull \hbox (badness 10000) in paragraph at lines 437--438
 []|\OT1/cmr/m/n/10.95 Violation trends; violation-type break-down;
  []
 
 
-Underfull \hbox (badness 7151) in paragraph at lines 416--417
+Underfull \hbox (badness 7151) in paragraph at lines 437--438
 \OT1/cmr/m/n/10.95 hour/day heatmap; junction-level view; ROI
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 417--417
+Underfull \hbox (badness 10000) in paragraph at lines 438--438
 []|\OT1/cmr/m/n/10.95 Responsible AI
  []
 
 ignored error: Infinite glue shrinkage found in box being split [9]
-<screenshots/01-landing.png, id=323, 1927.2pt x 976.64874pt>
+Underfull \hbox (badness 10000) in paragraph at lines 472--472
+[]|\OT1/cmr/m/n/10.95 Frontend Dash-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 472--472
+[]|[][]$\OT1/cmtt/m/n/10.95 https : / / vigil-[]ai-[]gules .
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 472--472
+[]|\OT1/cmr/m/n/10.95 HuggingFace
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 472--472
+[]|[][]$\OT1/cmtt/m/n/10.95 https : / /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 472--472
+\OT1/cmtt/m/n/10.95 vtongtv-[]vigilai-[]backend .
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 472--472
+[]|[][]$\OT1/cmtt/m/n/10.95 https : / / github . com / VTongTV /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 489--489
+[]|\OT1/cmr/m/n/10.95 HuggingFace Spaces
+ []
+
+
+Underfull \hbox (badness 1924) in paragraph at lines 489--490
+[]|\OT1/cmr/m/n/10.95 FastAPI + mod-els on 16GB
+ []
+
+[10]
+<screenshots/01-landing.png, id=352, 1927.2pt x 976.64874pt>
 File: screenshots/01-landing.png Graphic file (type png)
 <use screenshots/01-landing.png>
-Package pdftex.def Info: screenshots/01-landing.png  used on input line 436.
+Package pdftex.def Info: screenshots/01-landing.png  used on input line 504.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/10-dashboard.png, id=324, 1927.2pt x 976.64874pt>
+<screenshots/10-dashboard.png, id=353, 1927.2pt x 976.64874pt>
 File: screenshots/10-dashboard.png Graphic file (type png)
 <use screenshots/10-dashboard.png>
-Package pdftex.def Info: screenshots/10-dashboard.png  used on input line 438.
+Package pdftex.def Info: screenshots/10-dashboard.png  used on input line 506.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/08-detect-upload.png, id=325, 1927.2pt x 976.64874pt>
+<screenshots/08-detect-upload.png, id=354, 1927.2pt x 976.64874pt>
 File: screenshots/08-detect-upload.png Graphic file (type png)
 <use screenshots/08-detect-upload.png>
-Package pdftex.def Info: screenshots/08-detect-upload.png  used on input line 4
-40.
+Package pdftex.def Info: screenshots/08-detect-upload.png  used on input line 5
+08.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/11-violations.png, id=326, 1927.2pt x 976.64874pt>
+<screenshots/11-violations.png, id=355, 1927.2pt x 976.64874pt>
 File: screenshots/11-violations.png Graphic file (type png)
 <use screenshots/11-violations.png>
-Package pdftex.def Info: screenshots/11-violations.png  used on input line 442.
+Package pdftex.def Info: screenshots/11-violations.png  used on input line 510.
 
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/12-evidence.png, id=327, 1927.2pt x 976.64874pt>
+<screenshots/12-evidence.png, id=356, 1927.2pt x 976.64874pt>
 File: screenshots/12-evidence.png Graphic file (type png)
 <use screenshots/12-evidence.png>
-Package pdftex.def Info: screenshots/12-evidence.png  used on input line 444.
+Package pdftex.def Info: screenshots/12-evidence.png  used on input line 512.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/14-evidence-2.png, id=328, 1578.89874pt x 788.9475pt>
+<screenshots/14-evidence-2.png, id=357, 1578.89874pt x 788.9475pt>
 File: screenshots/14-evidence-2.png Graphic file (type png)
 <use screenshots/14-evidence-2.png>
-Package pdftex.def Info: screenshots/14-evidence-2.png  used on input line 446.
+Package pdftex.def Info: screenshots/14-evidence-2.png  used on input line 514.
 
 (pdftex.def)             Requested size: 469.45717pt x 234.57936pt.
-<screenshots/13-analytics.png, id=329, 1927.2pt x 976.64874pt>
+<screenshots/13-analytics.png, id=358, 1927.2pt x 976.64874pt>
 File: screenshots/13-analytics.png Graphic file (type png)
 <use screenshots/13-analytics.png>
-Package pdftex.def Info: screenshots/13-analytics.png  used on input line 448.
+Package pdftex.def Info: screenshots/13-analytics.png  used on input line 516.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/15-map.png, id=330, 1561.835pt x 459.7175pt>
+<screenshots/15-map.png, id=359, 1561.835pt x 459.7175pt>
 File: screenshots/15-map.png Graphic file (type png)
 <use screenshots/15-map.png>
-Package pdftex.def Info: screenshots/15-map.png  used on input line 450.
+Package pdftex.def Info: screenshots/15-map.png  used on input line 518.
 (pdftex.def)             Requested size: 469.45972pt x 138.18286pt.
-<screenshots/16-dashboard-2.png, id=331, 1927.2pt x 976.64874pt>
+<screenshots/16-dashboard-2.png, id=360, 1927.2pt x 976.64874pt>
 File: screenshots/16-dashboard-2.png Graphic file (type png)
 <use screenshots/16-dashboard-2.png>
-Package pdftex.def Info: screenshots/16-dashboard-2.png  used on input line 452
+Package pdftex.def Info: screenshots/16-dashboard-2.png  used on input line 520
 .
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/19-video.png, id=332, 1927.2pt x 976.64874pt>
+<screenshots/19-video.png, id=361, 1927.2pt x 976.64874pt>
 File: screenshots/19-video.png Graphic file (type png)
 <use screenshots/19-video.png>
-Package pdftex.def Info: screenshots/19-video.png  used on input line 458.
+Package pdftex.def Info: screenshots/19-video.png  used on input line 526.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/17-citizen.png, id=333, 1927.2pt x 976.64874pt>
+<screenshots/17-citizen.png, id=362, 1927.2pt x 976.64874pt>
 File: screenshots/17-citizen.png Graphic file (type png)
 <use screenshots/17-citizen.png>
-Package pdftex.def Info: screenshots/17-citizen.png  used on input line 460.
+Package pdftex.def Info: screenshots/17-citizen.png  used on input line 528.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/22-scraper.png, id=334, 1927.2pt x 976.64874pt>
+<screenshots/22-scraper.png, id=363, 1927.2pt x 976.64874pt>
 File: screenshots/22-scraper.png Graphic file (type png)
 <use screenshots/22-scraper.png>
-Package pdftex.def Info: screenshots/22-scraper.png  used on input line 462.
+Package pdftex.def Info: screenshots/22-scraper.png  used on input line 530.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/18-tracking.png, id=335, 1927.2pt x 976.64874pt>
+<screenshots/18-tracking.png, id=364, 1927.2pt x 976.64874pt>
 File: screenshots/18-tracking.png Graphic file (type png)
 <use screenshots/18-tracking.png>
-Package pdftex.def Info: screenshots/18-tracking.png  used on input line 464.
+Package pdftex.def Info: screenshots/18-tracking.png  used on input line 532.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/20-deepfake.png, id=336, 1927.2pt x 976.64874pt>
+<screenshots/20-deepfake.png, id=365, 1927.2pt x 976.64874pt>
 File: screenshots/20-deepfake.png Graphic file (type png)
 <use screenshots/20-deepfake.png>
-Package pdftex.def Info: screenshots/20-deepfake.png  used on input line 466.
+Package pdftex.def Info: screenshots/20-deepfake.png  used on input line 534.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
-<screenshots/21-generator.png, id=337, 1927.2pt x 976.64874pt>
+<screenshots/21-generator.png, id=366, 1927.2pt x 976.64874pt>
 File: screenshots/21-generator.png Graphic file (type png)
 <use screenshots/21-generator.png>
-Package pdftex.def Info: screenshots/21-generator.png  used on input line 468.
+Package pdftex.def Info: screenshots/21-generator.png  used on input line 536.
 (pdftex.def)             Requested size: 469.44803pt x 237.90256pt.
 
-Overfull \hbox (2.16685pt too wide) in paragraph at lines 476--477
+Overfull \hbox (2.16685pt too wide) in paragraph at lines 544--545
 []\OT1/cmr/m/n/10.95 VigilAI's method-ol-ogy spans five in-ter-con-nected do-ma
 ins | the CV de-tec-tion pipeline, violation-
  []
 
-[10 <D:/Web Project/Flipkart/Round 2/doc/doc/screenshots/01-landing.png>]
-Overfull \hbox (44.31598pt too wide) in paragraph at lines 480--481
+[11 <./screenshots/01-landing.png>]
+Overfull \hbox (44.31598pt too wide) in paragraph at lines 548--549
 \OT1/cmr/m/n/10.95 cu-racy and VRAM foot-print. Two mod-els are per-ma-nently r
 es-i-dent (COCO for per-sons/vehicles/motorcycles
  []
 
-[11 <D:/Web Project/Flipkart/Round 2/doc/doc/screenshots/10-dashboard.png> <D:/
-Web Project/Flipkart/Round 2/doc/doc/screenshots/08-detect-upload.png>]
-[12 <D:/Web Project/Flipkart/Round 2/doc/doc/screenshots/11-violations.png> <D:
-/Web Project/Flipkart/Round 2/doc/doc/screenshots/12-evidence.png>]
-ignored error: Infinite glue shrinkage found in box being split [13 <D:/Web Pro
-ject/Flipkart/Round 2/doc/doc/screenshots/14-evidence-2.png> <D:/Web Project/Fl
-ipkart/Round 2/doc/doc/screenshots/13-analytics.png>]
-Underfull \hbox (badness 3396) in paragraph at lines 515--515
+[12 <./screenshots/10-dashboard.png> <./screenshots/08-detect-upload.png>]
+[13 <./screenshots/11-violations.png> <./screenshots/12-evidence.png>]
+ignored error: Infinite glue shrinkage found in box being split [14 <./screensh
+ots/14-evidence-2.png> <./screenshots/13-analytics.png>]
+Underfull \hbox (badness 3396) in paragraph at lines 583--583
 []|\OT1/cmr/m/n/10.95 COCO in-cludes over-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 515--516
+Underfull \hbox (badness 10000) in paragraph at lines 583--584
 []|\OT1/cmr/m/n/10.95 Evidence-gen
  []
 
 
-Underfull \hbox (badness 1881) in paragraph at lines 516--517
+Underfull \hbox (badness 1881) in paragraph at lines 584--585
 []|\OT1/cmr/m/n/10.95 Switch to Easy-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 518--519
+Underfull \hbox (badness 10000) in paragraph at lines 586--587
 []|\OT1/cmr/m/n/10.95 Tune
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 519--520
+Underfull \hbox (badness 10000) in paragraph at lines 587--588
 []|\OT1/cmr/m/n/10.95 Add tem-po-ral
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 520--521
+Underfull \hbox (badness 10000) in paragraph at lines 588--589
 []|\OT1/cmr/m/n/10.95 Screenshot fall-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 536--536
+Underfull \hbox (badness 10000) in paragraph at lines 604--604
 []|\OT1/cmr/m/n/10.95 Social-media posts are
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 538--539
+Underfull \hbox (badness 10000) in paragraph at lines 606--607
 []|\OT1/cmr/m/n/10.95 Officer cer-ti-fi-ca-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 541--541
+Underfull \hbox (badness 10000) in paragraph at lines 609--609
 []|\OT1/cmr/m/n/10.95 CCTV law-ful (S.143
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 541--542
+Underfull \hbox (badness 10000) in paragraph at lines 609--610
 []|\OT1/cmr/m/n/10.95 BTP au-tho-riza-
  []
 
-ignored error: Infinite glue shrinkage found in box being split [14]
-Underfull \hbox (badness 10000) in paragraph at lines 554--555
+ignored error: Infinite glue shrinkage found in box being split [15]
+Underfull \hbox (badness 10000) in paragraph at lines 622--623
 []|\OT1/cmr/m/n/10.95 Verify amend-
  []
 
 
-Overfull \hbox (3.80637pt too wide) in paragraph at lines 577--578
+Overfull \hbox (3.80637pt too wide) in paragraph at lines 645--646
 []|\OT1/cmr/bx/n/10.95 Priority| 
  []
 
-[15] [16 <D:/Web Project/Flipkart/Round 2/doc/doc/screenshots/15-map.png> <D:/W
-eb Project/Flipkart/Round 2/doc/doc/screenshots/16-dashboard-2.png>]
+[16] [17 <./screenshots/15-map.png> <./screenshots/16-dashboard-2.png>]
 Overfull \vbox (43.02443pt too high) has occurred while \output is active []
 
 
-[17 <D:/Web Project/Flipkart/Round 2/doc/doc/screenshots/19-video.png> <D:/Web 
-Project/Flipkart/Round 2/doc/doc/screenshots/17-citizen.png>] [18 <D:/Web Proje
-ct/Flipkart/Round 2/doc/doc/screenshots/22-scraper.png> <D:/Web Project/Flipkar
-t/Round 2/doc/doc/screenshots/18-tracking.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 641--641
+[18 <./screenshots/19-video.png> <./screenshots/17-citizen.png>] [19 <./screens
+hots/22-scraper.png> <./screenshots/18-tracking.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 709--709
 []|\OT1/cmr/m/n/10.95 8 junc-tions'
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 643--643
+Underfull \hbox (badness 10000) in paragraph at lines 711--711
 []|\OT1/cmr/m/n/10.95 Up to
  []
 
 
-Underfull \hbox (badness 1515) in paragraph at lines 643--644
+Underfull \hbox (badness 1515) in paragraph at lines 711--712
 []|\OT1/cmr/m/n/10.95 aggressive sce-nario es-ti-mate, not
  []
 
-[19 <D:/Web Project/Flipkart/Round 2/doc/doc/screenshots/20-deepfake.png> <D:/W
-eb Project/Flipkart/Round 2/doc/doc/screenshots/21-generator.png>] [20]
-[21] [22]
-(D:\Web Project\Flipkart\Round 2\doc\doc\hackathon-submission-document.aux)
+[20 <./screenshots/20-deepfake.png> <./screenshots/21-generator.png>] [21]
+LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <10.95> not available
+(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 780.
+
+[22] [23] (hackathon-submission-document.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `hackathon-submission-document.out' has not c
 hanged.
-(rerunfilecheck)             Checksum: 2C58DB1638E8604200288A9F8F2F159D;3611.
+(rerunfilecheck)             Checksum: DB7358B31A00AA223E4671EA250D710A;3745.
  ) 
 Here is how much of TeX's memory you used:
- 20591 strings out of 467871
- 399708 string characters out of 5417893
- 805477 words of memory out of 5000000
- 49040 multiletter control sequences out of 15000+600000
- 635876 words of font info for 67 fonts, out of 8000000 for 9000
+ 20599 strings out of 467871
+ 399427 string characters out of 5417893
+ 805534 words of memory out of 5000000
+ 49045 multiletter control sequences out of 15000+600000
+ 636211 words of font info for 68 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,8n,94p,816b,643s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,13n,94p,776b,643s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\Vedant\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcr
 m1095.pk> <C:\Users\Vedant\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi
-600\tcbx1200.pk><C:/Users/Vedant/AppData/Local/Programs/MiKTeX/fonts/type1/publ
-ic/amsfonts/cm/cmbx10.pfb><C:/Users/Vedant/AppData/Local/Programs/MiKTeX/fonts/
-type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Vedant/AppData/Local/Programs/MiK
-TeX/fonts/type1/public/amsfonts/cm/cmbx8.pfb><C:/Users/Vedant/AppData/Local/Pro
-grams/MiKTeX/fonts/type1/public/amsfonts/cm/cmbxti10.pfb><C:/Users/Vedant/AppDa
-ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Ve
-dant/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C
-:/Users/Vedant/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr
-10.pfb><C:/Users/Vedant/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
-ts/cm/cmr6.pfb><C:/Users/Vedant/AppData/Local/Programs/MiKTeX/fonts/type1/publi
-c/amsfonts/cm/cmr9.pfb><C:/Users/Vedant/AppData/Local/Programs/MiKTeX/fonts/typ
-e1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Vedant/AppData/Local/Programs/MiKTeX
-/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/Vedant/AppData/Local/Progr
-ams/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on "D:\Web Project\Flipkart\Round 2\doc\doc\hackathon-submission
--document.pdf" (26 pages, 7618403 bytes).
+600\tcrm1000.pk> <C:\Users\Vedant\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen
+/ec/dpi600\tcbx1200.pk><C:/Users/Vedant/AppData/Local/Programs/MiKTeX/fonts/typ
+e1/public/amsfonts/cm/cmbx10.pfb><C:/Users/Vedant/AppData/Local/Programs/MiKTeX
+/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Vedant/AppData/Local/Progr
+ams/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx8.pfb><C:/Users/Vedant/AppData/Lo
+cal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbxti10.pfb><C:/Users/Vedan
+t/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/U
+sers/Vedant/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12
+.pfb><C:/Users/Vedant/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts
+/cm/cmr10.pfb><C:/Users/Vedant/AppData/Local/Programs/MiKTeX/fonts/type1/public
+/amsfonts/cm/cmr6.pfb><C:/Users/Vedant/AppData/Local/Programs/MiKTeX/fonts/type
+1/public/amsfonts/cm/cmr9.pfb><C:/Users/Vedant/AppData/Local/Programs/MiKTeX/fo
+nts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Vedant/AppData/Local/Programs
+/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/Vedant/AppData/Loca
+l/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on hackathon-submission-document.pdf (28 pages, 7627944 bytes).
 PDF statistics:
- 522 PDF objects out of 1000 (max. 8388607)
- 110 named destinations out of 1000 (max. 500000)
- 483 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 558 PDF objects out of 1000 (max. 8388607)
+ 114 named destinations out of 1000 (max. 500000)
+ 499 words of extra memory for PDF output out of 10000 (max. 10000000)
 
