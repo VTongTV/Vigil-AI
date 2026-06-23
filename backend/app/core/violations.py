@@ -327,9 +327,6 @@ def detect_helmet_violations(
         # Only flag when: helmet model returned at least 1 detection somewhere
         # in the image (so the model is actually working), no confident
         # "With Helmet" found in head region, AND person confidence is high.
-        # If the helmet model returned zero detections anywhere, we cannot
-        # infer anything — the model simply didn't fire, which is not
-        # evidence of no helmet.
         elif (
             len(helmet_boxes) > 0
             and not has_confident_with_helmet
@@ -999,8 +996,15 @@ def detect_all_violations(
         )
 
     # Best-effort: Red-light violation (if signal is red and zones configured)
+    # Gate on traffic light detection: if COCO doesn't see a traffic light
+    # in the frame, the signal state from config is unreliable — skip red
+    # light violations to avoid FP on images without visible signals.
     red_light_violations = []
-    if stop_line_zones and signal_state == "red":
+    has_traffic_light = any(
+        d["class_id"] == 9 and d["confidence"] >= 0.15
+        for d in coco_detections
+    )
+    if stop_line_zones and signal_state == "red" and has_traffic_light:
         red_light_violations = detect_red_light_violations(
             all_vehicles, stop_line_zones, signal_state, img_w, img_h
         )
